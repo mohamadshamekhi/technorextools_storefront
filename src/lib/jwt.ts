@@ -30,6 +30,23 @@ function base64UrlDecode(segment: string): string {
   return Buffer.from(withPad, 'base64').toString('binary');
 }
 
+/**
+ * Dev-only escape hatch. While `abzar/api` auth is not wired up locally, this
+ * lets you browse the dashboard without a real API-issued session. Hard-gated to
+ * non-production — it can never take effect on a deployed build.
+ */
+export const DEV_SESSION_USER: SessionUser = {
+  id: 'dev-user',
+  email: 'dev@pumaair.local',
+  role: UserRole.SuperAdmin,
+  name: 'کاربر توسعه',
+};
+
+/** True when the dashboard auth gate should be short-circuited (dev machines only). */
+export function isDevAuthBypass(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.DEV_AUTH_BYPASS !== '0';
+}
+
 export function decodeToken(token: string): SessionUser | null {
   const segment = token.split('.')[1];
   if (!segment) return null;

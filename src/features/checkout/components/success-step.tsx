@@ -49,7 +49,7 @@ export function SuccessStep({ order }: { order: PlacedOrder }) {
           بازگشت به فروشگاه
         </Link>
         <Link
-          href={routes.contact}
+          href={routes.orderTracking}
           className="border-hairline inline-flex items-center gap-2 rounded-full border px-7 py-3.5 text-sm font-bold"
         >
           پیگیری سفارش

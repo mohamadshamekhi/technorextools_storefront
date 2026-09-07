@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: routes.about, priority: 0.7, changeFrequency: 'monthly' },
     { path: routes.contact, priority: 0.5, changeFrequency: 'monthly' },
     { path: routes.blog, priority: 0.8, changeFrequency: 'weekly' },
+    { path: routes.orderTracking, priority: 0.4, changeFrequency: 'monthly' },
     ...stockedCategories().map(
       (category): Entry => ({
         path: routes.category(category.slug),

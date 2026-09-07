@@ -20,7 +20,7 @@ export function PrimaryNav() {
           </Link>
         ))}
         <Link
-          href={routes.account}
+          href={routes.orderTracking}
           className="text-brand-600 me-auto flex items-center gap-1.5 whitespace-nowrap"
         >
           <Icon name="truck" className="size-4" />

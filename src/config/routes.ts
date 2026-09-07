@@ -12,6 +12,7 @@ export const routes = {
   search: '/search',
   cart: '/cart',
   checkout: '/checkout',
+  orderTracking: '/order-tracking',
   account: '/dashboard',
   blog: '/blog',
   blogPost: (slug: string) => `/blog/${slug}`,
@@ -50,6 +51,7 @@ export const PUBLIC_PATHS = [
   '/blog',
   '/cart',
   '/checkout',
+  '/order-tracking',
 ] as const;
 export const AUTH_PATHS = ['/login', '/register', '/forgot-password'] as const;
 export const DASHBOARD_PREFIX = '/dashboard';

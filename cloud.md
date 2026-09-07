@@ -5,6 +5,62 @@
 
 ---
 
+## 2026-09-07 — Dev-only dashboard auth bypass
+
+`abzar/api` auth is not runnable locally, so `/dashboard/*` was unreachable. Added a
+hard dev-gated escape hatch: a mock super-admin session (`DEV_SESSION_USER`) that
+stands in when there is no real API-issued session.
+
+- **`lib/jwt.ts`** (edge-pure): `DEV_SESSION_USER` + `isDevAuthBypass()` —
+  `NODE_ENV !== 'production' && process.env.DEV_AUTH_BYPASS !== '0'`. Cannot ever
+  fire on a production build.
+- **`lib/session.ts`**: `getSession()` falls back to `DEV_SESSION_USER` when no
+  cookie/token and bypass is on.
+- **`middleware.ts`**: same fallback for the Edge gate; the auth-route redirect
+  still keys off the *real* token so `/login` stays reachable while bypassing.
+- **`app/api/auth/me/route.ts`**: on `authApi.me()` failure, returns the mock
+  session instead of 502 when bypass is on (keeps client `useCurrentUser` happy).
+- **`.env.example` / `.env.local`**: `DEV_AUTH_BYPASS=1` documented; set `0` to
+  exercise the real gate in dev.
+
+No new components or state flow. Remove this once real auth is wired.
+
+---
+
+## 2026-09-07 — Order tracking (`/order-tracking`) — new `features/order-tracking/`
+
+Implemented the last un-built mockup ("Puma Air Order Tracking"): a public guest
+lookup of an order's fulfilment status by order code + mobile number. No auth, no
+DB — fixture-backed, ready to swap for an `abzar/api` call.
+
+### Route
+
+- **`(public)/order-tracking/page.tsx`** — RSC. `buildMetadata` (indexable) +
+  `breadcrumbSchema([خانه, پیگیری سفارش])`. Renders the one client island.
+
+### `features/order-tracking/`
+
+| Area | Files |
+| --- | --- |
+| types | `trackingFormSchema` (Zod: `PA-######` code + `09xxxxxxxxx` mobile), `TrackedOrder` / `TimelineStep` / `TrackedItem` / `TrackingStatus` |
+| data | `orders.ts` — `DEMO_ORDERS` fixture + `findDemoOrder(code, mobile)` (case-insensitive code, exact mobile) |
+| hooks | `use-order-tracking.ts` — `safeParse` → `findDemoOrder` → `{ order, error }` |
+| components | `order-tracking-view` (client orchestrator) → `tracking-hero` → `tracking-form` (client, 2 inputs + submit + alert); `tracking-result` → `tracking-timeline` (flex dot-rail, done = index ≤ current status), `shipping-info` (carrier + `IR…` parcel no.), `tracked-items` |
+| index.ts | exports `OrderTrackingView`, `trackingFormSchema`, `TrackedOrder`/`TrackingStatus` |
+
+State flow: all state client-side in `useOrderTracking` (owned by
+`OrderTrackingView`). Form fields are local `useState` in `TrackingForm`, lifted to
+the hook only on submit. No store slice, no URL state, no server round-trip — the
+result panel mounts conditionally when a fixture matches.
+
+Wiring: `routes.orderTracking = '/order-tracking'` (+ `PUBLIC_PATHS`); `PrimaryNav`
+"پیگیری سفارش" link and checkout `SuccessStep` "پیگیری سفارش" link both repointed
+here (were `/dashboard` and `/contact`); `sitemap.ts` += route (0.4 monthly).
+
+Verified: `typecheck` + `lint` + `build` green.
+
+---
+
 ## 2026-09-07 — Journal/blog (`/blog` + `/blog/[slug]`) — new `journal-page/` family
 
 Replaced the placeholder journal with the full "مجله پوما ایر" (mockup "Puma Air Blog").

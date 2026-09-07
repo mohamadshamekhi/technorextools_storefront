@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { ApiError } from '@/lib/api-client';
+import { isDevAuthBypass } from '@/lib/jwt';
 import { getSession } from '@/lib/session';
 import { authApi } from '@/features/auth/services/auth.api';
 
@@ -20,6 +21,10 @@ export async function GET() {
     const user = await authApi.me();
     return NextResponse.json(user);
   } catch (error) {
+    // Dev bypass: `abzar/api` is usually not running locally — serve the mock session.
+    if (isDevAuthBypass()) {
+      return NextResponse.json(session);
+    }
     const status = error instanceof ApiError ? error.status : 502;
     return NextResponse.json({ message: 'Failed to resolve user' }, { status });
   }
