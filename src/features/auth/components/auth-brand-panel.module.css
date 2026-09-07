@@ -1,0 +1,50 @@
+.ring {
+  position: absolute;
+  inset: -3%;
+  border: 1px dashed oklch(1 0 0 / 0.14);
+  border-radius: 50%;
+  animation: spin 50s linear infinite;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  bottom: -140px;
+  inset-inline-start: -100px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(0.7 0.13 45 / 0.22) 0%, transparent 68%);
+  animation: blob 17s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .blob,
+  .float {
+    animation: none;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blob {
+  50% {
+    transform: translate(22px, -26px) scale(1.1);
+  }
+}
+
+@keyframes float {
+  50% {
+    transform: translateY(-14px);
+  }
+}

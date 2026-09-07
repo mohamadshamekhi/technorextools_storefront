@@ -1,0 +1,18 @@
+import { routes } from '@/config/routes';
+
+import { UNREAD_COUNT } from './notifications';
+import type { AccountNavItem } from '../types';
+
+export const ACCOUNT_NAV: AccountNavItem[] = [
+  { href: routes.dashboard.root, label: 'خلاصه داشبورد', icon: 'grid' },
+  { href: routes.dashboard.orders, label: 'سفارش‌های من', icon: 'box' },
+  { href: routes.dashboard.addresses, label: 'آدرس‌های من', icon: 'pin' },
+  { href: routes.dashboard.profile, label: 'اطلاعات حساب', icon: 'user' },
+  { href: routes.dashboard.wishlist, label: 'علاقه‌مندی‌ها', icon: 'heart' },
+  {
+    href: routes.dashboard.notifications,
+    label: 'نوتیفیکیشن‌ها',
+    icon: 'bell',
+    badge: UNREAD_COUNT || undefined,
+  },
+];

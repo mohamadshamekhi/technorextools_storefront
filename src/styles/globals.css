@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+@import './animations.css';
+
+/* ── Design tokens (Tailwind v4 CSS-first theme) ─────────────────── */
+@theme {
+  /* Brand — pneumatic-tool rust/orange */
+  --color-brand-50: oklch(0.965 0.02 55);
+  --color-brand-100: oklch(0.92 0.055 52);
+  --color-brand-400: oklch(0.74 0.16 47);
+  --color-brand-500: oklch(0.68 0.19 45);
+  --color-brand-600: oklch(0.62 0.19 45);
+  --color-brand-700: oklch(0.5 0.16 43);
+
+  /* Accent — machined gold */
+  --color-accent-400: oklch(0.82 0.14 66);
+  --color-accent-500: oklch(0.78 0.16 60);
+
+  /* Semantic signals */
+  --color-ink: oklch(0.22 0.02 70);
+  --color-sale: oklch(0.55 0.2 25);
+  --color-info: oklch(0.55 0.15 250);
+
+  /* Surfaces & text */
+  --color-surface: oklch(1 0 0);
+  --color-surface-muted: oklch(0.975 0.008 85);
+  --color-surface-sunken: oklch(0.955 0.008 85);
+  --color-foreground: oklch(0.22 0.02 70);
+  --color-foreground-muted: oklch(0.48 0.02 70);
+  --color-hairline: oklch(0.92 0.008 85);
+
+  --radius-card: 1.375rem;
+
+  --font-sans:
+    var(--font-vazirmatn), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  --font-display:
+    var(--font-space-grotesk), var(--font-vazirmatn), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* The storefront is a committed light design (warm off-white). Dark-mode
+   theming is reserved for the authenticated dashboard. */
+
+/* ── Base layer ─────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-surface-muted);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+}

@@ -1,0 +1,22 @@
+@keyframes newsletter-blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(18px, -22px) scale(1.08);
+  }
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset-block-start: -120px;
+  inset-inline-start: -60px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: oklch(1 0 0 / 0.12);
+  animation: newsletter-blob 16s ease-in-out infinite;
+  pointer-events: none;
+}

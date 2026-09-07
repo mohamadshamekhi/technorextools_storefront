@@ -1,0 +1,10 @@
+.surface {
+  background-color: oklch(0.93 0.006 85);
+  background-image: repeating-linear-gradient(
+    135deg,
+    oklch(0.9 0.008 85) 0,
+    oklch(0.9 0.008 85) 11px,
+    oklch(0.86 0.01 75) 11px,
+    oklch(0.86 0.01 75) 22px
+  );
+}

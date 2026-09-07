@@ -1,0 +1,33 @@
+.viewport {
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  flex-wrap: nowrap;
+}
+
+.track.slow {
+  animation: marquee-forward 46s linear infinite;
+}
+.track.normal {
+  animation: marquee-forward 30s linear infinite;
+}
+.track.fast {
+  animation: marquee-forward 20s linear infinite;
+}
+
+.track.reverse.slow {
+  animation-name: marquee-reverse;
+}
+.track.reverse.normal {
+  animation-name: marquee-reverse;
+}
+.track.reverse.fast {
+  animation-name: marquee-reverse;
+}
+
+.viewport:hover .track {
+  animation-play-state: paused;
+}
