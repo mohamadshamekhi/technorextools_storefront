@@ -9,12 +9,22 @@ export function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={routes.blogPost(article.slug)}
-      className="border-hairline bg-surface block overflow-hidden rounded-card border transition-[transform,box-shadow] duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+      className="border-hairline bg-surface group block overflow-hidden rounded-card border shadow-(--shadow-soft) transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:border-brand-300 hover:shadow-(--shadow-float)"
     >
-      <MediaPlaceholder label="عکس مقاله" className="aspect-[16/10] text-[12px]" />
+      <div className="overflow-hidden">
+        <MediaPlaceholder
+          label="عکس مقاله"
+          className="aspect-[16/10] text-[12px] transition-transform duration-500 group-hover:scale-[1.05]"
+        />
+      </div>
       <div className="p-5">
-        <p className="text-brand-600 mb-2.5 text-[12px] font-bold">{article.date}</p>
-        <h3 className="text-[17px] leading-relaxed font-bold text-balance">{article.title}</h3>
+        <p className="text-brand-600 mb-2.5 flex items-center gap-1.5 text-[12px] font-bold">
+          <span className="bg-brand-500 size-1 rounded-full" aria-hidden />
+          {article.date}
+        </p>
+        <h3 className="group-hover:text-brand-700 text-[17px] leading-relaxed font-bold text-balance transition-colors">
+          {article.title}
+        </h3>
       </div>
     </Link>
   );

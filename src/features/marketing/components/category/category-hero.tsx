@@ -30,9 +30,14 @@ export function CategoryHero({ category, count }: CategoryHeroProps) {
         <span className="text-foreground font-semibold">{category.title}</span>
       </nav>
 
-      <div className="border-hairline bg-surface rounded-card flex flex-col gap-5 border p-6 shadow-sm sm:flex-row sm:items-center sm:gap-7 sm:p-8">
+      <div className="border-hairline bg-surface rounded-card relative flex flex-col gap-5 overflow-hidden border p-6 shadow-(--shadow-soft) sm:flex-row sm:items-center sm:gap-7 sm:p-8">
         <span
-          className="grid size-16 shrink-0 place-items-center rounded-2xl sm:size-[70px]"
+          aria-hidden
+          className="absolute -end-16 -top-16 size-40 rounded-full opacity-40 blur-2xl"
+          style={{ backgroundColor: category.tint }}
+        />
+        <span
+          className="relative grid size-16 shrink-0 place-items-center rounded-2xl shadow-(--shadow-soft) ring-1 ring-black/5 sm:size-[70px]"
           style={{ backgroundColor: category.tint, color: category.ink }}
         >
           <Icon name={category.icon} className="size-8" />
@@ -45,8 +50,8 @@ export function CategoryHero({ category, count }: CategoryHeroProps) {
           </p>
         </div>
 
-        <div className="border-hairline flex shrink-0 items-center gap-3 border-t pt-4 sm:flex-col sm:gap-0.5 sm:border-t-0 sm:border-s sm:ps-7">
-          <span className="text-brand-600 font-display text-2xl font-bold">
+        <div className="border-hairline relative flex shrink-0 items-center gap-3 border-t pt-4 sm:flex-col sm:gap-0.5 sm:border-t-0 sm:border-s sm:ps-7">
+          <span className="text-gradient-brand font-display text-2xl font-black">
             {toPersianDigits(count)}
           </span>
           <span className="text-foreground-muted text-[12px]">محصول در این دسته</span>

@@ -14,7 +14,7 @@
   width: 380px;
   height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, oklch(0.7 0.13 45 / 0.22) 0%, transparent 68%);
+  background: radial-gradient(circle, oklch(0.7 0.17 262 / 0.28) 0%, transparent 68%);
   animation: blob 17s ease-in-out infinite;
   pointer-events: none;
 }

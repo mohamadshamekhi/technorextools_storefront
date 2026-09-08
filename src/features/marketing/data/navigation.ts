@@ -7,19 +7,20 @@ export const PRIMARY_NAV: NavItem[] = [
   { label: 'همه محصولات', href: routes.products },
   { label: 'دسته‌بندی‌ها', href: anchor('categories') },
   { label: 'پیشنهاد شگفت‌انگیز', href: anchor('deals') },
-  { label: 'درباره ما', href: anchor('about') },
-  { label: 'نظر مشتریان', href: anchor('voices') },
-  { label: 'مجله پوما', href: anchor('journal') },
+  { label: 'مجله پوما', href: routes.blog },
+  { label: 'درباره ما', href: routes.about },
+  { label: 'تماس با ما', href: routes.contact },
 ];
 
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: 'دسترسی سریع',
     links: [
-      { label: 'درباره ما', href: anchor('about') },
+      { label: 'درباره ما', href: routes.about },
       { label: 'همه محصولات', href: routes.products },
-      { label: 'مجله پوما', href: anchor('journal') },
-      { label: 'نمایندگی و همکاری', href: anchor('contact') },
+      { label: 'مجله پوما', href: routes.blog },
+      { label: 'پیگیری سفارش', href: routes.orderTracking },
+      { label: 'نمایندگی و همکاری', href: routes.contact },
     ],
   },
   {

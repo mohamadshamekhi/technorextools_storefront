@@ -4,8 +4,8 @@ import type { ValueProp as ValuePropData } from '../../types';
 
 export function ValueProp({ item }: { item: ValuePropData }) {
   return (
-    <div className="flex items-center gap-3.5">
-      <span className="bg-brand-50 text-brand-600 grid size-12 shrink-0 place-items-center rounded-2xl">
+    <div className="group flex items-center gap-3.5">
+      <span className="bg-brand-50 text-brand-600 ring-brand-100 grid size-12 shrink-0 place-items-center rounded-2xl ring-1 transition-colors group-hover:bg-brand-500 group-hover:text-white">
         <Icon name={item.icon} className="size-6" />
       </span>
       <div>

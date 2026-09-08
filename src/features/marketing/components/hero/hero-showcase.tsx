@@ -1,5 +1,6 @@
 import { MediaPlaceholder } from '@/components/atoms';
 
+import { PRODUCT_SHOT } from '../../data/media';
 import { HeroFloatingCard } from './hero-floating-card';
 import styles from './hero.module.css';
 
@@ -7,10 +8,17 @@ import styles from './hero.module.css';
 export function HeroShowcase() {
   return (
     <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+      <div
+        aria-hidden
+        className="absolute inset-6 -z-10 rounded-full bg-(image:--gradient-brand) opacity-25 blur-3xl"
+      />
       <div className={styles.ring} aria-hidden />
       <MediaPlaceholder
-        label="تصویر شاخص محصول (بکس بادی)"
-        className="border-hairline aspect-square rounded-[1.75rem] border shadow-2xl"
+        label="پیچ‌گوشتی بادی پوما ایر"
+        src={PRODUCT_SHOT}
+        priority
+        sizes="(max-width: 1024px) 90vw, 45vw"
+        className="aspect-square rounded-[2rem] shadow-(--shadow-float) ring-1 ring-hairline"
       />
       <HeroFloatingCard
         icon="bolt"

@@ -19,9 +19,9 @@ export function OrderSummary() {
   const totals = useCartTotals(shipping, coupon.applied);
 
   return (
-    <div className="border-hairline bg-surface rounded-card border p-6 shadow-sm lg:sticky lg:top-24">
+    <div className="border-hairline bg-surface rounded-card border p-6 shadow-(--shadow-lift) lg:sticky lg:top-24">
       <div className="mb-4.5 flex items-center gap-2.5">
-        <span className="bg-brand-50 text-brand-600 flex size-8 items-center justify-center rounded-lg">
+        <span className="bg-brand-50 text-brand-600 ring-brand-100 flex size-8 items-center justify-center rounded-lg ring-1">
           <Icon name="cart" className="size-4" />
         </span>
         <p className="text-[15px] font-black">خلاصه سفارش</p>

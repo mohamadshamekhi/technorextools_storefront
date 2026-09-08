@@ -4,10 +4,10 @@ import type { StatCard as StatCardData } from '../types';
 
 export function StatCard({ card }: { card: StatCardData }) {
   return (
-    <div className="border-hairline bg-surface rounded-2xl border p-5 shadow-sm">
+    <div className="border-hairline bg-surface rounded-2xl border p-5 shadow-(--shadow-soft) transition-shadow hover:shadow-(--shadow-lift)">
       <div className="mb-3.5 flex items-center justify-between">
         <span
-          className="grid size-9 place-items-center rounded-xl"
+          className="grid size-9 place-items-center rounded-xl ring-1 ring-black/5"
           style={{ backgroundColor: card.tint, color: card.ink }}
         >
           <Icon name={card.icon} className="size-[18px]" />

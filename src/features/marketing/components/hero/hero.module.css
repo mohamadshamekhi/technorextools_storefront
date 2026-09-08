@@ -62,26 +62,26 @@
   filter: blur(4px);
 }
 .blobWarm {
-  inset-block-start: -150px;
-  inset-inline-start: -90px;
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, oklch(0.82 0.13 60 / 0.5) 0%, transparent 68%);
+  inset-block-start: -160px;
+  inset-inline-start: -110px;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, oklch(0.7 0.19 260 / 0.42) 0%, transparent 68%);
   animation: hero-blob 15s ease-in-out infinite;
 }
 .blobCool {
-  inset-block-end: -190px;
-  inset-inline-end: -70px;
-  width: 460px;
-  height: 460px;
-  background: radial-gradient(circle, oklch(0.78 0.1 250 / 0.36) 0%, transparent 68%);
+  inset-block-end: -200px;
+  inset-inline-end: -90px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, oklch(0.84 0.16 82 / 0.4) 0%, transparent 68%);
   animation: hero-blob 19s ease-in-out infinite;
 }
 
 .ring {
   position: absolute;
   inset: -3%;
-  border: 1px dashed oklch(0.68 0.19 45 / 0.32);
+  border: 1px dashed oklch(0.56 0.21 261 / 0.35);
   border-radius: 50%;
   animation: hero-spin 46s linear infinite;
 }

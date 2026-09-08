@@ -15,8 +15,10 @@ export type PillLinkProps = LinkProps &
   };
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-brand-500 text-white shadow-lg shadow-brand-500/30 hover:bg-brand-600',
-  outline: 'border border-hairline hover:border-brand-500 text-foreground',
+  primary:
+    'bg-brand-500 bg-(image:--gradient-brand) text-white shadow-(--shadow-brand) hover:-translate-y-0.5',
+  outline:
+    'bg-surface border border-hairline text-foreground shadow-(--shadow-soft) hover:border-brand-300 hover:-translate-y-0.5',
   ghost: 'text-brand-600 hover:text-brand-700',
 };
 
@@ -36,7 +38,7 @@ export function PillLink({
   return (
     <Link
       className={cn(
-        'inline-flex items-center justify-center rounded-full font-bold transition-colors',
+        'inline-flex items-center justify-center rounded-full font-bold transition-[transform,box-shadow,background-color,border-color] duration-200',
         VARIANTS[variant],
         SIZES[size],
         className,

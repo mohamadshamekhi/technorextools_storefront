@@ -1,7 +1,7 @@
 import { Container, Icon, PillLink } from '@/components/atoms';
 import { Reveal } from '@/components/molecules';
+import { routes } from '@/config/routes';
 
-import { anchor } from '../../anchors';
 import { HeroBadge } from './hero-badge';
 import { HeroHeadline } from './hero-headline';
 import { HeroShowcase } from './hero-showcase';
@@ -10,7 +10,10 @@ import styles from './hero.module.css';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden py-16 sm:py-20" aria-labelledby="hero-heading">
+    <section
+      className="relative overflow-hidden py-16 sm:py-24 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)]"
+      aria-labelledby="hero-heading"
+    >
       <span className={styles.blobWarm} aria-hidden />
       <span className={styles.blobCool} aria-hidden />
       <Container className="relative grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
@@ -25,11 +28,11 @@ export function Hero() {
             فنی رایگان پیش از خرید.
           </p>
           <div className="flex flex-wrap gap-3.5">
-            <PillLink href={anchor('products')} size="lg">
+            <PillLink href={routes.products} size="lg">
               <Icon name="cart" className="size-[18px]" />
               مشاهدهٔ محصولات
             </PillLink>
-            <PillLink href={anchor('contact')} size="lg" variant="outline">
+            <PillLink href={routes.contact} size="lg" variant="outline">
               <Icon name="headset" className="text-brand-600 size-[18px]" />
               مشاورهٔ رایگان خرید
             </PillLink>

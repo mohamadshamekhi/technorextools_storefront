@@ -28,7 +28,7 @@ export function DealsCountdown() {
   return (
     <div className="flex gap-2" dir="ltr">
       {units.map((unit) => (
-        <div key={unit.label} className="text-sale min-w-[52px] rounded-xl bg-white px-3 py-2 text-center">
+        <div key={unit.label} className="text-sale min-w-[52px] rounded-xl bg-white px-3 py-2 text-center shadow-(--shadow-soft)">
           <div className="font-display text-xl leading-none font-bold">{unit.value}</div>
           <div className="text-foreground-muted mt-1 text-[10px]">{unit.label}</div>
         </div>

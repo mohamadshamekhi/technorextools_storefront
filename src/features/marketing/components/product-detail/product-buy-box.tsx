@@ -48,7 +48,7 @@ export function ProductBuyBox({ product, detail }: ProductBuyBoxProps) {
   };
 
   return (
-    <div className="border-hairline bg-surface rounded-card border p-6 lg:sticky lg:top-24">
+    <div className="border-hairline bg-surface rounded-card border p-6 shadow-(--shadow-lift) lg:sticky lg:top-24">
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
         <span className="bg-brand-50 text-brand-700 rounded-full px-3 py-1 text-[12px] font-bold">
           {product.brand}
@@ -96,7 +96,7 @@ export function ProductBuyBox({ product, detail }: ProductBuyBoxProps) {
           type="button"
           onClick={handleAdd}
           disabled={!product.inStock}
-          className="bg-brand-500 hover:bg-brand-600 flex h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-extrabold text-white transition-colors disabled:opacity-50"
+          className="bg-brand-500 bg-(image:--gradient-brand) shadow-(--shadow-brand) flex h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-extrabold text-white transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-50"
         >
           <Icon name={added ? 'check' : 'cart'} className="size-4" />
           {added ? 'به سبد اضافه شد' : 'افزودن به سبد خرید'}

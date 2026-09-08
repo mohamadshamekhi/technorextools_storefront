@@ -15,7 +15,7 @@ export function ProductCard({ product }: { product: Product }) {
   const href = routes.product(product.id);
 
   return (
-    <article className="border-hairline bg-surface hover:border-brand-500/45 relative flex flex-col overflow-hidden rounded-card border transition-[transform,box-shadow] duration-300 hover:-translate-y-2 hover:shadow-2xl">
+    <article className="border-hairline bg-surface hover:border-brand-300 relative flex flex-col overflow-hidden rounded-card border shadow-(--shadow-soft) transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-2 hover:shadow-(--shadow-float)">
       {product.badge ? <ProductBadge badge={product.badge} /> : null}
       <WishlistButton title={product.title} />
       <Link href={href} aria-label={product.title} tabIndex={-1}>

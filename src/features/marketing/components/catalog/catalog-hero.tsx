@@ -14,11 +14,13 @@ export function CatalogHero() {
         <span aria-hidden>/</span>
         <span className="text-foreground font-semibold">همه محصولات</span>
       </nav>
-      <p className="text-brand-600 font-display mb-2 flex items-center gap-2 text-xs tracking-[0.2em]">
+      <p className="text-brand-600 font-display ring-brand-100 mb-3 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold tracking-[0.18em] ring-1">
         <Icon name="bolt" className="size-3.5" />
         PUMA AIR CATALOG
       </p>
-      <h1 className="text-3xl font-black tracking-tight sm:text-[2.35rem]">همه محصولات</h1>
+      <h1 className="text-3xl font-black tracking-tight text-balance sm:text-[2.4rem]">
+        همه <span className="text-gradient-brand">محصولات</span>
+      </h1>
       <p className="text-foreground-muted mt-3 max-w-2xl text-sm leading-relaxed">
         مجموعه کامل ابزار بادی و شارژی صنعتی پوما ایر با گارانتی اصالت کالا، ارسال سریع به سراسر
         ایران و پشتیبانی فنی. با فیلترهای دسته‌بندی، برند، قیمت و امتیاز، سریع‌تر به ابزار مورد

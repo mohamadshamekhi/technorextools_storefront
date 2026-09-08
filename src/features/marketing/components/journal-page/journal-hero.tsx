@@ -28,8 +28,8 @@ export function CategoryTabs({ active }: CategoryTabsProps) {
             className={cn(
               'rounded-full border px-5 py-2.5 text-[13.5px] font-bold transition-colors',
               isActive
-                ? 'border-brand-500 bg-brand-500 text-white'
-                : 'border-hairline bg-surface text-foreground-muted hover:border-brand-400 hover:text-foreground',
+                ? 'border-brand-500 bg-brand-500 bg-(image:--gradient-brand) text-white shadow-(--shadow-brand)'
+                : 'border-hairline bg-surface text-foreground-muted shadow-(--shadow-soft) hover:border-brand-300 hover:text-foreground',
             )}
           >
             {tab.label}
@@ -43,17 +43,17 @@ export function CategoryTabs({ active }: CategoryTabsProps) {
 /** Journal hero — identity block, quick stats and the filter tabs. */
 export function JournalHero({ activeCategory }: { activeCategory?: string }) {
   return (
-    <section className="relative overflow-hidden pt-14">
+    <section className="relative overflow-hidden pt-14 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)]">
       <div
         aria-hidden
-        className="animate-blob pointer-events-none absolute -top-[150px] -left-[100px] size-[420px] rounded-full bg-[radial-gradient(circle,oklch(0.82_0.13_60/0.28)_0%,transparent_68%)]"
+        className="animate-blob pointer-events-none absolute -top-[150px] -left-[100px] size-[420px] rounded-full bg-[radial-gradient(circle,oklch(0.7_0.19_260/0.24)_0%,transparent_68%)]"
       />
       <Container className="relative">
-        <div className="mb-2.5 flex items-center gap-2.5">
-          <span className="bg-brand-50 text-brand-600 grid size-[34px] place-items-center rounded-[11px]">
+        <div className="mb-3 flex items-center gap-2.5">
+          <span className="bg-brand-500 bg-(image:--gradient-brand) text-white shadow-(--shadow-brand) grid size-[34px] place-items-center rounded-[11px]">
             <Icon name="doc" className="size-[17px]" />
           </span>
-          <span className="font-display text-brand-600 text-[13px] tracking-[0.2em]">
+          <span className="font-display text-brand-600 ring-brand-100 rounded-full bg-brand-50 px-3 py-1 text-[12px] font-bold tracking-[0.18em] ring-1">
             PUMA AIR JOURNAL
           </span>
         </div>

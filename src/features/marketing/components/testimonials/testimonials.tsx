@@ -20,9 +20,15 @@ export function Testimonials() {
   }, []);
 
   return (
-    <section id={SECTION.voices} aria-labelledby="voices-heading" className="bg-ink scroll-mt-24 py-24 text-white">
-      <Container className="mx-auto max-w-2xl text-center">
-        <span className="font-display text-accent-500 text-xs tracking-[0.2em]">CUSTOMERS</span>
+    <section
+      id={SECTION.voices}
+      aria-labelledby="voices-heading"
+      className="surface-ink texture-grid scroll-mt-24 py-24 text-white"
+    >
+      <Container className="relative mx-auto max-w-2xl text-center">
+        <span className="font-display text-accent-500 inline-block rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold tracking-[0.2em]">
+          CUSTOMERS
+        </span>
         <h2 id="voices-heading" className="mt-3 mb-10 text-[2.1rem] font-black tracking-tight">
           حرف حساب از زبان کاربران
         </h2>

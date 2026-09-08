@@ -12,7 +12,7 @@ export function BrandStrip() {
         {PARTNER_BRANDS.map((brand) => (
           <span
             key={brand}
-            className="border-hairline font-display text-foreground-muted mx-3 grid h-14 w-40 shrink-0 place-items-center rounded-2xl border text-[15px] font-bold"
+            className="border-hairline bg-surface font-display text-foreground-muted hover:text-brand-600 mx-3 grid h-14 w-40 shrink-0 place-items-center rounded-2xl border text-[15px] font-bold shadow-(--shadow-soft) transition-colors"
           >
             {brand}
           </span>

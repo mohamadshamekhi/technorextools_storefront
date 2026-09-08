@@ -15,7 +15,7 @@ export function NewsletterCta() {
 
   return (
     <Container as="section" className="py-20" aria-labelledby="newsletter-heading">
-      <Reveal className={cn(styles.panel, 'bg-brand-500 relative grid items-center gap-11 overflow-hidden rounded-[2rem] p-12 text-white shadow-2xl lg:grid-cols-2')}>
+      <Reveal className={cn(styles.panel, 'bg-brand-600 bg-(image:--gradient-brand) relative grid items-center gap-11 overflow-hidden rounded-[2rem] p-12 text-white shadow-(--shadow-float) lg:grid-cols-2')}>
         <div className="relative">
           <h2 id="newsletter-heading" className="mb-3 text-[2.1rem] leading-tight font-black tracking-tight">
             اول از تخفیف‌ها باخبر شو
@@ -43,7 +43,7 @@ export function NewsletterCta() {
               <button
                 type="submit"
                 disabled={pending}
-                className="bg-ink rounded-full px-8 py-4 text-[15px] font-extrabold text-white transition-opacity disabled:opacity-60"
+                className="bg-accent-500 text-ink rounded-full px-8 py-4 text-[15px] font-extrabold shadow-(--shadow-accent) transition-[transform,opacity] hover:-translate-y-0.5 disabled:opacity-60"
               >
                 {pending ? 'در حال ثبت…' : 'عضویت'}
               </button>

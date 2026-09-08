@@ -5,6 +5,135 @@
 
 ---
 
+## 2026-09-07 — Real product photography wired into the media slots
+
+- **`MediaPlaceholder`** now takes optional `src` / `fit` / `sizes` / `priority`.
+  With `src` it renders a `next/image` (`fill`, `object-contain p-[7%]`) over a
+  calm cobalt-tinted `.photo` backdrop (which shows through if the file is
+  missing); without it, the striped stand-in is unchanged.
+- **`features/marketing/data/media.ts`** — `PRODUCT_SHOT =
+  '/products/puma-air-screwdriver.png'` (one shared hero shot for now).
+- Wired into: `hero-showcase` (priority), `products/product-media` (home + catalog
+  cards), `flash-deals/deal-card`, `product-detail/product-gallery` (main image +
+  photo thumbs).
+- `public/products/README.md` documents the expected file. **Manual step:** drop
+  the screwdriver PNG at `public/products/puma-air-screwdriver.png` — no
+  `next.config` change needed (local asset).
+
+Verified: `typecheck` + `lint` + `build` green.
+
+---
+
+## 2026-09-07 — `/contact` page built out from the mockup ("Puma Air Contact")
+
+Replaced the earlier stub with the full contact page, adapted to the cobalt/amber
+system. New feature `features/contact/`:
+
+- **types/index.ts** — `CONTACT_SUBJECTS` (4 chips) + `contactFormSchema`
+  (Zod: name ≥ 2, `09xxxxxxxxx` phone, message ≥ 5).
+- **data/contact.ts** — `CONTACT_CHANNELS` (phone / email / address / hours) +
+  `WORK_HOURS`.
+- **hooks/use-contact-form.ts** — owns fields + field errors + `submitted` flag.
+- **components** — `contact-hero` (blob + gradient headline), `contact-channels`
+  (4 cards, RSC, link when a channel has an href), `contact-form` (client) →
+  `subject-chips` + `contact-sent` (success panel); `contact-info-panel` (RSC:
+  map `MediaPlaceholder` `#location`, working-hours card, support prompt).
+- **index.ts** barrel.
+
+Route: `(public)/contact/page.tsx` — RSC; `buildMetadata` + `localBusinessSchema`
++ breadcrumb JSON-LD; hero + channels + `lg:grid-cols-2` (form | info panel).
+
+State flow: all client state in `useContactForm` (owned by `ContactForm`); subject
+is local UI state (not validated); on valid submit the form swaps to `ContactSent`.
+No server action, no store.
+
+Verified: `typecheck` + `lint` + `build` green.
+
+---
+
+## 2026-09-07 — Navigation / page-linking fixes
+
+Site links were partly broken off the homepage.
+
+- **`anchors.ts`**: `anchor()` now returns root-absolute `/#id` (was bare `#id`,
+  which only scrolls while already on `/`). Fixes every home-section link used in
+  the header nav, footer, hero and promo cards when clicked from another route.
+- **`data/navigation.ts` `PRIMARY_NAV`**: repointed to real pages — "مجله پوما" →
+  `/blog`, "درباره ما" → `/about`, added "تماس با ما" → `/contact` (dropped the
+  dead "نظر مشتریان" `#voices` nav entry; section still exists on home).
+- **`FOOTER_COLUMNS` "دسترسی سریع"**: all entries now real routes (`/about`,
+  `/products`, `/blog`, `/order-tracking`, `/contact`) instead of `#` anchors.
+- **`/contact` page created** (`(public)/contact/page.tsx`) — was referenced by
+  `routes.contact`, `sitemap.ts`, `about-cta` and hero but never existed (404).
+  Persian "تماس با ما"; phone/whatsapp/email channel cards, `surface-ink` address
+  block, social links; `localBusinessSchema` + breadcrumb JSON-LD.
+- **`hero.tsx`** / **`promo-card.tsx`** / **`flash-deals.tsx`**: `#contact` /
+  `#products` CTAs repointed to `routes.contact` / `routes.products`.
+
+Verified: `typecheck` + `lint` + `build` green.
+
+---
+
+## 2026-09-07 — Deep visual redesign: light "cobalt + hi-vis amber" system
+
+Full-project restyle at the user's request ("make it striking, not simple; very
+important"). Direction locked: **stay light**, fresh palette, drama from
+dark-colored *sections* not a dark theme. See memory `redesign-direction-2026-09`.
+
+### Token system — `src/styles/globals.css`
+
+- **Brand pivot** rust-orange → **electric cobalt** (`--color-brand-50..700`).
+- **Accent** machined-gold → **hi-vis amber** (`--color-accent-100..600`).
+- New: `--color-ink` / `--color-ink-soft` / `--color-surface-inverse` /
+  `--color-hairline-inverse` for dark sections; cool near-white surfaces re-tinted
+  to hue 260; `--color-success/-sale/-info` promoted to real tokens.
+- **Elevation scale**: `--shadow-soft / -lift / -float / -brand / -accent`.
+- **Signature gradients**: `--gradient-brand`, `--gradient-spark`, `--gradient-ink`.
+- New `@utility`s: `surface-ink` (ink gradient bg), `texture-grid` (engineered grid
+  overlay for dark sections), `text-gradient-brand` (clipped gradient text).
+- `::selection` tint added.
+
+### animations.css
+
+Added `animate-soft-float`, `animate-glow-pulse`, `animate-gradient-pan`, and
+`shine-sweep` / `gradient-pan` keyframes.
+
+### Primitives rebuilt
+
+`Button` (gradient primary + brand shadow + lift, rounded-xl, h-11), `PillLink`
+(gradient/elevated variants), `Badge` (ringed tones, token colors), `Card`
+(hairline + `--shadow-soft`), `SectionHeading` (pill eyebrow w/ accent dot),
+`MediaPlaceholder` (cobalt/amber radial wash + hover shine sweep).
+
+### Components touched (visual only, no logic change)
+
+- **Global chrome:** `store-header` (elevated bar), `announcement-bar` +
+  `auth-brand-panel` + `testimonials` + `store-footer` (→ `surface-ink texture-grid`),
+  `brand-logo` (gradient chip + accent notch), `header-search` (focus ring glow),
+  `header-actions`, `primary-nav` (pill links), all `footer/*`.
+- **Home:** `hero` (+ `hero.module.css` recolor, badge/showcase/floating-card/stats),
+  `category-rail-item`, `flash-deals` + `deal-card` + `deals-countdown`,
+  `promo-card`, `value-prop`, `promo-ticker`, `brand-strip`, `product-card` +
+  `product-badge` + `product-price` + `add-to-cart-button`, `about-section` +
+  `pillar-card`, `journal/article-card`, `newsletter-cta`.
+- **Page heroes:** `catalog-hero`, `category-hero`, `journal-hero` (+ tabs),
+  `about-hero` + `about-eyebrow` (orange blobs → cobalt/amber).
+- **Product detail:** `product-buy-box`, `buy-box-price`.
+- **Cart:** `order-summary`, `checkout-button`.
+- **Account:** `account-sidebar`, `account-nav-link` (active rail), `stat-card`.
+- **Bug fixes:**
+  - `not-found.tsx` + `error.tsx` were English → localized to Persian and restyled.
+  - `search` page given a real on-page search form + hero treatment.
+  - `(dashboard)/dashboard/page.tsx` was a stale English SaaS placeholder
+    ("Welcome / Active users / MRR / Open tickets") — now renders the real
+    `OverviewView` (stats, purchase-trend chart, membership card, recent orders).
+  - `(dashboard)/dashboard/analytics` + `admin/users` were English stubs →
+    localized "به‌زودی" placeholder panels.
+
+Verified: `typecheck` + `lint` (`--max-warnings 0`) + `build` all green.
+
+---
+
 ## 2026-09-07 — Dev-only dashboard auth bypass
 
 `abzar/api` auth is not runnable locally, so `/dashboard/*` was unreachable. Added a

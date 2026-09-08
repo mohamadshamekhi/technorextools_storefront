@@ -4,8 +4,8 @@ import { siteConfig } from '@/config/site';
 /** Thin utility strip above the header. Server-rendered, zero JS. */
 export function AnnouncementBar() {
   return (
-    <div className="bg-ink text-surface/85 text-[13px]">
-      <Container className="flex items-center justify-between gap-4 py-2.5">
+    <div className="surface-ink texture-grid text-[13px] text-surface/85">
+      <Container className="relative flex items-center justify-between gap-4 py-2.5">
         <div className="flex items-center gap-5">
           <a
             href={`tel:${siteConfig.phoneHref}`}

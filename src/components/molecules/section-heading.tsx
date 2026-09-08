@@ -30,11 +30,14 @@ export function SectionHeading({
         className,
       )}
     >
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-3">
         {eyebrow ? (
-          <span className="font-display text-brand-600 text-xs tracking-[0.2em]">{eyebrow}</span>
+          <span className="font-display text-brand-600 inline-flex w-fit items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-bold tracking-[0.18em] uppercase ring-1 ring-brand-100">
+            <span className="bg-accent-500 size-1.5 rounded-full" aria-hidden />
+            {eyebrow}
+          </span>
         ) : null}
-        <h2 id={id} className="text-3xl font-black tracking-tight text-balance sm:text-[2.35rem]">
+        <h2 id={id} className="text-3xl font-black tracking-tight text-balance sm:text-[2.4rem]">
           {title}
         </h2>
       </div>

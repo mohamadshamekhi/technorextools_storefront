@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { Icon, MediaPlaceholder } from '@/components/atoms';
 
+import { PRODUCT_SHOT } from '../../data/media';
 import { discountPercent, toPersianDigits } from '../../utils/persian';
 import { GalleryThumb } from './gallery-thumb';
 import { ProductStage } from './product-stage';
@@ -30,7 +31,13 @@ export function ProductGallery({ images, price, compareAt }: ProductGalleryProps
       <div className="flex-1">
         <div className="border-hairline bg-surface relative aspect-square overflow-hidden rounded-3xl border">
           {mode === 'photo' ? (
-            <MediaPlaceholder label={images[photo] ?? 'عکس محصول'} className="size-full text-xs" />
+            <MediaPlaceholder
+              label={images[photo] ?? 'عکس محصول'}
+              src={PRODUCT_SHOT}
+              priority
+              sizes="(max-width: 1024px) 90vw, 40vw"
+              className="size-full text-xs"
+            />
           ) : (
             <div className="absolute inset-0">
               <ProductStage />
@@ -71,7 +78,7 @@ export function ProductGallery({ images, price, compareAt }: ProductGalleryProps
                 setPhoto(index);
               }}
             >
-              {label}
+              <MediaPlaceholder src={PRODUCT_SHOT} label={label} sizes="64px" className="size-full" />
             </GalleryThumb>
           ))}
           <GalleryThumb

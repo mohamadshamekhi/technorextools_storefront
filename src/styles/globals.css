@@ -1,43 +1,71 @@
 @import 'tailwindcss';
 @import './animations.css';
 
-/* ── Design tokens (Tailwind v4 CSS-first theme) ─────────────────── */
+/* ── Design tokens (Tailwind v4 CSS-first theme) ─────────────────────
+   Direction: a committed LIGHT storefront with a bold, high-energy accent
+   system. Brand = electric cobalt. Accent = hi-vis machined amber.
+   Drama comes from dark-colored *sections* (hero backdrop, CTA bands,
+   footer) built on the `ink` / `surface-inverse` tokens — never a dark
+   theme (dark mode stays reserved for the dashboard). */
 @theme {
-  /* Brand — pneumatic-tool rust/orange */
-  --color-brand-50: oklch(0.965 0.02 55);
-  --color-brand-100: oklch(0.92 0.055 52);
-  --color-brand-400: oklch(0.74 0.16 47);
-  --color-brand-500: oklch(0.68 0.19 45);
-  --color-brand-600: oklch(0.62 0.19 45);
-  --color-brand-700: oklch(0.5 0.16 43);
+  /* Brand — electric cobalt */
+  --color-brand-50: oklch(0.972 0.016 258);
+  --color-brand-100: oklch(0.935 0.042 258);
+  --color-brand-200: oklch(0.86 0.088 258);
+  --color-brand-300: oklch(0.76 0.14 259);
+  --color-brand-400: oklch(0.66 0.18 260);
+  --color-brand-500: oklch(0.56 0.212 261);
+  --color-brand-600: oklch(0.49 0.203 263);
+  --color-brand-700: oklch(0.41 0.162 265);
 
-  /* Accent — machined gold */
-  --color-accent-400: oklch(0.82 0.14 66);
-  --color-accent-500: oklch(0.78 0.16 60);
+  /* Accent — hi-vis machined amber */
+  --color-accent-100: oklch(0.96 0.05 92);
+  --color-accent-300: oklch(0.9 0.13 90);
+  --color-accent-400: oklch(0.85 0.16 84);
+  --color-accent-500: oklch(0.8 0.17 78);
+  --color-accent-600: oklch(0.72 0.16 66);
+
+  /* Ink — dark sections dropped onto the light page */
+  --color-ink: oklch(0.24 0.035 265);
+  --color-ink-soft: oklch(0.3 0.035 265);
+  --color-surface-inverse: oklch(0.205 0.035 266);
+  --color-hairline-inverse: oklch(1 0 0 / 0.12);
 
   /* Semantic signals */
-  --color-ink: oklch(0.22 0.02 70);
-  --color-sale: oklch(0.55 0.2 25);
-  --color-info: oklch(0.55 0.15 250);
+  --color-success: oklch(0.62 0.15 155);
+  --color-sale: oklch(0.57 0.21 25);
+  --color-info: oklch(0.6 0.16 245);
 
-  /* Surfaces & text */
+  /* Surfaces & text — cool near-white */
   --color-surface: oklch(1 0 0);
-  --color-surface-muted: oklch(0.975 0.008 85);
-  --color-surface-sunken: oklch(0.955 0.008 85);
-  --color-foreground: oklch(0.22 0.02 70);
-  --color-foreground-muted: oklch(0.48 0.02 70);
-  --color-hairline: oklch(0.92 0.008 85);
+  --color-surface-muted: oklch(0.978 0.004 260);
+  --color-surface-sunken: oklch(0.957 0.006 260);
+  --color-foreground: oklch(0.23 0.03 265);
+  --color-foreground-muted: oklch(0.48 0.021 265);
+  --color-hairline: oklch(0.915 0.008 260);
 
-  --radius-card: 1.375rem;
+  --radius-card: 1.5rem;
+
+  /* Elevation — cool-tinted, layered */
+  --shadow-soft: 0 1px 2px oklch(0.4 0.05 260 / 0.05), 0 4px 14px oklch(0.4 0.05 260 / 0.07);
+  --shadow-lift:
+    0 2px 6px oklch(0.4 0.05 260 / 0.06), 0 20px 44px -14px oklch(0.34 0.09 262 / 0.22);
+  --shadow-float:
+    0 4px 10px oklch(0.4 0.05 260 / 0.08), 0 34px 60px -18px oklch(0.32 0.1 262 / 0.28);
+  --shadow-brand: 0 12px 34px -10px oklch(0.56 0.212 261 / 0.5);
+  --shadow-accent: 0 12px 34px -10px oklch(0.8 0.17 78 / 0.55);
+
+  /* Signature gradients */
+  --gradient-brand: linear-gradient(135deg, oklch(0.6 0.21 262) 0%, oklch(0.47 0.2 268) 100%);
+  --gradient-spark: linear-gradient(135deg, oklch(0.83 0.17 82) 0%, oklch(0.7 0.19 45) 100%);
+  --gradient-ink:
+    radial-gradient(120% 140% at 12% 0%, oklch(0.32 0.06 265) 0%, oklch(0.19 0.035 266) 55%);
 
   --font-sans:
     var(--font-vazirmatn), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
   --font-display:
     var(--font-space-grotesk), var(--font-vazirmatn), ui-sans-serif, system-ui, sans-serif;
 }
-
-/* The storefront is a committed light design (warm off-white). Dark-mode
-   theming is reserved for the authenticated dashboard. */
 
 /* ── Base layer ─────────────────────────────────────────────────── */
 @layer base {
@@ -55,8 +83,33 @@
     overflow-x: hidden;
   }
 
+  ::selection {
+    background-color: oklch(0.56 0.212 261 / 0.22);
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
   }
+}
+
+/* ── Shared surface utilities ───────────────────────────────────── */
+@utility surface-ink {
+  background-image: var(--gradient-ink);
+  background-color: var(--color-surface-inverse);
+}
+
+/* Fine engineered-grid texture for dark sections. */
+@utility texture-grid {
+  background-image:
+    linear-gradient(oklch(1 0 0 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+@utility text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

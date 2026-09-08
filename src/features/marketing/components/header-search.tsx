@@ -10,11 +10,11 @@ export function HeaderSearch({ className }: { className?: string }) {
       method="get"
       role="search"
       className={cn(
-        'bg-surface-sunken border-hairline focus-within:border-brand-500 flex items-center gap-2.5 rounded-2xl border px-4 transition-colors',
+        'bg-surface-sunken border-hairline focus-within:border-brand-400 focus-within:bg-surface focus-within:ring-4 focus-within:ring-brand-500/12 flex items-center gap-2.5 rounded-2xl border px-4 transition-[background-color,border-color,box-shadow]',
         className,
       )}
     >
-      <Icon name="search" className="text-foreground-muted size-[17px]" />
+      <Icon name="search" className="text-brand-500 size-[17px]" />
       <input
         type="search"
         name="q"

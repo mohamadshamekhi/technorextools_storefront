@@ -9,7 +9,9 @@ export function BuyBoxPrice({ price, compareAt }: BuyBoxPriceProps) {
   return (
     <div>
       <p className="flex items-baseline gap-2">
-        <span className="font-display text-[27px] font-bold">{formatToman(price)}</span>
+        <span className="font-display text-gradient-brand text-[27px] font-black">
+          {formatToman(price)}
+        </span>
         <span className="text-foreground-muted text-[13px]">تومان</span>
       </p>
       {compareAt ? (

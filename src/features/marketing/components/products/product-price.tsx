@@ -19,7 +19,9 @@ export function ProductPrice({ price, compareAt }: ProductPriceProps) {
         </div>
       ) : null}
       <p className="flex items-baseline gap-1.5">
-        <span className="font-display text-xl font-bold">{formatToman(price)}</span>
+        <span className="font-display text-gradient-brand text-xl font-black">
+          {formatToman(price)}
+        </span>
         <span className="text-foreground-muted text-[12px]">تومان</span>
       </p>
     </div>

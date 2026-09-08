@@ -11,8 +11,15 @@ import { FooterTrustBar } from './footer-trust-bar';
 
 export function StoreFooter() {
   return (
-    <footer id={SECTION.contact} className="bg-ink scroll-mt-24 pt-16 text-white/85">
-      <Container>
+    <footer
+      id={SECTION.contact}
+      className="surface-ink texture-grid relative scroll-mt-24 pt-16 text-white/85"
+    >
+      <span
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,var(--color-brand-400),var(--color-accent-500),transparent)]"
+      />
+      <Container className="relative">
         <FooterTrustBar />
         <div className="grid gap-11 border-t border-white/10 py-11 lg:grid-cols-[1.6fr_1fr_1fr_1.3fr]">
           <div>

@@ -8,10 +8,10 @@ import styles from './auth-brand-panel.module.css';
 /** Dark storytelling half of the auth split screen (RSC — zero client JS). */
 export function AuthBrandPanel() {
   return (
-    <aside className="bg-ink text-surface relative hidden flex-col justify-between overflow-hidden p-14 lg:flex">
+    <aside className="surface-ink texture-grid text-surface relative hidden flex-col justify-between overflow-hidden p-14 lg:flex">
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(120%_100%_at_20%_0%,oklch(0.32_0.09_45_/_0.35)_0%,transparent_60%)]"
+        className="absolute inset-0 bg-[radial-gradient(120%_100%_at_20%_0%,oklch(0.42_0.16_262_/_0.4)_0%,transparent_60%)]"
       />
       <span aria-hidden className={styles.ring} />
       <span aria-hidden className={styles.blob} />

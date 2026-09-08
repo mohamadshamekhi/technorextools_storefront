@@ -9,4 +9,9 @@ export const SECTION = {
   contact: 'contact',
 } as const;
 
-export const anchor = (id: keyof typeof SECTION) => `#${SECTION[id]}`;
+/**
+ * Root-absolute hash link to a homepage section. Prefixing `/` makes the link
+ * work from any route (Next navigates home, then scrolls) — a bare `#id` only
+ * works while already on `/`.
+ */
+export const anchor = (id: keyof typeof SECTION) => `/#${SECTION[id]}`;

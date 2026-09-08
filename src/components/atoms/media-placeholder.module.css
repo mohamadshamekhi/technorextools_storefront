@@ -1,10 +1,39 @@
 .surface {
-  background-color: oklch(0.93 0.006 85);
-  background-image: repeating-linear-gradient(
-    135deg,
-    oklch(0.9 0.008 85) 0,
-    oklch(0.9 0.008 85) 11px,
-    oklch(0.86 0.01 75) 11px,
-    oklch(0.86 0.01 75) 22px
+  position: relative;
+  overflow: hidden;
+  background-color: oklch(0.955 0.008 260);
+  background-image:
+    radial-gradient(80% 80% at 25% 20%, oklch(0.9 0.05 258 / 0.55) 0%, transparent 60%),
+    radial-gradient(70% 70% at 85% 90%, oklch(0.86 0.09 82 / 0.35) 0%, transparent 60%),
+    repeating-linear-gradient(
+      135deg,
+      oklch(0.94 0.006 260) 0,
+      oklch(0.94 0.006 260) 12px,
+      oklch(0.9 0.012 260) 12px,
+      oklch(0.9 0.012 260) 24px
+    );
+  color: oklch(0.5 0.03 262);
+}
+
+.surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 40%, oklch(1 0 0 / 0.35) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.surface:hover::after {
+  transform: translateX(100%);
+}
+
+/* Calm backdrop for a real product shot on transparent art. */
+.photo {
+  background-color: oklch(0.99 0.002 260);
+  background-image: radial-gradient(
+    120% 90% at 50% 15%,
+    oklch(0.93 0.045 258 / 0.45) 0%,
+    transparent 62%
   );
 }

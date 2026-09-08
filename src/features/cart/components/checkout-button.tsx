@@ -8,7 +8,7 @@ export function CheckoutButton() {
     <>
       <Link
         href={routes.checkout}
-        className="bg-brand-500 hover:bg-brand-600 mt-5 flex h-13 items-center justify-center gap-2 rounded-xl text-[15px] font-extrabold text-white shadow-lg transition-[background-color,transform] hover:-translate-y-0.5"
+        className="bg-brand-500 bg-(image:--gradient-brand) shadow-(--shadow-brand) mt-5 flex h-13 items-center justify-center gap-2 rounded-xl text-[15px] font-extrabold text-white transition-transform hover:-translate-y-0.5"
       >
         <Icon name="lock" className="size-4.5" />
         تکمیل سفارش و پرداخت

@@ -23,12 +23,18 @@ export function AccountNavLink({ item }: { item: AccountNavItem }) {
       href={item.href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13.5px] font-bold transition-colors',
+        'relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13.5px] font-bold transition-colors',
         active
-          ? 'bg-brand-50 text-brand-600'
+          ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-100'
           : 'text-foreground-muted hover:bg-surface-sunken hover:text-foreground',
       )}
     >
+      {active ? (
+        <span
+          aria-hidden
+          className="bg-brand-500 absolute inset-y-2 end-0 w-1 rounded-full"
+        />
+      ) : null}
       <Icon name={item.icon} className={cn('size-[18px]', active && 'text-brand-600')} />
       {item.label}
       {item.badge ? (

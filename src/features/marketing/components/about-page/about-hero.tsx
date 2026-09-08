@@ -9,8 +9,8 @@ function Blob({ className }: { className: string }) {
     <div
       aria-hidden
       className={cn(
-        'animate-blob pointer-events-none absolute size-[420px] rounded-full',
-        'bg-[radial-gradient(circle,oklch(0.82_0.13_60/0.28)_0%,transparent_68%)]',
+        'animate-blob pointer-events-none absolute size-[460px] rounded-full',
+        'bg-[radial-gradient(circle,oklch(0.7_0.19_260/0.24)_0%,transparent_68%)]',
         className,
       )}
     />
@@ -20,8 +20,9 @@ function Blob({ className }: { className: string }) {
 /** About-page opening: story badge, headline and intro copy. */
 export function AboutHero() {
   return (
-    <section className="relative overflow-hidden py-20 lg:py-[90px]">
+    <section className="relative overflow-hidden py-20 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)] lg:py-[90px]">
       <Blob className="-top-[150px] -left-[100px]" />
+      <Blob className="-right-[120px] -bottom-[200px] [background:radial-gradient(circle,oklch(0.84_0.16_82/0.22)_0%,transparent_68%)]" />
       <Container className="relative max-w-3xl text-center">
         <AboutEyebrow>داستان پوما ایر</AboutEyebrow>
         <h1 className="mt-5 mb-4 text-3xl leading-[1.4] font-black tracking-tight text-balance sm:text-4xl">

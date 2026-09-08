@@ -1,12 +1,18 @@
 import { MediaPlaceholder } from '@/components/atoms';
 
+import { PRODUCT_SHOT } from '../../data/media';
 import type { Deal } from '../../types';
 import { discountPercent, formatToman, toPersianDigits } from '../../utils/persian';
 
 export function DealCard({ deal }: { deal: Deal }) {
   return (
-    <article className="border-hairline hover:bg-surface-muted flex flex-col gap-3 border-e p-5 transition-colors last:border-e-0">
-      <MediaPlaceholder label="عکس" className="aspect-square rounded-xl text-[11px]" />
+    <article className="border-hairline hover:bg-brand-50/60 group flex flex-col gap-3 border-e p-5 transition-colors last:border-e-0">
+      <MediaPlaceholder
+        label={deal.title}
+        src={PRODUCT_SHOT}
+        sizes="(max-width: 640px) 45vw, 18vw"
+        className="aspect-square rounded-xl text-[11px] transition-transform duration-300 group-hover:scale-[1.03]"
+      />
       <h3 className="line-clamp-2 min-h-[2.6rem] text-[13px] leading-relaxed font-semibold">
         {deal.title}
       </h3>

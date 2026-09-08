@@ -13,12 +13,14 @@ export function CategoryRailItem({ category }: { category: Category }) {
       className="group flex shrink-0 basis-24 flex-col items-center gap-3 text-center sm:flex-1"
     >
       <span
-        className="grid size-[76px] place-items-center rounded-full transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:scale-105"
+        className="grid size-[78px] place-items-center rounded-2xl shadow-(--shadow-soft) ring-1 ring-black/5 transition-[transform,box-shadow] duration-300 group-hover:-translate-y-1.5 group-hover:shadow-(--shadow-lift)"
         style={{ backgroundColor: category.tint, color: category.ink }}
       >
         <Icon name={category.icon} className="size-8" />
       </span>
-      <span className="text-[13px] font-bold">{category.title}</span>
+      <span className="group-hover:text-brand-700 text-[13px] font-bold transition-colors">
+        {category.title}
+      </span>
     </Link>
   );
 }
