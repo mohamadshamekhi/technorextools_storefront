@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 
-import type { Product } from '@/features/marketing';
 import type { CartLine } from '@/store/cart-store';
 import { useCartStore } from '@/store/cart-store';
 
+import type { UpsellProduct } from '../types';
 import { pickUpsells } from '../utils/pick-upsells';
 import { CartHeading } from './cart-heading';
 import { CartItemList } from './cart-item-list';
@@ -14,7 +14,7 @@ import { EmptyCart } from './empty-cart';
 import { FreeShippingBar } from './free-shipping-bar';
 import { OrderSummary } from './order-summary';
 
-export function CartPageView({ upsellPool }: { upsellPool: Product[] }) {
+export function CartPageView({ upsellPool }: { upsellPool: UpsellProduct[] }) {
   const lines = useCartStore((state) => state.lines);
   const setQuantity = useCartStore((state) => state.setQuantity);
   const removeItem = useCartStore((state) => state.removeItem);

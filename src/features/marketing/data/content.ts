@@ -1,4 +1,4 @@
-import type { Article, PromoCard, Testimonial, ValueProp } from '../types';
+import type { PromoCard, Testimonial, ValueProp } from '../types';
 
 export const HERO_WORDS = [
   'کارهای سنگین',
@@ -102,24 +102,6 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       'مشاوره پیش از خرید دقیقاً کمک کرد ابزار درست را با بودجه‌ام انتخاب کنم، نه گران‌تر و نه ضعیف‌تر.',
     rating: 5,
-  },
-];
-
-export const JOURNAL: Article[] = [
-  {
-    slug: 'choose-air-screwdriver',
-    title: 'راهنمای کامل انتخاب پیچ‌گوشتی بادی مناسب کارگاه',
-    date: '۱۲ مرداد ۱۴۰۵',
-  },
-  {
-    slug: 'air-tool-maintenance',
-    title: '۱۰ نکته طلایی برای نگهداری و روغن‌کاری ابزار بادی',
-    date: '۳ مرداد ۱۴۰۵',
-  },
-  {
-    slug: 'air-vs-cordless',
-    title: 'ابزار بادی یا شارژی؛ کدام برای کار شما به‌صرفه‌تر است',
-    date: '۲۲ تیر ۱۴۰۵',
   },
 ];
 

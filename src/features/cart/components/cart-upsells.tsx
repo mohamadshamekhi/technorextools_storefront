@@ -1,9 +1,9 @@
 import { Icon } from '@/components/atoms';
-import type { Product } from '@/features/marketing';
+import type { UpsellProduct } from '../types';
 
 import { UpsellCard } from './upsell-card';
 
-export function CartUpsells({ products }: { products: Product[] }) {
+export function CartUpsells({ products }: { products: UpsellProduct[] }) {
   if (products.length === 0) return null;
 
   return (

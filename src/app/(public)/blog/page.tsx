@@ -1,51 +1,33 @@
 import type { Metadata } from 'next';
+import { z } from 'zod';
 
 import { Container } from '@/components/atoms';
 import { Reveal } from '@/components/molecules';
 import { routes } from '@/config/routes';
-import {
-  FEATURED_SLUG,
-  JOURNAL_ARTICLES,
-  NewsletterCta,
-  journalParamsSchema,
-  toJournalList,
-} from '@/features/marketing';
-import {
-  FeaturedArticle,
-  JournalList,
-  TrendingStrip,
-} from '@/features/marketing/components/journal-page/journal-sections';
-import { JournalHero } from '@/features/marketing/components/journal-page/journal-hero';
+import { ArticleCard, FeaturedArticle, JournalHero } from '@/features/content';
+import { listArticles } from '@/features/content/services/content.api';
+import { NewsletterCta } from '@/features/marketing';
 import { breadcrumbSchema, itemListSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
 import type { PageProps } from '@/types';
 
-type BlogSearch = Record<string, string | string[] | undefined>;
+type BlogSearch = { page?: string };
 
-function parse(searchParams: BlogSearch) {
-  const result = journalParamsSchema.safeParse(searchParams);
-  return result.success ? result.data : {};
-}
+const searchSchema = z.object({ page: z.coerce.number().int().min(1).max(999).optional() });
 
-export async function generateMetadata({
-  searchParams,
-}: PageProps<Record<string, never>, BlogSearch>): Promise<Metadata> {
-  const { cat } = parse(await searchParams);
-  return buildMetadata({
-    title: cat ? 'مجله پوما ایر — مقالات انتخاب‌شده' : 'مجله پوما ایر؛ راهنمای خرید و نگهداری ابزار',
-    description:
-      'راهنمای خرید، نگهداری و کاربرد درست ابزار بادی و شارژی صنعتی به زبان ساده؛ نوشته تیم فنی پوما ایر.',
-    path: routes.blog,
-    // Filtered views are thin duplicates — keep only the canonical index in Google.
-    noindex: Boolean(cat),
-  });
-}
+export const metadata: Metadata = buildMetadata({
+  title: 'مجله پوما ایر؛ راهنمای خرید و نگهداری ابزار',
+  description:
+    'راهنمای خرید، نگهداری و کاربرد درست ابزار بادی و شارژی صنعتی به زبان ساده؛ نوشته تیم فنی پوما ایر.',
+  path: routes.blog,
+});
 
 export default async function BlogPage({ searchParams }: PageProps<Record<string, never>, BlogSearch>) {
-  const { cat } = parse(await searchParams);
-  const articles = toJournalList(cat);
-  const featured =
-    JOURNAL_ARTICLES.find((article) => article.slug === FEATURED_SLUG) ?? JOURNAL_ARTICLES[0]!;
+  const { page = 1 } = searchSchema.parse(await searchParams);
+  const result = await listArticles({ page, take: 12 }).catch(() => null);
+  const articles = result?.items ?? [];
+  const featured = page === 1 ? articles[0] : undefined;
+  const rest = featured ? articles.slice(1) : articles;
 
   const structuredData = [
     breadcrumbSchema([
@@ -65,15 +47,20 @@ export default async function BlogPage({ searchParams }: PageProps<Record<string
         // Static, server-generated structured data — XSS-safe.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <JournalHero activeCategory={cat} />
-      <div className="mt-9">
-        <TrendingStrip />
-      </div>
-      <FeaturedArticle article={featured} />
+      <JournalHero />
+      {featured ? <FeaturedArticle article={featured} /> : null}
       <Container className="pb-24">
-        <Reveal className="mt-10">
-          <JournalList articles={articles} />
-        </Reveal>
+        {articles.length === 0 ? (
+          <p className="text-foreground-muted py-16 text-center text-sm">
+            هنوز مقاله‌ای منتشر نشده است.
+          </p>
+        ) : (
+          <Reveal className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {rest.map((article) => (
+              <ArticleCard key={article.slug} article={article} />
+            ))}
+          </Reveal>
+        )}
       </Container>
       <NewsletterCta />
     </article>

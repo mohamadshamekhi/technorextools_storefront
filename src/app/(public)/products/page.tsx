@@ -1,55 +1,54 @@
 import type { Metadata } from 'next';
 
 import { Container } from '@/components/atoms';
-import {
-  catalogParamsSchema,
-  CatalogHero,
-  hasActiveFilters,
-  ProductCatalog,
-  PRODUCTS,
-  PromoTicker,
-  toCatalogState,
-} from '@/features/marketing';
+import { routes } from '@/config/routes';
+import { CatalogHero, hasActiveFilters, parseCatalogParams } from '@/features/catalog';
+import { CatalogView } from '@/features/catalog/components/catalog-view';
+import { listProducts } from '@/features/catalog/services/catalog.api';
+import { PromoTicker } from '@/features/marketing';
 import { breadcrumbSchema, itemListSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
-import { routes } from '@/config/routes';
 import type { PageProps } from '@/types';
 
 type CatalogSearch = Record<string, string | string[] | undefined>;
 
-function parse(searchParams: CatalogSearch) {
-  const result = catalogParamsSchema.safeParse(searchParams);
-  return toCatalogState(result.success ? result.data : catalogParamsSchema.parse({}));
-}
-
 export async function generateMetadata({
   searchParams,
 }: PageProps<Record<string, never>, CatalogSearch>): Promise<Metadata> {
-  const { filters } = parse(await searchParams);
+  const params = parseCatalogParams(await searchParams);
   return buildMetadata({
     title: 'فروشگاه ابزار بادی و شارژی صنعتی',
     description:
-      'خرید ابزار بادی و شارژی صنعتی پوما ایر با گارانتی اصالت؛ فیلتر بر اساس دسته‌بندی، برند، قیمت و امتیاز مشتریان.',
+      'خرید ابزار بادی و شارژی صنعتی پوما ایر با گارانتی اصالت؛ فیلتر بر اساس دسته‌بندی، برند و قیمت.',
     path: routes.products,
-    noindex: hasActiveFilters(filters),
+    noindex: hasActiveFilters(params),
   });
 }
-
-const structuredData = [
-  breadcrumbSchema([
-    { name: 'خانه', path: routes.home },
-    { name: 'همه محصولات', path: routes.products },
-  ]),
-  itemListSchema(
-    'محصولات پوما ایر',
-    PRODUCTS.map((product) => ({ name: product.title, price: product.price })),
-  ),
-];
 
 export default async function ProductsPage({
   searchParams,
 }: PageProps<Record<string, never>, CatalogSearch>) {
-  const initial = parse(await searchParams);
+  const params = parseCatalogParams(await searchParams);
+  const result = await listProducts(params).catch(() => null);
+
+  const structuredData = [
+    breadcrumbSchema([
+      { name: 'خانه', path: routes.home },
+      { name: 'همه محصولات', path: routes.products },
+    ]),
+    ...(result
+      ? [
+          itemListSchema(
+            'محصولات پوما ایر',
+            result.items.map((product) => ({
+              name: product.title,
+              url: routes.product(product.slug),
+              price: product.basePrice,
+            })),
+          ),
+        ]
+      : []),
+  ];
 
   return (
     <>
@@ -63,7 +62,7 @@ export default async function ProductsPage({
       </Container>
       <PromoTicker />
       <Container className="py-10">
-        <ProductCatalog initial={initial} />
+        <CatalogView params={params} />
       </Container>
     </>
   );

@@ -4,17 +4,15 @@ import { notFound } from 'next/navigation';
 import { Container } from '@/components/atoms';
 import { routes } from '@/config/routes';
 import {
-  catalogParamsSchema,
   CategoryHero,
-  CategoryLanding,
-  categoryProductCount,
-  findCategory,
+  findCategoryNode,
+  flattenCategories,
   hasActiveFilters,
-  PRODUCTS,
-  PromoTicker,
-  stockedCategories,
-  toCatalogState,
-} from '@/features/marketing';
+  parseCatalogParams,
+} from '@/features/catalog';
+import { CatalogView } from '@/features/catalog/components/catalog-view';
+import { getCategoryTree, listProducts } from '@/features/catalog/services/catalog.api';
+import { PromoTicker } from '@/features/marketing';
 import { breadcrumbSchema, itemListSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
 import type { PageProps } from '@/types';
@@ -22,14 +20,9 @@ import type { PageProps } from '@/types';
 type CategoryParams = { slug: string };
 type CategorySearch = Record<string, string | string[] | undefined>;
 
-export function generateStaticParams(): CategoryParams[] {
-  return stockedCategories().map((category) => ({ slug: category.slug }));
-}
-
-function parse(slug: string, searchParams: CategorySearch) {
-  const result = catalogParamsSchema.safeParse(searchParams);
-  const state = toCatalogState(result.success ? result.data : catalogParamsSchema.parse({}));
-  return { ...state, filters: { ...state.filters, categories: [slug] } };
+export async function generateStaticParams(): Promise<CategoryParams[]> {
+  const tree = await getCategoryTree().catch(() => []);
+  return flattenCategories(tree).map((node) => ({ slug: node.slug }));
 }
 
 export async function generateMetadata({
@@ -37,15 +30,16 @@ export async function generateMetadata({
   searchParams,
 }: PageProps<CategoryParams, CategorySearch>): Promise<Metadata> {
   const { slug } = await params;
-  const category = findCategory(slug);
+  const tree = await getCategoryTree().catch(() => []);
+  const category = findCategoryNode(tree, slug);
   if (!category) return buildMetadata({ title: 'دسته‌بندی یافت نشد', noindex: true });
 
-  const { filters } = parse(slug, await searchParams);
+  const filters = parseCatalogParams(await searchParams);
   return buildMetadata({
     title: `خرید ${category.title} صنعتی | پوما ایر`,
-    description: category.description,
+    description: `مجموعه ${category.title} پوما ایر با گارانتی اصالت و ارسال سریع.`,
     path: routes.category(slug),
-    noindex: hasActiveFilters({ ...filters, categories: [] }),
+    noindex: hasActiveFilters({ ...filters, category: undefined }),
   });
 }
 
@@ -54,13 +48,12 @@ export default async function CategoryPage({
   searchParams,
 }: PageProps<CategoryParams, CategorySearch>) {
   const { slug } = await params;
-  const category = findCategory(slug);
+  const filters = parseCatalogParams(await searchParams);
+  const tree = await getCategoryTree().catch(() => []);
+  const category = findCategoryNode(tree, slug);
   if (!category) notFound();
 
-  const initial = parse(slug, await searchParams);
-  const count = categoryProductCount(slug);
-  const stocked = stockedCategories();
-  const siblings = stocked.some((c) => c.slug === slug) ? stocked : [...stocked, category];
+  const result = await listProducts(filters, { category: slug }).catch(() => null);
 
   const structuredData = [
     breadcrumbSchema([
@@ -68,14 +61,18 @@ export default async function CategoryPage({
       { name: 'همه محصولات', path: routes.products },
       { name: category.title, path: routes.category(slug) },
     ]),
-    itemListSchema(
-      `${category.title} پوما ایر`,
-      PRODUCTS.filter((product) => product.categorySlug === slug).map((product) => ({
-        name: product.title,
-        url: routes.product(product.id),
-        price: product.price,
-      })),
-    ),
+    ...(result
+      ? [
+          itemListSchema(
+            `${category.title} پوما ایر`,
+            result.items.map((product) => ({
+              name: product.title,
+              url: routes.product(product.slug),
+              price: product.basePrice,
+            })),
+          ),
+        ]
+      : []),
   ];
 
   return (
@@ -86,11 +83,11 @@ export default async function CategoryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <Container className="pt-8">
-        <CategoryHero category={category} count={count} />
+        <CategoryHero title={category.title} slug={slug} count={result?.total ?? 0} />
       </Container>
       <PromoTicker />
       <Container className="py-10">
-        <CategoryLanding category={category} siblings={siblings} initial={initial} />
+        <CatalogView params={filters} lockedCategory={slug} />
       </Container>
     </>
   );

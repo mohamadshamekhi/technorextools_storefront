@@ -1,11 +1,11 @@
 import { MediaPlaceholder } from '@/components/atoms';
-import type { Product } from '@/features/marketing';
+import type { UpsellProduct } from '../types';
 import { formatToman } from '@/lib/persian';
 
 import { ProductMediaBadge } from './product-media-badge';
 import { UpsellAddButton } from './upsell-add-button';
 
-export function UpsellCard({ product }: { product: Product }) {
+export function UpsellCard({ product }: { product: UpsellProduct }) {
   return (
     <div className="border-hairline hover:border-brand-500/40 bg-surface overflow-hidden rounded-2xl border shadow-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:shadow-md">
       <div className="relative">

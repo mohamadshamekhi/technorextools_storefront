@@ -109,12 +109,16 @@ export function productSchema(input: {
       url: absoluteUrl(input.path, siteConfig.url),
       seller: { '@type': 'Organization', name: siteConfig.name },
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: input.rating,
-      reviewCount: input.reviewCount,
-      bestRating: 5,
-    },
+    ...(input.reviewCount > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: input.rating,
+            reviewCount: input.reviewCount,
+            bestRating: 5,
+          },
+        }
+      : {}),
   });
 }
 

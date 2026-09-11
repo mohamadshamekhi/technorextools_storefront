@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 
+import { BrandStrip } from '@/features/catalog/components/brand-strip';
+import { CategoryRail } from '@/features/catalog/components/category-rail';
+import { FlashDeals } from '@/features/catalog/components/flash-deals';
+import { ProductShowcase } from '@/features/catalog/components/product-showcase';
+import { listProducts } from '@/features/catalog/services/catalog.api';
+import { JournalRail } from '@/features/content/components/journal-rail';
 import {
   AboutSection,
-  BrandStrip,
-  CategoryRail,
-  FlashDeals,
   Hero,
-  JournalSection,
   NewsletterCta,
-  ProductShowcase,
-  PRODUCTS,
   PromoCards,
   PromoTicker,
   Testimonials,
@@ -23,16 +23,24 @@ export const metadata: Metadata = buildMetadata({
   path: '/',
 });
 
-const structuredData = [
-  websiteSchema(),
-  localBusinessSchema(),
-  itemListSchema(
-    'پرفروش‌ترین ابزارهای پوما ایر',
-    PRODUCTS.map((product) => ({ name: product.title, price: product.price })),
-  ),
-];
+export const revalidate = 300;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featured = await listProducts({ sort: 'newest' }, { take: 8 }).catch(() => null);
+
+  const structuredData = [
+    websiteSchema(),
+    localBusinessSchema(),
+    ...(featured
+      ? [
+          itemListSchema(
+            'جدیدترین ابزارهای پوما ایر',
+            featured.items.map((product) => ({ name: product.title, price: product.basePrice })),
+          ),
+        ]
+      : []),
+  ];
+
   return (
     <>
       <script
@@ -51,7 +59,7 @@ export default function HomePage() {
       <Testimonials />
       <BrandStrip />
       <NewsletterCta />
-      <JournalSection />
+      <JournalRail />
     </>
   );
 }

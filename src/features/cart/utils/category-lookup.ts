@@ -1,7 +1,6 @@
-import { CATEGORIES, type Category } from '@/features/marketing';
+import { categoryPresentation } from '@/features/catalog/data/presentation';
 
-/** Resolve a catalogue category by slug — drives the coloured cart icon badge. */
-export function categoryFor(slug: string | undefined): Category | undefined {
-  if (!slug) return undefined;
-  return CATEGORIES.find((category) => category.slug === slug);
+/** Visual chip (icon + OKLCH tint pair) for a category slug — always resolves. */
+export function categoryChip(slug: string | undefined) {
+  return categoryPresentation(slug ?? '');
 }

@@ -13,6 +13,15 @@ export type ShippingMethod = {
 /** Result of `useCoupon` after an apply attempt. */
 export type CouponFeedback = { text: string; valid: boolean };
 
+/** Minimal product shape the cart upsell rail needs, mapped from the catalog API. */
+export type UpsellProduct = {
+  id: string;
+  title: string;
+  price: number;
+  slug: string;
+  categorySlug: string;
+};
+
 /** Computed order totals — everything `OrderSummary` needs to render. */
 export type CartTotals = {
   subtotal: number;

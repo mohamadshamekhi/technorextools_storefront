@@ -5,6 +5,147 @@
 
 ---
 
+## 2026-09-10 — Storefront wired to `abzar/api` (catalog + content dynamic)
+
+The whole public site now reads from `abzar/api` `/storefront/*` over `apiClient`
+(server-only, `auth:false`, `next.revalidate=300`). Mock data deleted.
+
+### New domains
+
+- **`src/features/catalog/`**
+  - `services/catalog.schemas.ts` — Zod mirrors of the API views (category tree,
+    brand, product card/detail, comments).
+  - `services/catalog.api.ts` — `getCategoryTree` · `listBrands` · `listProducts` ·
+    `getProduct` · `getProductComments`. **server-only, import by path.**
+  - `services/catalog.query.ts` — URL `searchParams` schema (`q,category,brand,
+    minPrice,maxPrice,deal,sort,page`) + `toProductsQuery` mapping to the API query.
+    `sort ∈ newest|price-asc|price-desc`. `CATALOG_PAGE_SIZE=12`.
+  - `data/presentation.ts` — slug→{icon,tint,ink} registry (API carries no visuals).
+  - `utils/category-tree.ts` — `flattenCategories` / `findCategoryNode` / `topLevelCategories`.
+  - `hooks/use-catalog-params.ts` — reads filter state from URL, writes via
+    `router.replace` (every change = server round-trip).
+  - `components/` — `catalog-view` (RSC: filters sidebar + grid + pagination),
+    `catalog-filters`/`filter-radio-list`/`price-range-filter`/`catalog-sort`/
+    `catalog-pagination` (client, URL-driven), `product-card`/`product-grid`/
+    `add-to-cart-button`, `category-rail`/`brand-strip`/`flash-deals`/`product-showcase`
+    (RSC home sections, each self-fetches), `catalog-hero`/`category-hero`,
+    `product-detail/*` (`product-detail-view`, `product-gallery`, `product-buy-box`
+    with variant picker, `spec-list` from `attributeValues`, `product-reviews` from
+    the comments endpoint, `detail-section`, `star-row`, `quantity-stepper`).
+  - `index.ts` — client-safe surface only (types, query utils, pure components).
+    Data-fetching RSC sections + `*.api.ts` import by direct path (barrel hygiene).
+
+- **`src/features/content/`**
+  - `services/content.schemas.ts` + `content.api.ts` (`listArticles`, `getArticle`).
+  - `utils/date.ts` — `formatJalaliDate` (ISO → `Intl.DateTimeFormat('fa-IR')`).
+  - `utils/sanitize.ts` — `sanitizeArticleHtml` via **`sanitize-html`** (pure JS,
+    no jsdom). Feeds the only sanctioned `dangerouslySetInnerHTML` (`article-body`).
+  - `components/` — `article-card`, `article-body` (+ `.module.css` prose), `journal-hero`,
+    `featured-article`, `journal-rail` (RSC, import by path).
+
+### Pages rewritten
+
+- `(public)/page.tsx` — RSC, `revalidate=300`; sections self-fetch; `itemListSchema`
+  from a page-level `listProducts`.
+- `products/page.tsx` — `searchParams`→`parseCatalogParams`→`CatalogView`; `noindex`
+  when any filter active.
+- `categories/[slug]/page.tsx` — `generateStaticParams`+`findCategoryNode` from the
+  category tree; `CatalogView` with `lockedCategory`; 404 when slug absent.
+- `products/[slug]/page.tsx` — `getProduct` + `getProductComments`; `generateStaticParams`
+  from `listProducts({take:100})`, `dynamicParams=true`; 404 on `ApiError` 404.
+- `search/page.tsx` — real results via `listProducts({search})`.
+- `blog/page.tsx` + `blog/[slug]/page.tsx` — `listArticles`/`getArticle`; sanitized
+  HTML body; article taxonomy/tabs dropped (API has none).
+- `cart/page.tsx` — upsell pool from `listProducts`; `sitemap.ts` async, slugs from API.
+
+### Contact form
+
+- `src/app/api/contact/route.ts` — Zod `safeParse`, `400 + fieldErrors`, else
+  `console.warn('[contact] TODO wire to abzar/api')` + `202`. No public API endpoint
+  exists yet. `features/contact/hooks/use-contact-form.ts` now POSTs there (+ `pending`).
+
+### Cart adaptations
+
+`Product`/`Category` (marketing mock) → `UpsellProduct` (`features/cart/types`) +
+`categoryChip` (wraps `categoryPresentation`). `pick-upsells` drops the stock filter.
+
+### Deleted
+
+`features/marketing/{data/{products,categories,catalog,journal,journal-taxonomy,
+journal-bodies,product-details},utils/{catalog-params,catalog-filter,catalog-chips,
+category,journal-params,journal-detail,product-detail},types/{catalog,product-detail},
+hooks/use-catalog-filters,components/{catalog,category,products,journal,journal-page,
+flash-deals,category-rail,product-detail,brand-strip}}`. Marketing barrel + `types/index.ts`
+trimmed to static sections only. `data/content.ts` lost `JOURNAL`.
+
+### Open
+
+- Product/article images: API returns absolute URLs but the host is not on the
+  `next/image` allowlist → every slot is `MediaPlaceholder` (no `src`). Add
+  `next.config.mjs` `images.remotePatterns` + wire `src` once the host is known.
+- `article.body` assumed HTML; add a Markdown renderer if it turns out to be MD.
+- Review submission (`POST .../comments`) needs auth — not built.
+- Verified: `typecheck` + `lint` + `build` green (25/25 pages, empty DB).
+
+---
+
+## 2026-09-10 — Claude Code config: token-lean + hardened
+
+Tooling only, no app code.
+
+- **`CLAUDE.md`** compressed 215 → ~150 lines. Every rule kept (architecture law,
+  Tailwind v4 + CSS Modules hybrid, 150-line cap, `any` ban, RSC-first, cloud.md
+  protocol, SEO/CWV, OWASP/RBAC/CSRF/XSS); prose collapsed to terse bullets, the
+  ASCII tree trimmed to essentials. Loaded verbatim into every session → smaller
+  fixed context cost per turn.
+- **`.claude/settings.json`** (new, team-shared): permission allowlist for safe
+  read/build commands (`pnpm dev|build|lint|typecheck|format`, `git` read verbs,
+  `rg`/`ls`/`find`, …) to cut prompt round-trips; `deny` on `.env*` reads,
+  `rm -rf`, `git push`, `git reset --hard`; `ask` on `git commit`/`checkout`.
+- **`~/.claude/settings.json`** (personal, global): `promptCacheTtl` +
+  `subagentPromptCacheTtl` = `1h` (keeps the prompt cache warm across breaks →
+  fewer cache-write billings on resume), `precomputeCompactionEnabled`,
+  `spinnerTipsEnabled: false`, `fileCheckpointingEnabled`. Dropped two stale
+  project-specific allow entries.
+
+No component tree / state flow changes.
+
+### Follow-up — CLAUDE.md split into modular files
+
+`CLAUDE.md` is now a lean root (~65 lines): role, app summary, commands, cloud.md
+protocol, quick-reference. Everything else moved out:
+
+- `.claude/rules/` — `working-style.md` (token discipline: no preamble, narrow reads,
+  batch calls, verify once), `architecture.md`, `styling.md`, `components.md` (+ providers
+  roadmap), `seo.md`, `security.md`. Pulled in via `@.claude/rules/*.md` imports → still
+  always in context, just organized.
+- `.claude/docs/api-contract.md` — full `abzar/api` surface. **Not** imported; CLAUDE.md
+  points at it, Claude reads it only when touching API code → smaller default context.
+
+### Follow-up — full permission ruleset (no more per-command prompts)
+
+- **`.claude/settings.json`** `permissions` expanded: `allow` now covers all read-only
+  inspection (`Read`/`Grep`/`Glob`, `rg`/`ls`/`cat`/`find`/`jq`/`git` read verbs, `git add`/
+  `restore`/`fetch`), the full dev loop (`pnpm dev|build|lint|typecheck|format|test|install|
+  add|exec|dlx`, `npx tsc|next|eslint|prettier`, `node`), scaffolding (`mkdir`/`touch`/`cp`/
+  `mv`), and `curl` to `localhost:3000/4000`. `deny`: `.env*`/`*.pem` reads+edits, `rm -rf`,
+  `sudo`, `git push`/`reset --hard`/`clean`/`rebase`/`filter-branch`, piped `curl|sh`. `ask`:
+  `git commit`/`checkout`/`switch`/`merge`/`tag`, `pnpm remove`/`publish`, bare `rm`.
+- **`.claude/settings.local.json`** (new, git-ignored, personal): `defaultMode: acceptEdits`
+  (file edits apply without a prompt) + broad `Bash(pnpm:*)`/`npx:*`/`node:*` and
+  `WebFetch(domain:localhost)`.
+
+### Follow-up — `abzar/api` contract wired into config
+
+- `.claude/settings.json` → `permissions.additionalDirectories: ["../api/postman"]` so
+  Claude can read the Postman collection (it sits outside the storefront working dir).
+- `CLAUDE.md` gained an **"`abzar/api` contract"** section: points at
+  `../api/postman/abzar-api.postman_collection.json` as the source of truth, with the
+  base URL, OTP auth flow, and the `/storefront/*` vs `/backoffice/*` split summarized.
+  Rule: read the collection before any `apiClient` call / BFF route / Zod response schema.
+
+---
+
 ## 2026-09-07 — Real product photography wired into the media slots
 
 - **`MediaPlaceholder`** now takes optional `src` / `fit` / `sizes` / `priority`.

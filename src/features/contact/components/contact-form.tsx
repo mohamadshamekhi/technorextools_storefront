@@ -18,7 +18,7 @@ export function ContactForm() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    form.submit();
+    void form.submit();
   };
 
   return (
@@ -72,9 +72,9 @@ export function ContactForm() {
         ) : null}
       </div>
 
-      <Button type="submit" size="lg" className="mt-5 w-full">
+      <Button type="submit" size="lg" className="mt-5 w-full" disabled={form.pending}>
         <Icon name="check" className="size-4" />
-        ارسال پیام
+        {form.pending ? 'در حال ارسال…' : 'ارسال پیام'}
       </Button>
     </form>
   );

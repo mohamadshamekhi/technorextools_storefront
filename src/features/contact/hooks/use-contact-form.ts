@@ -14,8 +14,9 @@ export function useContactForm() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [pending, setPending] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     const parsed = contactFormSchema.safeParse({ name, phone, message });
     if (!parsed.success) {
       const flat = parsed.error.flatten().fieldErrors;
@@ -23,7 +24,23 @@ export function useContactForm() {
       return;
     }
     setErrors({});
-    setSubmitted(true);
+    setPending(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...parsed.data, subject }),
+      });
+      if (!res.ok) {
+        setErrors({ message: 'ارسال پیام ناموفق بود. دوباره تلاش کنید.' });
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setErrors({ message: 'ارتباط با سرور برقرار نشد.' });
+    } finally {
+      setPending(false);
+    }
   };
 
   return {
@@ -37,6 +54,7 @@ export function useContactForm() {
     setMessage,
     errors,
     submitted,
+    pending,
     submit,
   };
 }

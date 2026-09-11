@@ -3,11 +3,11 @@
 import { useState } from 'react';
 
 import { Icon } from '@/components/atoms';
-import type { Product } from '@/features/marketing';
+import type { UpsellProduct } from '../types';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 
-export function UpsellAddButton({ product }: { product: Product }) {
+export function UpsellAddButton({ product }: { product: UpsellProduct }) {
   const addItem = useCartStore((state) => state.addItem);
   const [added, setAdded] = useState(false);
 
@@ -16,7 +16,7 @@ export function UpsellAddButton({ product }: { product: Product }) {
       id: product.id,
       title: product.title,
       price: product.price,
-      compareAt: product.compareAt,
+      compareAt: null,
       categorySlug: product.categorySlug,
     });
     setAdded(true);
