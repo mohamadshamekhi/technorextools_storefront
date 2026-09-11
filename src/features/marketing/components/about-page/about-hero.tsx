@@ -24,12 +24,12 @@ export function AboutHero() {
       <Blob className="-top-[150px] -left-[100px]" />
       <Blob className="-right-[120px] -bottom-[200px] [background:radial-gradient(circle,oklch(0.84_0.16_82/0.22)_0%,transparent_68%)]" />
       <Container className="relative max-w-3xl text-center">
-        <AboutEyebrow>داستان پوما ایر</AboutEyebrow>
+        <AboutEyebrow>داستان تکنورکس</AboutEyebrow>
         <h1 className="mt-5 mb-4 text-3xl leading-[1.4] font-black tracking-tight text-balance sm:text-4xl">
           ۱۴ سال در کنار صنعت ابزار ایران
         </h1>
         <p className="text-foreground-muted text-base leading-loose text-pretty">
-          از یک فروشگاه کوچک ابزار تا نمایندگی رسمی پوما ایر در ایران؛ مسیری که با اعتماد کارگاه‌ها
+          از یک فروشگاه کوچک ابزار تا نمایندگی رسمی تکنورکس در ایران؛ مسیری که با اعتماد کارگاه‌ها
           و خطوط تولید صنعتی ساخته شد.
         </p>
       </Container>

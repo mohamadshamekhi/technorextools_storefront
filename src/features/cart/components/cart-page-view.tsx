@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import type { CartLine } from '@/store/cart-store';
 import { useCartStore } from '@/store/cart-store';
 
-import type { UpsellProduct } from '../types';
+import type { ShippingMethod, UpsellProduct } from '../types';
 import { pickUpsells } from '../utils/pick-upsells';
 import { CartHeading } from './cart-heading';
 import { CartItemList } from './cart-item-list';
@@ -14,7 +14,12 @@ import { EmptyCart } from './empty-cart';
 import { FreeShippingBar } from './free-shipping-bar';
 import { OrderSummary } from './order-summary';
 
-export function CartPageView({ upsellPool }: { upsellPool: UpsellProduct[] }) {
+type CartPageViewProps = {
+  upsellPool: UpsellProduct[];
+  shippingMethods: ShippingMethod[];
+};
+
+export function CartPageView({ upsellPool, shippingMethods }: CartPageViewProps) {
   const lines = useCartStore((state) => state.lines);
   const setQuantity = useCartStore((state) => state.setQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -39,7 +44,7 @@ export function CartPageView({ upsellPool }: { upsellPool: UpsellProduct[] }) {
     <div className="pt-6 pb-24">
       <CartHeading count={itemCount} />
 
-      <FreeShippingBar subtotal={subtotal} />
+      <FreeShippingBar subtotal={subtotal} methods={shippingMethods} />
 
       <div className="grid min-w-0 items-start gap-7 lg:grid-cols-[1fr_380px]">
         <CartItemList
@@ -48,7 +53,7 @@ export function CartPageView({ upsellPool }: { upsellPool: UpsellProduct[] }) {
           onChangeQuantity={setQuantity}
           onRemove={removeItem}
         />
-        <OrderSummary />
+        <OrderSummary shippingMethods={shippingMethods} />
       </div>
 
       <CartUpsells products={upsells} />

@@ -19,7 +19,7 @@ export function Hero() {
       <Container className="relative grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
         <Reveal className="flex flex-col gap-6">
           <span id="hero-heading" className="sr-only">
-            پوما ایر؛ فروش ابزار بادی و شارژی صنعتی
+            تکنورکس؛ فروش ابزار بادی و شارژی صنعتی
           </span>
           <HeroBadge />
           <HeroHeadline />

@@ -20,7 +20,7 @@ export const DEMO_ORDERS: TrackedOrder[] = [
       { key: 'delivered', label: 'تحویل به مشتری', date: null },
     ],
     items: [
-      { title: 'پیچ‌گوشتی بادی پوما ایر مدل PA-3000', quantity: 1, total: 4850000 },
+      { title: 'پیچ‌گوشتی بادی تکنورکس مدل PA-3000', quantity: 1, total: 4850000 },
       { title: 'مجموعه سری بکس بادی ۱۰ پارچه', quantity: 2, total: 1720000 },
     ],
   },

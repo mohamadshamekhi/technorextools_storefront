@@ -11,6 +11,7 @@ type AddToCartButtonProps = {
   title: string;
   price: number;
   slug: string;
+  imageUrl?: string | null;
   variant?: string;
   quantity?: number;
   className?: string;
@@ -21,6 +22,7 @@ export function AddToCartButton({
   title,
   price,
   slug,
+  imageUrl,
   variant,
   quantity = 1,
   className,
@@ -29,7 +31,7 @@ export function AddToCartButton({
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
-    addItem({ id, title, price, variant, compareAt: null, categorySlug: slug }, quantity);
+    addItem({ id, title, price, variant, compareAt: null, categorySlug: slug, imageUrl }, quantity);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };

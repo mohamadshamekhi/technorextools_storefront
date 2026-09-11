@@ -1,3 +1,4 @@
+import { toPersianDigits } from '@/lib/persian';
 import type { SessionUser } from '@/lib/session';
 
 import { ACCOUNT_NAV } from '../data/nav';
@@ -15,8 +16,10 @@ export function AccountSidebar({ user }: { user: SessionUser }) {
           {initial(user.name)}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-[13.5px] font-bold">{user.name ?? 'کاربر پوما ایر'}</p>
-          <p className="text-foreground-muted truncate text-[11.5px]">{user.email}</p>
+          <p className="truncate text-[13.5px] font-bold">{user.name ?? 'کاربر تکنورکس'}</p>
+          <p dir="ltr" className="text-foreground-muted truncate text-end text-[11.5px]">
+            {toPersianDigits(user.mobile)}
+          </p>
         </div>
       </div>
 

@@ -18,7 +18,7 @@ export function AccountTopbar({ user }: { user: SessionUser }) {
           <span className="bg-brand-500 font-display grid size-9 place-items-center rounded-xl text-lg font-bold text-white">
             P
           </span>
-          <span className="text-[17px] font-black tracking-tight">پوما ایر</span>
+          <span className="text-[17px] font-black tracking-tight">تکنورکس</span>
         </Link>
 
         <div className="flex items-center gap-3.5">

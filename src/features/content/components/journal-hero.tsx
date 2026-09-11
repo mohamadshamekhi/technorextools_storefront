@@ -10,10 +10,10 @@ export function JournalHero() {
             <Icon name="doc" className="size-[17px]" />
           </span>
           <span className="font-display text-brand-600 ring-brand-100 rounded-full bg-brand-50 px-3 py-1 text-[12px] font-bold tracking-[0.18em] ring-1">
-            PUMA AIR JOURNAL
+            TECHNOREXTOOLS JOURNAL
           </span>
         </div>
-        <h1 className="mb-2 text-3xl font-black tracking-tight sm:text-4xl">مجله پوما ایر</h1>
+        <h1 className="mb-2 text-3xl font-black tracking-tight sm:text-4xl">مجله تکنورکس</h1>
         <p className="text-foreground-muted mb-8 max-w-xl text-[15px] leading-loose">
           راهنمای خرید، نگهداری و کاربرد درست ابزار بادی و شارژی صنعتی، به زبان ساده.
         </p>

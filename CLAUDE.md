@@ -42,7 +42,8 @@ pnpm lint           # eslint src --max-warnings 0 — zero tolerance
 pnpm format / format:check
 ```
 
-**Done = `pnpm typecheck && pnpm lint && pnpm build` all green AND `cloud.md` updated.** No exceptions.
+**Done = `pnpm typecheck && pnpm lint && pnpm build` all green AND `.claude/docs/changelog.md`
+updated.** No exceptions.
 Run these once at the end, not after every edit.
 
 Self-verify before declaring done:
@@ -56,12 +57,14 @@ Self-verify before declaring done:
 No test runner yet. When adding one: Vitest + Testing Library, add `test`/`test:watch`, document
 single-test invocation here.
 
-## `cloud.md` — mandatory live ledger
+## `.claude/docs/changelog.md` — mandatory live ledger
 
 Newest-first. On **every** structural change (feature, page, API route, atomic component, store
 slice, provider, state flow) add an entry **in the same turn as the change**, not batched at the
 end of a longer task: exact file/folder additions, component tree, state flow (who owns state,
-how it propagates). Part of "done".
+how it propagates). Part of "done". Lives under `.claude/` (tooling data, not app/product
+content) — read on demand, not preloaded; see `.claude/docs/api-contract.md` for the same
+on-demand pattern.
 
 ## Quick reference
 
@@ -76,3 +79,4 @@ how it propagates). Part of "done".
 | Page metadata | `buildMetadata()` (`lib/seo.ts`) |
 | Structured data | `lib/json-ld.ts` helpers |
 | Global UI state | `useUiStore` (`store/ui-store.ts`) |
+| Client 401 → redirect to login | `throw new UnauthorizedError()` (`lib/api-error.ts`) in the hook |

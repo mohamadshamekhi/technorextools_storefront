@@ -26,7 +26,7 @@ export function FeaturedArticle({ article }: { article: ArticleCardData }) {
               <p className="text-foreground-muted mb-5 text-sm leading-loose">{article.excerpt}</p>
             ) : null}
             <div className="text-foreground-muted flex items-center gap-3 text-[12.5px]">
-              <span>تیم فنی پوما ایر</span>
+              <span>تیم فنی تکنورکس</span>
               <span aria-hidden>·</span>
               <span>{formatJalaliDate(article.publishedAt)}</span>
             </div>

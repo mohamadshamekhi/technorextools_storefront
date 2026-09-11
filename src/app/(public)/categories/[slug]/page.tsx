@@ -36,8 +36,8 @@ export async function generateMetadata({
 
   const filters = parseCatalogParams(await searchParams);
   return buildMetadata({
-    title: `خرید ${category.title} صنعتی | پوما ایر`,
-    description: `مجموعه ${category.title} پوما ایر با گارانتی اصالت و ارسال سریع.`,
+    title: `خرید ${category.title} صنعتی | تکنورکس`,
+    description: `مجموعه ${category.title} تکنورکس با گارانتی اصالت و ارسال سریع.`,
     path: routes.category(slug),
     noindex: hasActiveFilters({ ...filters, category: undefined }),
   });
@@ -64,7 +64,7 @@ export default async function CategoryPage({
     ...(result
       ? [
           itemListSchema(
-            `${category.title} پوما ایر`,
+            `${category.title} تکنورکس`,
             result.items.map((product) => ({
               name: product.title,
               url: routes.product(product.slug),

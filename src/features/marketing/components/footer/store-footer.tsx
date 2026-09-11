@@ -25,7 +25,7 @@ export function StoreFooter() {
           <div>
             <BrandLogo tone="dark" className="mb-4" />
             <p className="mb-5 max-w-xs text-sm leading-relaxed">
-              نمایندهٔ رسمی برند پوما ایر در ایران؛ ابزار بادی و شارژی صنعتی با گارانتی اصالت و
+              نمایندهٔ رسمی برند تکنورکس در ایران؛ ابزار بادی و شارژی صنعتی با گارانتی اصالت و
               پشتیبانی فنی.
             </p>
             <FooterSocialLinks />
@@ -37,7 +37,7 @@ export function StoreFooter() {
         </div>
         <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-[13px] text-white/55 sm:flex-row sm:justify-between">
           <span>© تمامی حقوق برای {siteConfig.name} محفوظ است.</span>
-          <span className="font-display">PUMA AIR · TEHRAN</span>
+          <span className="font-display">TECHNOREXTOOLS · TEHRAN</span>
         </div>
       </Container>
     </footer>

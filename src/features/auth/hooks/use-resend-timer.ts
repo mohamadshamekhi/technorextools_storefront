@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
- * Counts a number of seconds down to zero. `restart()` sets it back to the
- * full duration; the interval clears itself on unmount and at zero.
+ * Counts a number of seconds down to zero. `restart(seconds?)` sets it back to a
+ * duration — the server's `resendAfter` when the caller has one, else `defaultSeconds`.
+ * The interval clears itself on unmount and at zero.
  */
-export function useResendTimer(seconds: number) {
-  const [remaining, setRemaining] = useState(seconds);
+export function useResendTimer(defaultSeconds: number) {
+  const [remaining, setRemaining] = useState(defaultSeconds);
   const timer = useRef<ReturnType<typeof setInterval>>(undefined);
 
   const stop = useCallback(() => {
@@ -15,19 +16,22 @@ export function useResendTimer(seconds: number) {
     timer.current = undefined;
   }, []);
 
-  const restart = useCallback(() => {
-    stop();
-    setRemaining(seconds);
-    timer.current = setInterval(() => {
-      setRemaining((value) => {
-        if (value <= 1) {
-          stop();
-          return 0;
-        }
-        return value - 1;
-      });
-    }, 1000);
-  }, [seconds, stop]);
+  const restart = useCallback(
+    (seconds: number = defaultSeconds) => {
+      stop();
+      setRemaining(seconds);
+      timer.current = setInterval(() => {
+        setRemaining((value) => {
+          if (value <= 1) {
+            stop();
+            return 0;
+          }
+          return value - 1;
+        });
+      }, 1000);
+    },
+    [defaultSeconds, stop],
+  );
 
   useEffect(() => stop, [stop]);
 

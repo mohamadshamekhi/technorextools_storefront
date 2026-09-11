@@ -34,7 +34,7 @@ export default async function HomePage() {
     ...(featured
       ? [
           itemListSchema(
-            'جدیدترین ابزارهای پوما ایر',
+            'جدیدترین ابزارهای تکنورکس',
             featured.items.map((product) => ({ name: product.title, price: product.basePrice })),
           ),
         ]

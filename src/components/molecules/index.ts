@@ -1,4 +1,5 @@
 export { BrandLogo } from './brand-logo';
+export { Modal, type ModalProps } from './modal';
 export { FormField, type FormFieldProps } from './form-field';
 export { Card, CardHeader, CardTitle } from './card';
 export { Marquee, type MarqueeProps } from './marquee/marquee';

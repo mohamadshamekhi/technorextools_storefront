@@ -19,7 +19,7 @@ export async function generateMetadata({
   return buildMetadata({
     title: 'فروشگاه ابزار بادی و شارژی صنعتی',
     description:
-      'خرید ابزار بادی و شارژی صنعتی پوما ایر با گارانتی اصالت؛ فیلتر بر اساس دسته‌بندی، برند و قیمت.',
+      'خرید ابزار بادی و شارژی صنعتی تکنورکس با گارانتی اصالت؛ فیلتر بر اساس دسته‌بندی، برند و قیمت.',
     path: routes.products,
     noindex: hasActiveFilters(params),
   });
@@ -30,7 +30,6 @@ export default async function ProductsPage({
 }: PageProps<Record<string, never>, CatalogSearch>) {
   const params = parseCatalogParams(await searchParams);
   const result = await listProducts(params).catch(() => null);
-
   const structuredData = [
     breadcrumbSchema([
       { name: 'خانه', path: routes.home },
@@ -39,7 +38,7 @@ export default async function ProductsPage({
     ...(result
       ? [
           itemListSchema(
-            'محصولات پوما ایر',
+            'محصولات تکنورکس',
             result.items.map((product) => ({
               name: product.title,
               url: routes.product(product.slug),

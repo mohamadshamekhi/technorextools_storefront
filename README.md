@@ -25,8 +25,8 @@ pnpm dev                     # http://localhost:3000
 
 ## Architecture
 
-See [`cloud.md`](./cloud.md) for the live ledger of routes, features, and state flows,
-and [`CLAUDE.md`](./CLAUDE.md) for the working contract.
+See [`.claude/docs/changelog.md`](./.claude/docs/changelog.md) for the live ledger of routes,
+features, and state flows, and [`CLAUDE.md`](./CLAUDE.md) for the working contract.
 
 Key rules:
 

@@ -20,7 +20,11 @@ export function CartItemRow({ line, categorySlug, onChangeQuantity, onRemove }: 
   return (
     <div className="border-hairline bg-surface hover:border-brand-500/40 grid grid-cols-[72px_1fr] items-start gap-3.5 rounded-2xl border p-4 shadow-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:shadow-md sm:grid-cols-[96px_1fr_auto] sm:items-center sm:gap-4.5 sm:p-4.5">
       <div className="relative">
-        <MediaPlaceholder label="عکس محصول" className="aspect-square rounded-xl text-[10px]" />
+        <MediaPlaceholder
+          label={line.title}
+          src={line.imageUrl ?? undefined}
+          className="aspect-square rounded-xl text-[10px]"
+        />
         <ProductMediaBadge categorySlug={categorySlug} />
       </div>
 

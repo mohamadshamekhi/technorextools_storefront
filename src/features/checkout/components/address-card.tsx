@@ -23,14 +23,19 @@ export function AddressCard({ address, selected, onSelect }: AddressCardProps) {
       />
       <div className="flex-1">
         <div className="mb-1 flex items-center gap-2">
-          <span className="text-[14px] font-bold">{address.title}</span>
+          <span className="text-[14px] font-bold">{address.receiverName}</span>
           {address.isDefault ? (
             <span className="bg-brand-50 text-brand-600 rounded-full px-2.5 py-0.5 text-[11px] font-bold">
               پیش‌فرض
             </span>
           ) : null}
         </div>
-        <p className="text-foreground-muted text-[13px] leading-loose">{address.text}</p>
+        <p className="text-foreground-muted text-[13px] leading-loose">
+          {address.province}، {address.city}، {address.fullAddress}
+        </p>
+        <p dir="ltr" className="text-foreground-muted mt-1 text-right text-[12px]">
+          {address.receiverMobile}
+        </p>
       </div>
     </label>
   );

@@ -13,6 +13,12 @@
   `abzar/api`'s job. (2) `(dashboard)/layout.tsx` re-checks `getSession()`; admin pages re-check
   `isAdmin(user?.role)`. (3) Hierarchy: `ROLE_RANK` (`constants/index.ts`); gate with `hasRole` /
   `isAdmin` (`lib/rbac.ts`).
+- **Client-side 401 handling:** any client hook (`use*`) fetching a BFF route that *requires*
+  auth must `throw new UnauthorizedError()` (`lib/api-error.ts`) on `res.status === 401` instead
+  of a generic `Error` — `QueryProvider`'s global `onError` catches it and bounces to
+  `/login?next=<path>`. Exception: a hook whose whole point is "am I logged in" (`useCurrentUser`)
+  returns `null` on 401 instead — that's an expected anonymous state, not a failure, and must
+  never force-redirect (would loop on every public page for guests).
 - **CSRF:** SameSite=Lax is baseline. Mutations via Server Actions (same-origin POST) or
   same-origin BFF routes. Any state-changing route exposed cross-site → add explicit CSRF token.
 - **XSS:** never `dangerouslySetInnerHTML` with user/API content. Rich text from `abzar/api` →

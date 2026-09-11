@@ -3,11 +3,21 @@ import Link from 'next/link';
 import { Icon } from '@/components/atoms';
 import { routes } from '@/config/routes';
 
-export function DoneStep({ isNewUser }: { isNewUser: boolean }) {
+export function DoneStep({
+  isNewUser,
+  redirectTo = routes.home,
+  onContinue,
+}: {
+  isNewUser: boolean;
+  /** Internal path to send the user to instead of the homepage (e.g. back to `/cart`). */
+  redirectTo?: string;
+  /** Called right before navigating — e.g. closes the sign-in modal this step is inside. */
+  onContinue?: () => void;
+}) {
   return (
     <div className="text-center">
       <div className="relative mx-auto mb-6 size-22">
-        <span className="absolute -inset-3 rounded-full bg-[oklch(0.5_0.14_155_/_0.15)] animate-[auth-pulse_1.8s_ease-in-out_infinite]" />
+        <span className="absolute -inset-3 rounded-full bg-[oklch(0.5_0.14_155/0.15)] animate-[auth-pulse_1.8s_ease-in-out_infinite]" />
         <span className="relative grid size-22 place-items-center rounded-full bg-[oklch(0.95_0.04_150)] text-[oklch(0.5_0.14_155)] animate-[auth-pop_0.5s_cubic-bezier(0.22,1,0.36,1)]">
           <Icon name="check" className="size-10" />
         </span>
@@ -21,10 +31,11 @@ export function DoneStep({ isNewUser }: { isNewUser: boolean }) {
           : 'با موفقیت وارد حساب کاربری خود شدید.'}
       </p>
       <Link
-        href={routes.home}
+        href={redirectTo}
+        onClick={onContinue}
         className="bg-brand-500 hover:bg-brand-600 mt-7 inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold text-white shadow-lg transition-[background-color,transform] hover:-translate-y-0.5"
       >
-        ورود به فروشگاه
+        {redirectTo === routes.home ? 'ورود به فروشگاه' : 'بازگشت و ادامه'}
       </Link>
     </div>
   );

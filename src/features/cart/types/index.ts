@@ -1,14 +1,8 @@
-import type { IconName } from '@/components/atoms';
+import type { z } from 'zod';
 
-export type ShippingMethodKey = 'standard' | 'express';
+import type { shippingMethodSchema } from '../services/shipping.schemas';
 
-export type ShippingMethod = {
-  key: ShippingMethodKey;
-  label: string;
-  eta: string;
-  price: number;
-  icon: IconName;
-};
+export type ShippingMethod = z.infer<typeof shippingMethodSchema>;
 
 /** Result of `useCoupon` after an apply attempt. */
 export type CouponFeedback = { text: string; valid: boolean };
@@ -20,6 +14,7 @@ export type UpsellProduct = {
   price: number;
   slug: string;
   categorySlug: string;
+  imageUrl?: string | null;
 };
 
 /** Computed order totals — everything `OrderSummary` needs to render. */

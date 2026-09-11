@@ -17,16 +17,23 @@ export function RecentOrders({ orders }: { orders: Order[] }) {
           مشاهده همه ←
         </Link>
       </div>
-      <div className="flex flex-col gap-2.5">
-        {orders.map((order) => (
-          <div
-            key={order.code}
-            className="border-hairline bg-surface rounded-2xl border p-4 shadow-sm"
-          >
-            <OrderRow order={order} />
-          </div>
-        ))}
-      </div>
+      {orders.length === 0 ? (
+        <p className="border-hairline text-foreground-muted rounded-2xl border border-dashed py-8 text-center text-sm">
+          هنوز سفارشی ثبت نکرده‌اید.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          {orders.map((order) => (
+            <Link
+              key={order.orderNumber}
+              href={routes.dashboard.orderDetail(order.orderNumber)}
+              className="border-hairline bg-surface hover:border-brand-500/40 rounded-2xl border p-4 shadow-sm transition-colors"
+            >
+              <OrderRow order={order} />
+            </Link>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

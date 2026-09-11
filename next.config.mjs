@@ -10,6 +10,7 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: '**.abzar.example' },
+      { protocol: 'https', hostname: '**.arvanstorage.ir' },
     ],
   },
   async headers() {

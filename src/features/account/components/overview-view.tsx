@@ -1,13 +1,13 @@
 import type { SessionUser } from '@/lib/session';
 
-import { ORDERS } from '../data/orders';
+import type { Order } from '../types';
 import { MembershipCard } from './membership-card';
 import { PageHeading } from './page-heading';
 import { PurchaseTrendCard } from './purchase-trend-card';
 import { RecentOrders } from './recent-orders';
 import { StatCardGrid } from './stat-card-grid';
 
-export function OverviewView({ user }: { user: SessionUser }) {
+export function OverviewView({ user, recentOrders }: { user: SessionUser; recentOrders: Order[] }) {
   return (
     <div>
       <PageHeading
@@ -19,7 +19,7 @@ export function OverviewView({ user }: { user: SessionUser }) {
         <PurchaseTrendCard />
         <MembershipCard />
       </div>
-      <RecentOrders orders={ORDERS.slice(0, 3)} />
+      <RecentOrders orders={recentOrders} />
     </div>
   );
 }

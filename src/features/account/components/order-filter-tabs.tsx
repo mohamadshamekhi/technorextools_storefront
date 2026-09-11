@@ -8,9 +8,11 @@ export type OrderFilter = OrderStatus | 'all';
 
 const FILTERS: { key: OrderFilter; label: string }[] = [
   { key: 'all', label: 'همه' },
+  { key: 'pending_payment', label: 'در انتظار پرداخت' },
   { key: 'processing', label: 'در حال پردازش' },
-  { key: 'shipping', label: 'در حال ارسال' },
+  { key: 'shipped', label: 'ارسال شده' },
   { key: 'delivered', label: 'تحویل‌شده' },
+  { key: 'cancelled', label: 'لغو شده' },
 ];
 
 type OrderFilterTabsProps = {

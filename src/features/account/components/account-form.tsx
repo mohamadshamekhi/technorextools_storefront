@@ -20,14 +20,15 @@ export function AccountForm({ user }: { user: SessionUser }) {
       <label className="text-[12px] font-bold">
         <span className="text-foreground-muted mb-1.5 block">شماره موبایل</span>
         <input
+          dir="ltr"
           className={`${field} bg-surface-sunken font-display text-foreground-muted`}
-          value={toPersianDigits('09121234567')}
+          value={toPersianDigits(user.mobile)}
           disabled
         />
       </label>
       <label className="text-[12px] font-bold">
-        <span className="text-foreground-muted mb-1.5 block">ایمیل</span>
-        <input className={field} dir="ltr" defaultValue={user.email} />
+        <span className="text-foreground-muted mb-1.5 block">ایمیل (اختیاری)</span>
+        <input className={field} dir="ltr" placeholder="example@mail.com" />
       </label>
       <button
         type="submit"

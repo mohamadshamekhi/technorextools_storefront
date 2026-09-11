@@ -14,7 +14,7 @@ export function HeroShowcase() {
       />
       <div className={styles.ring} aria-hidden />
       <MediaPlaceholder
-        label="پیچ‌گوشتی بادی پوما ایر"
+        label="پیچ‌گوشتی بادی تکنورکس"
         src={PRODUCT_SHOT}
         priority
         sizes="(max-width: 1024px) 90vw, 45vw"

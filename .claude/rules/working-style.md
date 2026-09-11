@@ -8,5 +8,5 @@
 - Batch independent tool calls in one turn. Skip redundant verification — run
   `typecheck`/`lint`/`build` once at the end, not after every edit.
 - Don't restate the plan, the file tree, or rules from these docs back to the user.
-- Prose in `cloud.md` and code comments stays terse — no marketing adjectives.
+- Prose in `.claude/docs/changelog.md` and code comments stays terse — no marketing adjectives.
 - Reach for a subagent only when the user asks; a cold spawn re-derives context.

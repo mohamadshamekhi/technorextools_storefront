@@ -4,7 +4,7 @@ Real product shots served as static assets.
 
 ## Required now
 
-- **`puma-air-screwdriver.png`** — the yellow Puma Air pneumatic screwdriver on a
+- **`puma-air-screwdriver.png`** — the yellow Technorextools pneumatic screwdriver on a
   transparent / white background. Used as the shared hero + card shot across the
   storefront (see `src/features/marketing/data/media.ts` → `PRODUCT_SHOT`).
 

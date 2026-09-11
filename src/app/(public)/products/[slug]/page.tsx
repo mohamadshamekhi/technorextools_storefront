@@ -67,7 +67,7 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
       name: product.title,
       description: product.shortDesc ?? product.description ?? product.title,
       sku: product.variants[0]?.sku ?? product.id,
-      brand: product.brand?.title ?? 'پوما ایر',
+      brand: product.brand?.title ?? 'تکنورکس',
       price: product.basePrice,
       path: routes.product(slug),
       inStock: product.variants.some((variant) => variant.stockQty > 0) || product.variants.length === 0,

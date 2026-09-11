@@ -45,7 +45,7 @@ export function PhoneStep({ auth }: { auth: PhoneAuthController }) {
         <Link href={routes.about} className="text-brand-600">
           قوانین و مقررات
         </Link>{' '}
-        پوما ایر را می‌پذیرید.
+        تکنورکس را می‌پذیرید.
       </p>
     </div>
   );

@@ -12,6 +12,7 @@ export const routes = {
   search: '/search',
   cart: '/cart',
   checkout: '/checkout',
+  checkoutResult: '/checkout/result',
   orderTracking: '/order-tracking',
   account: '/dashboard',
   blog: '/blog',
@@ -26,6 +27,7 @@ export const routes = {
   dashboard: {
     root: '/dashboard',
     orders: '/dashboard/orders',
+    orderDetail: (orderNumber: string) => `/dashboard/orders/${orderNumber}`,
     addresses: '/dashboard/addresses',
     profile: '/dashboard/account',
     wishlist: '/dashboard/wishlist',

@@ -1,27 +1,32 @@
-import { SHIPPING_METHODS } from '../data/shipping';
-import type { ShippingMethodKey } from '../types';
+import type { ShippingMethod } from '../types';
 import { ShippingOption } from './shipping-option';
 
 type ShippingMethodsProps = {
-  selected: ShippingMethodKey;
-  freeShipping: boolean;
-  onSelect: (key: ShippingMethodKey) => void;
+  methods: ShippingMethod[];
+  selected: string;
+  subtotal: number;
+  onSelect: (id: string) => void;
 };
 
-export function ShippingMethods({ selected, freeShipping, onSelect }: ShippingMethodsProps) {
+export function ShippingMethods({ methods, selected, subtotal, onSelect }: ShippingMethodsProps) {
+  if (methods.length === 0) return null;
+
   return (
     <div className="mb-5">
       <p className="mb-2.5 text-[13.5px] font-bold">روش ارسال</p>
       <div className="flex flex-col gap-2.5">
-        {SHIPPING_METHODS.map((method) => (
-          <ShippingOption
-            key={method.key}
-            method={method}
-            price={method.key === 'standard' && freeShipping ? 0 : method.price}
-            selected={selected === method.key}
-            onSelect={() => onSelect(method.key)}
-          />
-        ))}
+        {methods.map((method) => {
+          const free = method.freeOverAmount !== null && subtotal >= method.freeOverAmount;
+          return (
+            <ShippingOption
+              key={method.id}
+              method={method}
+              price={free ? 0 : method.cost}
+              selected={selected === method.id}
+              onSelect={() => onSelect(method.id)}
+            />
+          );
+        })}
       </div>
     </div>
   );

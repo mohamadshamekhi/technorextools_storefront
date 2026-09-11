@@ -16,9 +16,9 @@ type BlogSearch = { page?: string };
 const searchSchema = z.object({ page: z.coerce.number().int().min(1).max(999).optional() });
 
 export const metadata: Metadata = buildMetadata({
-  title: 'مجله پوما ایر؛ راهنمای خرید و نگهداری ابزار',
+  title: 'مجله تکنورکس؛ راهنمای خرید و نگهداری ابزار',
   description:
-    'راهنمای خرید، نگهداری و کاربرد درست ابزار بادی و شارژی صنعتی به زبان ساده؛ نوشته تیم فنی پوما ایر.',
+    'راهنمای خرید، نگهداری و کاربرد درست ابزار بادی و شارژی صنعتی به زبان ساده؛ نوشته تیم فنی تکنورکس.',
   path: routes.blog,
 });
 
@@ -32,10 +32,10 @@ export default async function BlogPage({ searchParams }: PageProps<Record<string
   const structuredData = [
     breadcrumbSchema([
       { name: 'خانه', path: routes.home },
-      { name: 'مجله پوما', path: routes.blog },
+      { name: 'مجله تکنورکس', path: routes.blog },
     ]),
     itemListSchema(
-      'مقالات مجله پوما ایر',
+      'مقالات مجله تکنورکس',
       articles.map((article) => ({ name: article.title, url: routes.blogPost(article.slug) })),
     ),
   ];

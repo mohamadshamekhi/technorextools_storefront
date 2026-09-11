@@ -1,43 +1,37 @@
 import { z } from 'zod';
 
-import { REGEX } from '@/constants/regex';
-import { UserRole } from '@/constants';
-
 export * from './phone-auth';
 
-export const loginSchema = z.object({
-  email: z.string().regex(REGEX.email, 'Enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-  rememberMe: z.boolean().optional().default(false),
-});
-
-export const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Name is too short').max(80),
-    email: z.string().regex(REGEX.email, 'Enter a valid email address'),
-    password: z.string().regex(REGEX.strongPassword, 'Min 8 chars with upper, lower and a number'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
-
+/**
+ * Mirrors `abzar/api`'s `UserView` (`GET/PATCH /auth/me`, embedded in the OTP-verify
+ * response). Source: `../api/src/modules/auth/auth.service.ts`.
+ */
 export const authUserSchema = z.object({
   id: z.string(),
-  email: z.string().email(),
-  name: z.string().nullable(),
-  role: z.nativeEnum(UserRole),
+  fullName: z.string().nullable(),
+  mobile: z.string(),
+  email: z.string().nullable(),
+  role: z.string(),
+  referralCode: z.string(),
 });
 
-/** Token bundle returned by `POST /auth/login` on `abzar/api`. */
-export const authTokensSchema = z.object({
+/** `POST /auth/otp/request` response. */
+export const otpRequestResultSchema = z.object({
+  expiresIn: z.number().int().positive(),
+  resendAfter: z.number().int().positive(),
+  /** Only present when `abzar/api`'s `OTP_DEV_ECHO` is on — never in production. */
+  devCode: z.string().optional(),
+});
+
+/** `POST /auth/otp/verify` response. */
+export const authResultSchema = z.object({
   accessToken: z.string().min(10),
   expiresIn: z.number().int().positive(),
+  refreshToken: z.string().min(1),
+  isNewUser: z.boolean(),
   user: authUserSchema,
 });
 
-export type LoginInput = z.infer<typeof loginSchema>;
-export type RegisterInput = z.infer<typeof registerSchema>;
 export type AuthUser = z.infer<typeof authUserSchema>;
-export type AuthTokens = z.infer<typeof authTokensSchema>;
+export type OtpRequestResult = z.infer<typeof otpRequestResultSchema>;
+export type AuthResult = z.infer<typeof authResultSchema>;

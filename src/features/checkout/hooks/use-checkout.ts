@@ -2,47 +2,87 @@
 
 import { useState } from 'react';
 
-import type { CartLine } from '@/store/cart-store';
+import { useMutation } from '@tanstack/react-query';
 
-import { ADDRESSES } from '../data/addresses';
-import { PAYMENT_METHODS } from '../data/payment-methods';
-import type { CheckoutStep, PlacedOrder } from '../types';
+import { UnauthorizedError } from '@/lib/api-error';
+import { useCartStore, type CartLine } from '@/store/cart-store';
 
-function generateOrderCode(): string {
-  return `PA-${Math.floor(100000 + Math.random() * 899999)}`;
-}
+import type { CheckoutPaymentMethod, CheckoutStep, PlacedOrder } from '../types';
 
-/** Owns the address → payment → review → success state machine. */
+type ConfirmInput = {
+  lines: CartLine[];
+  shippingMethodId: string;
+  discountCode: string | null;
+};
+
+type StartResult = { orderNumber: string; total: number; paymentUrl: string | null; paid: boolean };
+
+/** Owns the address → payment → review → success/cash-pending state machine, and places
+ * the real order through `/api/checkout` on confirm. */
 export function useCheckout() {
   const [step, setStep] = useState<CheckoutStep>('address');
-  const [addressId, setAddressId] = useState(ADDRESSES[0]?.id ?? '');
+  const [addressId, setAddressId] = useState('');
   const [showNewAddress, setShowNewAddress] = useState(false);
-  const [paymentKey, setPaymentKey] = useState(PAYMENT_METHODS[0]?.key ?? '');
+  const [paymentMethod, setPaymentMethod] = useState<CheckoutPaymentMethod['code'] | ''>('');
   const [placedOrder, setPlacedOrder] = useState<PlacedOrder | null>(null);
 
-  const confirm = (lines: CartLine[], total: number) => {
-    setPlacedOrder({
-      code: generateOrderCode(),
-      total,
-      itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
-    });
-    setStep('success');
-  };
+  const mutation = useMutation({
+    mutationFn: async ({ lines, shippingMethodId, discountCode }: ConfirmInput) => {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: {
+            addressId,
+            shippingMethodId: shippingMethodId || undefined,
+            discountCode: discountCode || undefined,
+            redeemPoints: 0,
+            paymentMethod: paymentMethod || undefined,
+          },
+          lines: lines.map((line) => ({ variantId: line.id, qty: line.quantity })),
+        }),
+      });
+      if (res.status === 401) throw new UnauthorizedError();
+      const payload: unknown = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error((payload as { message?: string } | null)?.message ?? 'ثبت سفارش ناموفق بود');
+      }
+      return {
+        result: payload as StartResult,
+        itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
+      };
+    },
+    onSuccess: ({ result, itemCount }) => {
+      // The order is placed either way (stock reserved, row created) — safe to clear now.
+      useCartStore.getState().clear();
+
+      // `abzar/api` opened a gateway session — leave the app, no local success screen.
+      if (result.paymentUrl) {
+        window.location.assign(result.paymentUrl);
+        return;
+      }
+      setPlacedOrder({ orderNumber: result.orderNumber, total: result.total, itemCount });
+      setStep(result.paid ? 'success' : 'cash-pending');
+    },
+  });
 
   return {
     step,
     addressId,
     showNewAddress,
-    paymentKey,
+    paymentMethod,
     placedOrder,
+    confirming: mutation.isPending,
+    confirmError: mutation.error instanceof Error ? mutation.error.message : '',
     selectAddress: setAddressId,
     toggleNewAddress: () => setShowNewAddress((value) => !value),
-    selectPayment: setPaymentKey,
+    selectPayment: setPaymentMethod,
     goToPayment: () => setStep('payment'),
     backToAddress: () => setStep('address'),
     goToReview: () => setStep('review'),
     backToPayment: () => setStep('payment'),
-    confirm,
+    confirm: mutation.mutate,
   };
 }
 

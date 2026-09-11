@@ -9,8 +9,14 @@ import { ProfileStep } from './profile-step';
 
 const STEP_INDEX = { phone: 0, otp: 1, profile: 2, done: 2 } as const;
 
+type PhoneAuthFlowProps = {
+  redirectTo?: string;
+  /** Called right before the success step navigates — e.g. closes a modal this flow sits in. */
+  onDone?: () => void;
+};
+
 /** Client entry point for the phone / OTP sign-in experience. */
-export function PhoneAuthFlow() {
+export function PhoneAuthFlow({ redirectTo, onDone }: PhoneAuthFlowProps) {
   const auth = usePhoneAuth();
 
   return (
@@ -21,7 +27,9 @@ export function PhoneAuthFlow() {
         {auth.step === 'phone' && <PhoneStep auth={auth} />}
         {auth.step === 'otp' && <OtpStep auth={auth} />}
         {auth.step === 'profile' && <ProfileStep auth={auth} />}
-        {auth.step === 'done' && <DoneStep isNewUser={auth.isNewUser} />}
+        {auth.step === 'done' && (
+          <DoneStep isNewUser={auth.isNewUser} redirectTo={redirectTo} onContinue={onDone} />
+        )}
       </div>
     </div>
   );

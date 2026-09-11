@@ -13,7 +13,12 @@ import { authApi } from '@/features/auth/services/auth.api';
  */
 export async function logoutAction(): Promise<never> {
   try {
+    // Best-effort: an already-expired/invalid token (e.g. the dev-bypass mock
+    // session) makes `abzar/api` reject this with 401 — sign-out must still
+    // proceed either way, so never let it block clearing the cookie.
     await authApi.logout();
+  } catch {
+    /* ignore — the cookie is cleared below regardless */
   } finally {
     await clearSessionCookie();
   }

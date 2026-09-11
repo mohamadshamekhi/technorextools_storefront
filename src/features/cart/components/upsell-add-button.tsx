@@ -18,6 +18,7 @@ export function UpsellAddButton({ product }: { product: UpsellProduct }) {
       price: product.price,
       compareAt: null,
       categorySlug: product.categorySlug,
+      imageUrl: product.imageUrl,
     });
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1400);
@@ -29,7 +30,7 @@ export function UpsellAddButton({ product }: { product: UpsellProduct }) {
       onClick={handleAdd}
       aria-label={`افزودن ${product.title} به سبد`}
       className={cn(
-        'border-hairline hover:bg-brand-500 hover:border-brand-500 grid size-8 place-items-center rounded-lg border transition-colors',
+        'border-hairline hover:bg-brand-500 hover:border-brand-500 grid size-11 place-items-center rounded-lg border transition-colors',
         added && 'bg-brand-500 border-brand-500',
       )}
     >

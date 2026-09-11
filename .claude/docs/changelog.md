@@ -1,7 +1,517 @@
-# cloud.md — Live Workspace Ledger
+# .claude/docs/changelog.md — Live Workspace Ledger
 
 > Update this file on every structural change: new feature, page, API route, atomic
 > component, store slice, or refactor. Keep entries newest-first.
+
+---
+
+## 2026-09-11 — Feature: `/checkout/result` gateway return page (was 404)
+
+`window.location.assign(result.paymentUrl)` in `use-checkout.ts` sends the customer to the
+online gateway, which redirects back to `/checkout/result?orderNumber=...&status=...` — that
+route never existed, so the return trip 404'd after every online payment.
+
+Added `src/app/(checkout)/checkout/result/page.tsx`: authenticated (redirect to login with
+`next`), Zod-validates `orderNumber` from `searchParams` (the gateway's own `status` query param
+is a hint only, never trusted), then re-fetches the real order via `ordersApi.detail()` —
+owner-scoped, so a tampered `orderNumber` just 404s to `/dashboard/orders` instead of leaking
+another customer's order. Rendering branches on `order.status`, not the query string.
+
+New in `features/checkout/components/`: `checkout-result-view.tsx` (RSC switch: `paid` /
+`processing` / `shipped` / `delivered` → existing `SuccessStep`; `pending_payment` + `cash` →
+existing `CashPendingStep`; `payment_failed` / `abandoned` / `cancelled` → new `FailedStep`
+(retry via `RetryPaymentButton` for `online`, else back-to-cart); `pending_payment` + `online`
+(webhook not landed yet) → new `PendingConfirmationStep`, same retry fallback.
+
+Account barrel (`features/account/index.ts`) now also exports `RetryPaymentButton`,
+`ORDER_STATUS_META`, and the `OrderDetail`/`OrderStatus` types — needed cross-feature by the new
+checkout view, previously only used inside `account`. Added `routes.checkoutResult` (`/checkout/
+result`); already covered by `robots.ts`'s `/checkout` disallow prefix, no change needed there.
+
+## 2026-09-11 — Fix: payment-method contract settled (was 502-ing silently to an empty list)
+
+User: `/checkout` payment step showed "هیچ روش پرداختی در دسترس نیست" (empty) even though
+`abzar/api` was up. Root cause: the payment-methods contract moved a **third** time after the
+previous entry shipped — `curl localhost:4000/api/v1/storefront/payment-methods` returned
+`{id, code, title, description, sortOrder}`, not the `{id, title, kind, sortOrder}` the previous
+pass built against. The mismatched `kind` field failed `paymentMethodListSchema`'s `safeParse` →
+`ApiError` → swallowed by the page's `.catch(() => [])` → an empty, silently-wrong list. Checked
+the now-current `abzar/api` source to confirm: it settled back close to the *original* spec from
+the top of this conversation — `POST /storefront/checkout` takes a plain `paymentMethod: 'online'
+| 'cash'` again (not `paymentMethodId`), and `Order.paymentMethod` is the bare `PaymentMethodKind`
+enum (not a relation) — `/storefront/payment-methods` is purely a read-only metadata table
+(title/description per code) for display, never referenced by id anywhere.
+
+Reverted/fixed to match: `payment-methods.schemas.ts` (`kind`→`code`, added `description`),
+`checkout.schemas.ts` (`paymentMethodId`→`paymentMethod: enum`), `use-checkout.ts` /
+`checkout-page-view.tsx` / `payment-step.tsx` / `payment-option.tsx` select and submit by `code`
+again (not a DB id) — `PaymentOption` now shows the catalog's own `description` when present,
+falling back to a built-in one per code. `orders.schemas.ts`'s `paymentMethod` is a bare code
+enum again too (`orderPaymentMethodSchema` removed); `order-row.tsx` / `order-detail-summary.tsx`
+display it through the restored `paymentMethodLabel()` helper instead of a `.title` field that no
+longer exists on the order. This is the third payment-method contract shift mid-conversation —
+worth a live smoke test once `abzar/api` stops moving before trusting this further.
+
+---
+
+## 2026-09-11 — Checkout + orders wired to real `abzar/api` end to end (was fully mock)
+
+User handed over the backend spec for `paymentMethod` on checkout-start; investigation showed
+checkout/orders were **still 100% local mock** (`useCheckout.confirm` just faked an order code —
+no `abzar/api` call existed at all, per the 2026-09-04 checkout entry). Scoped up to the full
+real wiring per explicit confirmation ("همه‌چیز با هم"), covering checkout-start, retry-payment,
+and the orders list/detail pages.
+
+**Contract moved under us mid-implementation.** The user's spec described
+`paymentMethod: "online" | "cash"` as a request field; partway through, `abzar/api`'s actual
+`storefront-checkout.schemas.ts` changed to `paymentMethodId` (an objectId) referencing a new
+`GET /storefront/payment-methods` catalog — an admin-configurable list of named methods (each
+with a `kind: 'online' | 'cash'`), not a fixed pair. Adapted to the *current* contract rather
+than the originally-pasted one: payment methods are fetched, not hardcoded, and the picker shows
+however many the backoffice has configured. `Order.paymentMethod` in the DB is likewise a full
+relation to that catalog (`{id, title, kind, sortOrder}`), not a bare string — mirrored as such.
+
+### Checkout-start (`features/checkout/`)
+
+- **`services/checkout.schemas.ts`** — `startCheckoutInputSchema` (`addressId,
+  shippingMethodId?, discountCode?, redeemPoints, paymentMethodId`), `checkoutStartResultSchema`
+  (`{orderNumber, total, paymentUrl, paid}`), `payAgainResultSchema`.
+- **`services/payment-methods.schemas.ts`** — `paymentMethodViewSchema`
+  (`{id, title, kind, sortOrder}`), shared with the orders module below.
+- **`services/checkout.api.ts`** (server-only) — `listPaymentMethods` (public, cached like
+  shipping methods), `start`, `payAgain`.
+- **`features/cart/services/cart.api.ts`** gained `syncCartToServer(lines)` — factored out of
+  the discount route (which now uses it too) since checkout-start needs the identical
+  clear-then-re-add sync of the local cart into `abzar/api`'s real cart before it can run.
+- **New BFF routes**: `POST /api/checkout` (`safeParse`s `{input, lines}`, syncs the cart, calls
+  `checkoutApi.start`) and `POST /api/checkout/[orderNumber]/pay` (retry).
+- **`hooks/use-checkout.ts`** rewritten as a `useMutation` (was a synchronous fake). On success:
+  a `paymentUrl` → `window.location.assign` (leaves the app for the gateway); no url + `paid` →
+  `success` step; no url + not paid → new **`cash-pending`** step. The cart is cleared in
+  `onSuccess` only — a failed attempt no longer wipes it. Throws `UnauthorizedError` on 401
+  (global modal, same as everywhere else).
+- **New `CashPendingStep`** — "سفارش شما ثبت شد، در انتظار تأیید/تسویه" (mirrors `SuccessStep`'s
+  layout, distinct copy/icon since nothing was actually charged yet).
+- **`PaymentStep`/`PaymentOption`** rewritten around the fetched `CheckoutPaymentMethod[]` —
+  icon/description derived from `kind`, not stored per hardcoded entry. Deleted
+  `data/payment-methods.ts` (the old 3-item fake gateway list).
+- **`/checkout/page.tsx`** now fetches `listShippingMethods()` *and*
+  `checkoutApi.listPaymentMethods()` server-side, passed into `CheckoutPageView`, which defaults
+  the picked payment method the same way it already defaulted the address.
+- **`ReviewStep`** gained `confirming`/`confirmError` (spinner + real Persian error message from
+  `abzar/api`, e.g. "شما یک سفارش در انتظار پرداخت دارید").
+
+### Orders (`features/account/`)
+
+- **`services/orders.schemas.ts`** — `orderStatusSchema` (all 8 real `OrderStatus` values, not
+  the old 3-value mock), `orderListItemSchema`/`orderDetailSchema` mirroring
+  `OrderListItemView`/`OrderDetailView` exactly (`paymentMethod` as the relation object, address,
+  items, `statusHistory`, `payment`).
+- **`services/orders.api.ts`** (server-only) — `list`, `detail`; called directly from RSC pages
+  (no BFF needed, these are plain authenticated reads).
+- **`data/orders.ts`** — `ORDER_STATUS_META` now covers all 8 statuses; dropped the fake
+  `ORDERS` array and the 4-stage `FULFILMENT_STAGES` concept (doesn't map to real,
+  non-linear statuses like `cancelled`/`abandoned`).
+- **New `dashboard/orders/[orderNumber]/page.tsx`** — a real order didn't have its own page
+  before (the old list just expanded a fake inline 4-stage stepper). RSC, 404s on `ApiError`
+  404/403. New `OrderDetailView` (+ `OrderDetailItems`, `OrderDetailSummary`,
+  `OrderStatusTimeline` — a real chronological log from `statusHistory`, not a guessed
+  4-stage progress bar) and `RetryPaymentButton` (`hooks/use-retry-payment.ts`, a `useMutation`
+  hitting the new retry BFF route) — shown **only** when `paymentMethod.kind === 'online' &&
+  status === 'pending_payment'`, matching `abzar/api`'s own 400 rejection of a cash retry.
+- `OrderCard` (list) now links to the detail page instead of expanding an inline fake timeline.
+  `order-filter-tabs.tsx` filters on the real statuses. `dashboard/page.tsx` and
+  `dashboard/orders/page.tsx` fetch real orders server-side and pass them down — `OverviewView`/
+  `OrdersView`/`RecentOrders` no longer import mock data.
+
+**Verified:** `pnpm typecheck && pnpm lint && pnpm build` green. Not exercised against a live
+`abzar/api` in this session — given the contract shifted once already mid-build, a real
+end-to-end pass (place an online order, a cash order, retry a failed online payment, view both
+in the orders list/detail) is worth doing once the backend settles.
+
+---
+
+## 2026-09-11 — Cart → checkout: shipping method + discount no longer lost
+
+User: going from `/cart` to `/checkout` dropped data, and going back lost more. Root cause —
+shipping-method selection and the applied discount were both plain local `useState` inside
+`OrderSummary`/`useCoupon`, scoped to `/cart` only. `CheckoutPageView` never received either:
+it recomputed its own bare `subtotal` from cart lines and `CheckoutSummarySidebar` **hardcoded**
+"هزینه ارسال: رایگان" regardless of what was actually picked, with no discount line at all.
+Going back to `/cart` remounted `OrderSummary` fresh, so even the coupon and shipping choice
+made moments earlier were gone.
+
+Moved both into `store/cart-store.ts` (already the persisted, `zustand` source of truth for cart
+lines) — new `shippingMethodId`/`shippingCost`/`discountCode`/`discountAmount` fields +
+`setShippingMethod`/`setDiscount`/`clearDiscount`. A discount is now auto-cleared by
+`addItem`/`setQuantity`/`removeItem` (it was validated against a specific subtotal — once the
+cart changes, that number is stale and must be re-applied). `clear()` (called post-order) resets
+all four.
+
+`use-cart-totals.ts` / `use-coupon.ts` now read/write the store instead of local state — no
+prop-drilled `couponCode`. `OrderSummary` picks a default shipping method into the store once
+the list loads, instead of local `useState`. `/checkout` now fetches shipping methods
+server-side too (same `listShippingMethods()` as `/cart`'s page.tsx) and `CheckoutPageView` calls
+the same `useCartTotals` (newly exported from `features/cart`'s barrel, alongside
+`OrderSummaryLines` and the `CartTotals`/`ShippingMethod` types) — so `CheckoutSummarySidebar`
+renders the real chosen shipping cost/free-shipping state and discount line instead of a
+hardcoded one, and `checkout.confirm()` uses the real `totals.total` (was the bare subtotal,
+silently overcharging by ignoring both shipping cost and discount).
+
+---
+
+## 2026-09-11 — Sign-in modal is now global (was one-off per `CheckoutButton`)
+
+User: applying a coupon while signed out did a full-page redirect instead of the same in-place
+modal the checkout button already used; asked for the modal everywhere auth is needed, not just
+checkout.
+
+New **`store/auth-modal-store.ts`** — plain (non-persisted) zustand store: `{isOpen, redirectTo,
+open(redirectTo?), close()}`. New **`components/organisms/auth-modal.tsx`** — the actual `Modal` +
+`PhoneAuthFlow` pairing, reading that store; mounted exactly once in `providers/index.tsx`
+(`AppProviders`, inside `QueryProvider` so `PhoneAuthFlow`'s `useQueryClient` call resolves) —
+covers every route group from one place.
+
+**`providers/query-provider.tsx`**'s global `UnauthorizedError` handler now calls
+`useAuthModalStore.getState().open(currentPath)` instead of `window.location.assign('/login?...')`
+— so `useCoupon`, `useAddresses`/`useCreateAddress`, and any future hook that throws
+`UnauthorizedError` all open the same modal in place, no page leave. `CheckoutButton` was
+rewritten to open the shared store (`openAuthModal(routes.checkout)`) instead of owning its own
+local `Modal`/`useState` — same visual result, one instance instead of N.
+
+`PhoneAuthFlow` gained an optional `onDone` prop, threaded to `DoneStep`'s `onContinue` (fires
+right as the success screen's Link is clicked) — the global modal passes its own `close()` so it
+doesn't stay open behind the page after a completed sign-in.
+
+---
+
+## 2026-09-11 — Cart discount code → real `abzar/api` (was `COUPONS` lookup table)
+
+User: applying "QWE" said invalid — correctly, since it isn't a real code, but the whole coupon
+feature was a client-side `Record<string, number>` (`TECHNOREX10`/`TECHNOREX20`) mock. Wired to
+the real `POST /storefront/discounts/validate`.
+
+**The catch, documented back on 2026-09-11's rebrand entry:** that endpoint takes no cart data in
+its body — it evaluates `abzar/api`'s own **server-side** cart for the authenticated user
+(`CartRepository.findActiveByUserId`), 400ing "سبد خرید شما خالی است" if that cart is empty. The
+storefront's cart is still 100% local (`zustand`/`localStorage`) — full migration to the real
+`X-Cart-Token`/server-cart model (`GET/POST/PATCH/DELETE /storefront/cart*`, rewiring
+`AddToCartButton`/`ProductBuyBox`/`UpsellAddButton`/the whole cart page, guest-cart-token
+handling, merge-on-login) is its own sizable project, not something to fold into a coupon fix.
+
+**Interim, real, working fix:** new `src/app/api/cart/discount/route.ts` — on apply, the BFF first
+mirrors the client's current local cart lines into the real server cart (`DELETE
+/storefront/cart` then `POST /storefront/cart/items` per line, via new server-only
+`features/cart/services/cart.{api,schemas}.ts`), THEN calls the real `discounts/validate` and
+returns its `{discountAmount, eligibleSubtotal}`. So the coupon rules (min order amount, per-user
+usage limits, active window, product/category targeting) are now genuinely enforced by
+`abzar/api`'s `DiscountEvaluatorService` — not guessed locally — at the cost of clearing +
+rebuilding the user's real server cart as a side effect of clicking "اعمال" (harmless today since
+nothing else reads that server cart yet).
+
+`use-coupon.ts` is now a `useMutation` (was local `useState` + a table lookup) — throws
+`UnauthorizedError` on 401 (guest clicking apply → bounced to `/login`, same global handler as
+everywhere else) and surfaces the real Persian error message from `abzar/api` (expired code,
+usage limit, "کد تخفیف روی اقلام سبد شما اعمال نمی‌شود", etc.) instead of one generic string.
+`use-cart-totals.ts` takes the server's absolute `discountAmount` (تومان) instead of computing
+`subtotal × mockRate` from a code lookup. `CouponField` gained a `pending` state (disabled inputs
++ spinner while the request is in flight). Deleted `features/cart/data/coupons.ts`.
+
+**Known gap:** a product with zero variant rows (shouldn't happen for anything actually
+sellable — every cart-eligible item is a `ProductVariant` in the schema) has no valid
+`variantId` to sync; that line's sync call 404s ("محصول مورد نظر یافت نشد") rather than being
+silently skipped.
+
+---
+
+## 2026-09-11 — Dev auth bypass removed entirely; key-spec chips on the buy-box
+
+**Dev auth bypass removed.** User manually commented out the `getSession()` bypass line while
+testing (visible via IDE selection on `lib/session.ts`) — that alone would have left the
+mechanism in a broken half-state: `middleware.ts`'s Edge check would still wave a bypassed
+visitor through to `/dashboard`, only for `(dashboard)/layout.tsx`'s `getSession()` re-check to
+immediately bounce them back to `/login` anyway (dead loop), and `/api/auth/me`'s own bypass
+branch would never run either since it's gated behind a truthy `session` first. With real OTP
+login now fully wired (previous entry), the bypass no longer serves a purpose and half-alive is
+worse than gone. Removed for good: `DEV_SESSION_USER` + `isDevAuthBypass()` out of `lib/jwt.ts`,
+the dead branch out of `lib/session.ts#getSession`, the fallback out of `middleware.ts` and
+`app/api/auth/me/route.ts`'s `GET`, and the now-meaningless `DEV_AUTH_BYPASS` var out of
+`.env.example`. `getSession()` is unconditionally real from here on; `/dashboard` requires an
+actual `abzar/api`-issued session both at the Edge and on every re-check.
+
+**Buy-box key-spec chips.** New `features/catalog/components/product-detail/key-spec-chips.tsx` —
+up to 4 of `product.attributeValues` (`value` + `unit`, `attributeTitle`) rendered as compact
+pills, shown in `ProductBuyBox` between the short description and the price. This is exactly
+`attributeValues`-derived data the API already returns (no new endpoint/schema) — the real
+`abzar/api` product model has no per-variant attribute axis (e.g. a phone case's "compatible
+device model" is a plain product-level spec, not a variant dimension like `colorName` is), so
+this surfaces existing specs as a scannable strip rather than fabricating a variant picker the
+backend doesn't support. The existing `colorName`-driven "مدل" variant picker in `ProductBuyBox`
+(shown only when `variants.length > 1`) is untouched and remains the real variant axis.
+
+---
+
+## 2026-09-11 — Phone/OTP login wired to real `abzar/api` (was fully client-mocked)
+
+User: "login is fine now, it needs to actually hit the server — no more hardcoded dev stuff."
+The whole sign-in flow was client-side mock (`phone-auth.service.ts`: `wait()` + a hardcoded
+known-phone/rejected-OTP pair, session "persisted" as a `localStorage` marker only). Replaced end
+to end with the real `abzar/api` OTP endpoints, discovered by reading
+`../api/src/modules/auth/{auth.controller,auth.service,auth.schemas,otp.service,token.types}.ts`
+(no saved Postman response bodies to go on).
+
+**New BFF routes** (server-only `apiClient`, `auth:false` where the real endpoint is public):
+- `POST /api/auth/otp/request` → `abzar/api` `/auth/otp/request` — `safeParse({mobile,
+  referralCode?})`, 400+`fieldErrors` on failure.
+- `POST /api/auth/otp/verify` → `/auth/otp/verify`; on success calls
+  `setSessionCookie(accessToken, expiresIn)` itself (HttpOnly, real JWT) and returns only
+  `{isNewUser, user}` to the client — the refresh token is intentionally not forwarded (no
+  refresh flow wired yet, see Open below).
+- `app/api/auth/me/route.ts` gained `PATCH` (self-service `fullName`/`email` edit, same
+  `safeParse` pattern) alongside the existing `GET`.
+
+**`features/auth/services/auth.api.ts`** rewritten: dropped the dead password-auth endpoints
+(`/auth/login`, `/auth/register` — predates the OTP pivot, never worked against the real API) for
+`requestOtp` / `verifyOtp` / `me` / `updateProfile` / `logout` matching the real controller.
+**`features/auth/types/index.ts`**: `authUserSchema` now mirrors the real `UserView`
+(`id, fullName, mobile, email, role, referralCode` — was a fictional `{id,email,name,role}`
+shape); added `otpRequestResultSchema` / `authResultSchema`; deleted the unused
+`loginSchema`/`registerSchema`/`authTokensSchema`.
+
+**Critical fix uncovered along the way — the JWT payload didn't match reality at all.**
+`lib/jwt.ts`'s `jwtPayloadSchema` expected `{sub, email, role: UserRole, name?}`; the real
+access token (`modules/auth/token.types.ts` `tokenPayloadSchema`, signed in
+`auth.service.ts#issueTokens`) only ever carries `{sub, mobile, role: <db slug>}` — no email, no
+name, and role is a free-form DB slug, not the storefront's old fixed enum. Every real login
+would have failed `decodeToken()`'s schema check and silently fallen through to "no session".
+Fixed: `SessionUser = {id, mobile, role: string, name?}`; `constants/index.ts` `UserRole` trimmed
+to the two slugs `abzar/api` actually exports as constants (`customer`, `superadmin` —
+`CUSTOMER_ROLE_SLUG`/`SUPERADMIN_ROLE_SLUG`; other roles are DB-seeded, rank unknown);
+`ROLE_RANK` → `Partial<Record<string, number>>` (unknown slug ranks as 0); `lib/rbac.ts`
+`hasRole`/`isAdmin` take a plain `role: string | undefined`; `formatRole` keys off the string
+slug with a raw-slug fallback instead of `Record<UserRole,string>`.
+
+**Client-side flow (`use-phone-auth.ts`, `phone-auth.service.ts`)**: removed
+`KNOWN_PHONE`/`REJECTED_OTP`/`persistSession()` entirely — errors and "new vs. existing user"
+now come straight from the server's response/message. `resendAfter` from the real OTP-request
+response now drives `useResendTimer` (`restart(seconds?)` gained an override param) instead of
+the fixed `RESEND_SECONDS` constant (kept only as the pre-first-request default).
+`ProfileStep`'s "تکمیل ثبت‌نام" now actually persists (`finishProfile` calls `PATCH /auth/me`
+through the service) — previously `auth.finishProfile()` took no input and just flipped the
+local step to `done`, never saving anything. Both `verifyCode` and `finishProfile` invalidate the
+`['auth','me']` query on success so the header/`CheckoutButton`/dashboard reflect the new session
+immediately, no reload needed.
+
+**Dashboard UI fallout from `SessionUser` losing `.email`:** `account-sidebar.tsx`,
+`dashboard-topbar.tsx` now show the real `user.mobile` (Persian-digit formatted) instead of a
+nonexistent email field. `account-form.tsx` also had its own separate hardcoded phone number
+literal (`"09121234567"`, unrelated leftover from the scaffold) — now shows `user.mobile` too.
+
+**Open / not in this pass:**
+- No refresh-token flow — a session is exactly `expiresIn` seconds (`abzar/api`'s
+  `JWT_ACCESS_TTL`, default 15m) and then requires a fresh OTP login; `/auth/refresh` exists
+  server-side but nothing here calls it yet.
+- OTP-verify's `cartToken` (guest-cart merge on login) isn't sent — the cart is still 100% local
+  `zustand`/`localStorage`, unrelated to `abzar/api`'s server-side cart (same gap noted in the
+  2026-09-11 rebrand entry below).
+- Beyond `customer`/`superadmin`, real backoffice role slugs are unknown from the storefront's
+  side (dynamic, DB-seeded) — `/dashboard/admin/*` gating only recognizes `superadmin` for now.
+
+Verified against `pnpm typecheck && pnpm lint && pnpm build` — end-to-end request against a
+running `abzar/api` not yet exercised in this session (would need OTP_DEV_ECHO or real SMS).
+
+---
+
+## 2026-09-11 — Dev auth bypass flipped to opt-in (was opt-out)
+
+User report: a signed-out visitor with no token could still open `/dashboard`. Root cause is the
+intentional [`DEV_AUTH_BYPASS`](.claude/docs/changelog.md) escape hatch from 2026-09-07 — hard-
+gated to `NODE_ENV !== 'production'` so it can never fire on a real deployment — but
+`isDevAuthBypass()`'s polarity was **opt-out**: `DEV_AUTH_BYPASS !== '0'`, so it defaulted ON in
+dev even with the var unset. Flipped to **opt-in**: `DEV_AUTH_BYPASS === '1'`, default OFF — a
+fresh `pnpm dev` (or any `.env.local` that doesn't explicitly set it) now enforces the real
+session gate, and `/dashboard` correctly bounces a signed-out visitor to `/login`. Also added a
+one-time `console.warn` in `lib/jwt.ts` when the bypass actually fires, so it can't go unnoticed
+again. `.env.example`'s `DEV_AUTH_BYPASS` default flipped `1` → `0` with an updated comment.
+
+**Action needed from the user:** `.env.local` is permission-blocked from Claude's `Read`/`Edit` —
+if it explicitly sets `DEV_AUTH_BYPASS=1`, that still wins over the new code default and must be
+changed by hand to `0` (or removed) + dev server restarted for the fix to take effect locally.
+
+Note: real session issuance is still not wired — `phone-auth.service.ts`'s `persistSession()`
+only writes a `localStorage` marker, no HttpOnly cookie — so completing the login modal/`/login`
+flow locally won't yet produce a session `getSession()` recognizes once the bypass is off. That's
+the next piece once `abzar/api` auth is reachable.
+
+---
+
+## 2026-09-11 — Fix: `logoutAction` 500 on an already-invalid session
+
+Reported crash: `POST /dashboard 500` — `logoutAction`'s `try { authApi.logout() } finally {
+clearSessionCookie() }` cleared the cookie but the `ApiError(401)` from `authApi.logout()` (the
+dev-bypass mock session isn't a token `abzar/api` accepts) still propagated after the `finally`,
+crashing the Server Action before it reached `redirect()`. Added a `catch` that swallows the
+logout-call failure — sign-out is best-effort against `abzar/api` and must never block clearing
+the local cookie + redirecting to `/login`.
+
+---
+
+## 2026-09-11 — Global client-side 401 → redirect to `/login`
+
+New **`lib/api-error.ts`**: `UnauthorizedError`. **`providers/query-provider.tsx`** now builds
+its `QueryClient` with a `QueryCache`/`MutationCache` `onError` that redirects
+(`window.location.assign`) to `/login?next=<current path+search>` whenever a query/mutation
+throws it; `retry` is also patched to never retry an `UnauthorizedError` (retrying a 401 is
+pointless — go straight to the redirect). One central place, so every future client hook gets
+this for free just by throwing the right error type.
+
+`features/checkout/hooks/use-addresses.ts` (`useAddresses` + `useCreateAddress`) now throws
+`UnauthorizedError` on `res.status === 401` instead of a generic `Error` — was surfacing as an
+inline "بارگذاری آدرس‌ها ناموفق بود" message even when the real cause was a missing/expired
+session; now it correctly bounces to login instead.
+
+`useCurrentUser` is the deliberate exception — it already treats 401 as "no session" and
+resolves to `null` rather than throwing, which is correct: it's read on every public page to
+decide header/`CheckoutButton` state, and must never force a redirect for an anonymous visitor
+just browsing. Documented the convention (which hooks throw vs. return `null`) in
+`.claude/rules/security.md` and the `CLAUDE.md` quick-reference table.
+
+---
+
+## 2026-09-11 — In-place login modal at "تکمیل سفارش و پرداخت"
+
+User picked inline modal over full-page redirect (fewer hops, cart stays visible) after a
+design-tradeoff review. New generic **`components/molecules/modal.tsx`** — `Modal` (portalled to
+`body`, backdrop-click + Escape close, body-scroll lock, focuses the first focusable element,
+`role="dialog"`/`aria-modal`); exported from `components/molecules/index.ts`. New
+`animate-modal-in`/`animate-modal-backdrop-in` keyframes in `animations.css`.
+
+**`features/cart/components/checkout-button.tsx`** rewritten client-side: was a bare `<Link
+href={routes.checkout}>`. Now reads `useCurrentUser()` (`@/features/auth`) — signed-in →
+`router.push(routes.checkout)`; guest → opens the `Modal` with the existing `PhoneAuthFlow
+redirectTo={routes.checkout}` inside (no new auth code — same phone/OTP state machine used at
+`/login`; its `DoneStep` CTA already accepts `redirectTo` and lands the user on `/checkout`
+directly, closing the modal by navigating away). Button disabled + `Spinner` while the user query
+is pending, to avoid a flash of the wrong branch.
+
+`/checkout`'s existing page-level `getSession()` redirect-to-`/login` guard is untouched and
+stays as the fallback for anyone who reaches `/checkout` by URL directly (deep link, back button)
+without going through this modal — defense in depth, same pattern as the dashboard RBAC gate.
+
+Known gap (pre-existing, not introduced here): `phone-auth.service.ts` is still a full mock — its
+`persistSession()` writes a `localStorage` marker only, not the real HttpOnly session cookie, so
+completing the modal flow won't actually flip `getSession()`/`useCurrentUser()` outside of
+`DEV_AUTH_BYPASS`. Same limitation the `/login` page already has; resolves itself once phone-auth
+is wired to `abzar/api`.
+
+---
+
+## 2026-09-11 — Ledger moved out of repo root: `cloud.md` → `.claude/docs/changelog.md`
+
+User feedback: a live workspace ledger doesn't belong at the project root — it's tooling data
+for Claude, not app/product content. Moved (`git mv`, history preserved) `cloud.md` →
+`.claude/docs/changelog.md`. Updated every reference: `CLAUDE.md` (`## cloud.md — mandatory live
+ledger` section + the "Done =" line), `.claude/rules/working-style.md` (terse-prose rule),
+`README.md` (Architecture section link). Past entries below still say "`cloud.md`" where that
+was the accurate filename at the time — left as historical record, not rewritten.
+
+---
+
+## 2026-09-11 — Checkout address empty state
+
+New `features/checkout/components/address-empty-state.tsx` — shown by `AddressStep` when
+`addresses.length === 0` (and the new-address form isn't already open): brand-tinted `pin` icon
+badge, heading + helper copy, single solid CTA that opens `NewAddressForm`. Replaces the old
+bare list + dashed "add address" row for the zero-state; that dashed row still shows once ≥1
+address exists. The bottom "ادامه به روش پرداخت" button is now hidden entirely in the zero-state
+(no address list yet, so nothing to continue with) instead of just being disabled.
+
+---
+
+## 2026-09-11 — Checkout addresses → real `abzar/api`
+
+`GET/POST /storefront/addresses` wired for real, replacing the hardcoded
+`checkout/data/addresses.ts` (deleted). New:
+- `features/checkout/services/checkout-address.{api,schemas}.ts` — `addressSchema` mirrors
+  `{id,receiverName,receiverMobile,province,city,fullAddress,postalCode,isDefault}`;
+  `createAddressInputSchema` validates the create form.
+- `src/app/api/checkout/addresses/route.ts` — BFF: `GET` lists, `POST` `safeParse`s the body
+  (400 + `fieldErrors` on failure), both 401 when unauthenticated.
+- `features/checkout/hooks/use-addresses.ts` — client `useAddresses` (`useQuery`) +
+  `useCreateAddress` (`useMutation`, invalidates the list on success).
+
+`Address` type now `z.infer<typeof addressSchema>` (was a hand-written mock shape with
+`title`/`text`). `AddressCard`/`ReviewStep` render `receiverName` + `province/city/fullAddress`
+instead of the old label/text pair. `AddressStep` gained loading (skeleton) and error states and
+now takes `addresses`/`isLoading`/`isError` as props instead of importing static data.
+`NewAddressForm` is now a real controlled form (was visual-only) posting through
+`useCreateAddress`, with inline field errors; on success it selects the new address and closes
+itself. `useCheckout`'s `addressId` starts empty; `CheckoutPageView` defaults it to the
+customer's default (or first) address once the query resolves. `CheckoutNextButton` gained a
+`disabled` prop, used to block "ادامه" while no address is selected/loaded.
+
+Note: `dashboard/addresses` (account settings page) still uses its own separate, still-static
+`features/account/data/addresses.ts` — out of scope for this change, left untouched.
+
+---
+
+## 2026-09-11 — Rebrand to Technorextools; real shipping methods; checkout login-gate; number font
+
+**Rebrand.** Visible brand switched from "تکنورکس / Puma Air" to "تکنورکس / Technorextools"
+across ~40 files (copy, `src/config/site.ts` — email/social/keywords/OG handle — `.env.example`
+`NEXT_PUBLIC_SITE_NAME`, `BrandLogo`'s monogram, mock coupon codes, `localStorage`/cart-store
+keys). `.env.local` needs the same `NEXT_PUBLIC_SITE_NAME` edit by hand (blocked path).
+
+**Number font.** `--font-display` (used on every price/number) listed `Space Grotesk` before
+`Vazirmatn` — Space Grotesk has no Persian-digit glyphs, so ۰-۹ fell back inconsistently.
+Reordered to Vazirmatn-first in `globals.css`.
+
+**Cart → real `abzar/api`, partially.** Read the live API + `../api` source directly (Postman
+had no response bodies saved) to confirm the actual contract:
+- `GET /storefront/shipping/methods` — public, `{id,title,costType,cost,freeOverAmount,sortOrder}`.
+  Wired for real: new `features/cart/services/shipping.{api,schemas}.ts`, `ShippingMethod` type
+  now mirrors the API shape (no more fake `eta`), `cart/page.tsx` fetches methods server-side
+  and threads them through `CartPageView → OrderSummary/ShippingMethods` and
+  `FreeShippingBar` (threshold = cheapest method's `freeOverAmount`, hidden if none set).
+  `data/shipping.ts` (static list + hardcoded threshold) deleted.
+- `POST /storefront/discounts/validate` and the whole `/storefront/checkout/*` module require
+  a **logged-in** user AND evaluate against that user's **server-side** cart
+  (`CartRepository.findActiveByUserId`) — our cart is still 100% local (`zustand` +
+  `localStorage`), so a real discount/checkout call would 400 "cart is empty" even once
+  logged in. **Not wired** — needs the cart itself migrated to the API's `X-Cart-Token`
+  guest-cart model first (own effort). Coupon panel stays the local mock for now.
+- Added the login-gate piece that *is* safe standalone: `/checkout` (page-level, mirrors the
+  `(dashboard)/layout.tsx getSession()` re-check pattern) redirects a guest to
+  `/login?next=/checkout`; `/login` now reads that `next` param (previously set by
+  `middleware.ts` but never consumed anywhere) and `PhoneAuthFlow → DoneStep` sends the user
+  back there post-OTP instead of always to `/`.
+- Cart item image was always the placeholder (`CartLine`/`UpsellProduct` never carried an
+  image url). Threaded `mainImageUrl`/`image.url` through `AddToCartButton`, `ProductBuyBox`,
+  `cart/page.tsx`'s upsell mapping, `CartItemRow`, `UpsellCard`.
+
+---
+
+## 2026-09-11 — Catalog fixes: real API base URL, live product images, polished `/products`
+
+`.env.local`/`.env.example` `API_BASE_URL` was missing the `/api/v1` prefix — every
+`apiClient` call 404'd, silently caught to `null` in `catalog-view.tsx`/`products/page.tsx`,
+rendering as the connection-error empty state. Fixed the env value; no code change needed
+for the fetch path itself.
+
+`next.config.mjs` `images.remotePatterns` only allowlisted the placeholder
+`**.abzar.example` host — added `**.arvanstorage.ir` (real product-media host). `ProductCard`,
+`ProductGallery`, and `FlashDeals` were also never passing `src` to `MediaPlaceholder`, so
+every product photo silently fell back to the labelled stand-in even once the host was
+allowlisted — wired `product.mainImageUrl` / `image.url` through in all three.
+
+Redesign pass on `/products` + the shared `ProductCard` (used everywhere): `catalog-hero.tsx`
+gained a trust-highlight chip row (`shield`/`truck`/`headset`); `catalog-filters.tsx` is now a
+bordered/shadowed panel with a header row and section dividers instead of bare stacked
+controls; `filter-radio-list.tsx` rows are full-width ≥40px touch targets with an active
+check icon instead of plain text links; `catalog-sort.tsx` is a matching card bar. New
+`coming-soon-card.tsx` — dashed-border filler tile shown by `product-grid.tsx` whenever the
+result set is under 3 items, so a sparse catalog doesn't look broken. `product-card.tsx` now
+shows the brand as a pill chip and separates the price/CTA block with a hairline divider.
 
 ---
 
@@ -333,7 +843,7 @@ Verified: `typecheck` + `lint` + `build` green.
 
 ## 2026-09-07 — Journal/blog (`/blog` + `/blog/[slug]`) — new `journal-page/` family
 
-Replaced the placeholder journal with the full "مجله پوما ایر" (mockup "Puma Air Blog").
+Replaced the placeholder journal with the full "مجله تکنورکس" (mockup "Puma Air Blog").
 Index is server-filtered via `?cat=` (Zod-validated, noindex on filtered views —
 canonical index only); the mockup's client tabs became crawlable `<Link>` pills.
 
@@ -811,13 +1321,13 @@ filter/sort change. `PRODUCTS` re-exported via `data/catalog.ts` from `data/prod
 
 ---
 
-## 2026-09-04 — Storefront home page (`پوما ایر`) + RTL/Persian foundation
+## 2026-09-04 — Storefront home page (`تکنورکس`) + RTL/Persian foundation
 
 ### Foundation
 
 - **Locale/RTL:** root `layout.tsx` → `lang="fa" dir="rtl"`; `Vazirmatn` (arabic+latin)
   as `--font-vazirmatn`/body, `Space_Grotesk` as `--font-space-grotesk` → `--font-display`
-  (numerals, eyebrows). `NEXT_PUBLIC_SITE_NAME` = `پوما ایر` in `.env.local`/`.env.example`.
+  (numerals, eyebrows). `NEXT_PUBLIC_SITE_NAME` = `تکنورکس` in `.env.local`/`.env.example`.
 - **Design tokens** (`styles/globals.css` `@theme`): rust brand ramp (`--color-brand-*`),
   `--color-accent-*` (gold), `--color-ink`, `--color-sale`, `--color-info`, warm surface
   ramp (`surface` / `surface-muted` = body / `surface-sunken`), `--color-hairline`,

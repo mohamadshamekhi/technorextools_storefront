@@ -1,24 +1,22 @@
 import type { IconName } from '@/components/atoms';
 
-export type OrderStatus = 'processing' | 'shipping' | 'delivered';
+import type {
+  OrderDetail,
+  OrderListItem,
+  OrderStatus,
+  PaymentMethod,
+} from '../services/orders.schemas';
 
-/** A customer order summary (mock — the real record lives in `abzar/api`). */
-export type Order = {
-  code: string;
-  status: OrderStatus;
-  itemCount: number;
-  date: string;
-  total: number;
-};
+export type { OrderDetail, OrderListItem, OrderStatus, PaymentMethod };
+/** Alias kept for existing call sites — a list-item order summary. */
+export type Order = OrderListItem;
 
-/** Presentation metadata for an order status — colours + fulfilment progress. */
+/** Presentation metadata for an order status — icon + colours. */
 export type OrderStatusMeta = {
   icon: IconName;
   label: string;
   tint: string;
   ink: string;
-  /** Completed count out of `FULFILMENT_STAGES.length`. */
-  stagesDone: number;
 };
 
 export type Address = {

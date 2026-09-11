@@ -7,7 +7,7 @@ export const PRIMARY_NAV: NavItem[] = [
   { label: 'همه محصولات', href: routes.products },
   { label: 'دسته‌بندی‌ها', href: anchor('categories') },
   { label: 'پیشنهاد شگفت‌انگیز', href: anchor('deals') },
-  { label: 'مجله پوما', href: routes.blog },
+  { label: 'مجله تکنورکس', href: routes.blog },
   { label: 'درباره ما', href: routes.about },
   { label: 'تماس با ما', href: routes.contact },
 ];
@@ -18,7 +18,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     links: [
       { label: 'درباره ما', href: routes.about },
       { label: 'همه محصولات', href: routes.products },
-      { label: 'مجله پوما', href: routes.blog },
+      { label: 'مجله تکنورکس', href: routes.blog },
       { label: 'پیگیری سفارش', href: routes.orderTracking },
       { label: 'نمایندگی و همکاری', href: routes.contact },
     ],
@@ -35,7 +35,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 ];
 
 export const SOCIAL_LINKS: SocialLink[] = [
-  { label: 'اینستاگرام', href: 'https://instagram.com/pumaair', icon: 'instagram' },
-  { label: 'تلگرام', href: 'https://t.me/pumaair', icon: 'telegram' },
+  { label: 'اینستاگرام', href: 'https://instagram.com/technorextools', icon: 'instagram' },
+  { label: 'تلگرام', href: 'https://t.me/technorextools', icon: 'telegram' },
   { label: 'واتساپ', href: 'https://wa.me/989121771587', icon: 'whatsapp' },
 ];

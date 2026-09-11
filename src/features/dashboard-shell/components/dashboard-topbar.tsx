@@ -1,5 +1,6 @@
 import { Badge } from '@/components/atoms';
 import { siteConfig } from '@/config/site';
+import { toPersianDigits } from '@/lib/persian';
 import type { SessionUser } from '@/lib/session';
 import { formatRole } from '@/features/auth';
 import { LogoutButton } from '@/features/auth';
@@ -16,7 +17,9 @@ export function DashboardTopbar({ user }: { user: SessionUser }) {
         <Badge tone="brand">{formatRole(user.role)}</Badge>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-foreground-muted hidden text-sm sm:inline">{user.email}</span>
+        <span dir="ltr" className="text-foreground-muted hidden text-sm sm:inline">
+          {toPersianDigits(user.mobile)}
+        </span>
         <LogoutButton />
       </div>
     </header>

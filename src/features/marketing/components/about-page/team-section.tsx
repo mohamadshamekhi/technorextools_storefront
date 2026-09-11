@@ -9,7 +9,7 @@ export function TeamSection() {
   return (
     <section className="py-24">
       <Container>
-        <AboutSectionHeading eyebrow="تیم ما" title="پشت صحنه پوما ایر" id="team-heading" />
+        <AboutSectionHeading eyebrow="تیم ما" title="پشت صحنه تکنورکس" id="team-heading" />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {ABOUT_TEAM.map((member) => (
             <Reveal key={member.name} className="text-center">

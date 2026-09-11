@@ -1,34 +1,59 @@
-import type { Order, OrderStatus, OrderStatusMeta } from '../types';
+import type { OrderStatus, OrderStatusMeta } from '../types';
 
-/** Fulfilment steps shown in the order timeline, in order. */
-export const FULFILMENT_STAGES = ['ثبت سفارش', 'پردازش', 'ارسال', 'تحویل'] as const;
-
+/** Presentation metadata for `abzar/api`'s `OrderStatus` enum (`prisma/schema.prisma`). */
 export const ORDER_STATUS_META: Record<OrderStatus, OrderStatusMeta> = {
-  processing: {
+  pending_payment: {
     icon: 'clock',
+    label: 'در انتظار پرداخت',
+    tint: 'oklch(0.96 0.03 75)',
+    ink: 'oklch(0.55 0.15 75)',
+  },
+  payment_failed: {
+    icon: 'alert',
+    label: 'پرداخت ناموفق',
+    tint: 'oklch(0.94 0.05 25)',
+    ink: 'oklch(0.55 0.2 25)',
+  },
+  abandoned: {
+    icon: 'close',
+    label: 'رهاشده',
+    tint: 'oklch(0.94 0.005 260)',
+    ink: 'oklch(0.5 0.01 260)',
+  },
+  paid: {
+    icon: 'check',
+    label: 'پرداخت‌شده',
+    tint: 'oklch(0.94 0.04 150)',
+    ink: 'oklch(0.5 0.14 155)',
+  },
+  processing: {
+    icon: 'box',
     label: 'در حال پردازش',
     tint: 'oklch(0.96 0.03 45)',
     ink: 'oklch(0.6 0.19 45)',
-    stagesDone: 2,
   },
-  shipping: {
+  shipped: {
     icon: 'truck',
-    label: 'در حال ارسال',
+    label: 'ارسال شده',
     tint: 'oklch(0.94 0.035 250)',
     ink: 'oklch(0.53 0.16 250)',
-    stagesDone: 3,
   },
   delivered: {
     icon: 'check',
-    label: 'تحویل شده',
+    label: 'تحویل‌شده',
     tint: 'oklch(0.94 0.04 150)',
     ink: 'oklch(0.5 0.14 155)',
-    stagesDone: 4,
+  },
+  cancelled: {
+    icon: 'close',
+    label: 'لغو شده',
+    tint: 'oklch(0.94 0.05 25)',
+    ink: 'oklch(0.55 0.2 25)',
   },
 };
 
-export const ORDERS: Order[] = [
-  { code: 'PA-2496872', status: 'delivered', itemCount: 2, date: '۱۰ مرداد ۱۴۰۵', total: 30_200_000 },
-  { code: 'PA-2488130', status: 'shipping', itemCount: 1, date: '۲ مرداد ۱۴۰۵', total: 13_700_000 },
-  { code: 'PA-2474500', status: 'processing', itemCount: 3, date: '۲۸ تیر ۱۴۰۵', total: 42_500_000 },
-];
+/** Fallback label when `/storefront/payment-methods` didn't have a matching title cached. */
+export const PAYMENT_METHOD_LABEL: Record<'online' | 'cash', string> = {
+  online: 'پرداخت آنلاین',
+  cash: 'پرداخت در محل',
+};

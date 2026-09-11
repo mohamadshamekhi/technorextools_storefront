@@ -30,7 +30,7 @@ export function ProductReviews({ comments }: { comments: ProductComments }) {
                   {(review.authorName ?? 'م').slice(0, 1)}
                 </span>
                 <div className="flex-1">
-                  <p className="text-sm font-bold">{review.authorName ?? 'کاربر پوما ایر'}</p>
+                  <p className="text-sm font-bold">{review.authorName ?? 'کاربر تکنورکس'}</p>
                   <p className="text-foreground-muted text-[11px]">
                     {formatJalaliDate(review.createdAt)}
                   </p>

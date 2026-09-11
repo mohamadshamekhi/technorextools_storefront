@@ -1,24 +1,19 @@
-import type { IconName } from '@/components/atoms';
+import type { z } from 'zod';
 
-export type CheckoutStep = 'address' | 'payment' | 'review' | 'success';
+import type { addressSchema } from '../services/checkout-address.schemas';
+import type { PaymentMethodView } from '../services/payment-methods.schemas';
 
-export type Address = {
-  id: string;
-  title: string;
-  text: string;
-  isDefault?: boolean;
-};
+export type CheckoutStep = 'address' | 'payment' | 'review' | 'success' | 'cash-pending';
 
-export type CheckoutPaymentMethod = {
-  key: string;
-  label: string;
-  desc: string;
-  icon: IconName;
-};
+export type Address = z.infer<typeof addressSchema>;
 
-/** Snapshot taken at confirm time — the cart may already be cleared by then. */
+/** One entry from `abzar/api`'s admin-configured `/storefront/payment-methods` catalog. */
+export type CheckoutPaymentMethod = PaymentMethodView;
+
+/** Snapshot of the real order returned by `POST /api/checkout` — taken at confirm time
+ * since the local cart is cleared right after. */
 export type PlacedOrder = {
-  code: string;
+  orderNumber: string;
   total: number;
   itemCount: number;
 };

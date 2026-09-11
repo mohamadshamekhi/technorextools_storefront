@@ -14,10 +14,10 @@ export function ContactHero() {
           CONTACT
         </span>
         <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-[2.4rem]">
-          با <span className="text-gradient-brand">پوما ایر</span> در تماس باشید
+          با <span className="text-gradient-brand">تکنورکس</span> در تماس باشید
         </h1>
         <p className="text-foreground-muted mt-3 text-sm leading-loose text-pretty">
-          سؤال، مشاورهٔ خرید یا پیشنهاد همکاری دارید؟ تیم پوما ایر در ساعات کاری آمادهٔ
+          سؤال، مشاورهٔ خرید یا پیشنهاد همکاری دارید؟ تیم تکنورکس در ساعات کاری آمادهٔ
           پاسخگویی است.
         </p>
       </Container>

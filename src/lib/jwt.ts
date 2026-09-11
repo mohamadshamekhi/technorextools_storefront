@@ -1,25 +1,29 @@
 import { z } from 'zod';
 
-import { UserRole } from '@/constants';
-
 /**
  * Edge-safe JWT payload decoding. Pure — no `next/headers`, no Node Buffer —
  * so it is importable from both middleware (Edge) and Server Components.
  *
  * This DECODES only; cryptographic verification is `abzar/api`'s job.
+ *
+ * Mirrors `abzar/api`'s access-token payload (`modules/auth/token.types.ts`
+ * `tokenPayloadSchema`): `{sub, mobile, role}` + `exp`/`iat` added by `jwt.signAsync`.
+ * There is no email/name in the token — this is mobile+OTP auth, and permissions are
+ * resolved per-request server-side, never carried here. Full profile (fullName, email)
+ * comes from `GET /auth/me` when needed, not from the session cookie.
  */
 const jwtPayloadSchema = z.object({
   sub: z.string(),
-  email: z.string().email(),
-  role: z.nativeEnum(UserRole),
-  name: z.string().optional(),
+  mobile: z.string(),
+  role: z.string(),
   exp: z.number(),
 });
 
 export type SessionUser = {
   id: string;
-  email: string;
-  role: UserRole;
+  mobile: string;
+  /** Role slug (`abzar/api`'s DB-driven role table) — see `constants/index.ts` `UserRole`. */
+  role: string;
   name?: string;
 };
 
@@ -28,23 +32,6 @@ function base64UrlDecode(segment: string): string {
   const withPad = padded.padEnd(padded.length + ((4 - (padded.length % 4)) % 4), '=');
   if (typeof atob === 'function') return atob(withPad);
   return Buffer.from(withPad, 'base64').toString('binary');
-}
-
-/**
- * Dev-only escape hatch. While `abzar/api` auth is not wired up locally, this
- * lets you browse the dashboard without a real API-issued session. Hard-gated to
- * non-production — it can never take effect on a deployed build.
- */
-export const DEV_SESSION_USER: SessionUser = {
-  id: 'dev-user',
-  email: 'dev@pumaair.local',
-  role: UserRole.SuperAdmin,
-  name: 'کاربر توسعه',
-};
-
-/** True when the dashboard auth gate should be short-circuited (dev machines only). */
-export function isDevAuthBypass(): boolean {
-  return process.env.NODE_ENV !== 'production' && process.env.DEV_AUTH_BYPASS !== '0';
 }
 
 export function decodeToken(token: string): SessionUser | null {
@@ -59,8 +46,8 @@ export function decodeToken(token: string): SessionUser | null {
     );
     const parsed = jwtPayloadSchema.safeParse(JSON.parse(decoded));
     if (!parsed.success || parsed.data.exp * 1000 < Date.now()) return null;
-    const { sub, email, role, name } = parsed.data;
-    return { id: sub, email, role, name };
+    const { sub, mobile, role } = parsed.data;
+    return { id: sub, mobile, role };
   } catch {
     return null;
   }

@@ -5,10 +5,10 @@ export const siteConfig = {
   name: env.NEXT_PUBLIC_SITE_NAME,
   url: env.NEXT_PUBLIC_SITE_URL,
   description:
-    'پوما ایر، نمایندگی رسمی ابزار بادی و شارژی صنعتی در ایران — پیچ‌گوشتی، دریل، بکس و چکش بادی با گارانتی اصالت، قطعات یدکی همیشه موجود و مشاوره فنی رایگان پیش از خرید.',
+    'تکنورکس، نمایندگی رسمی ابزار بادی و شارژی صنعتی در ایران — پیچ‌گوشتی، دریل، بکس و چکش بادی با گارانتی اصالت، قطعات یدکی همیشه موجود و مشاوره فنی رایگان پیش از خرید.',
   locale: 'fa_IR',
   themeColor: '#b45a2c',
-  twitterHandle: '@pumaair',
+  twitterHandle: '@technorextools',
   ogImage: '/og/default.png',
   keywords: [
     'ابزار بادی',
@@ -16,16 +16,16 @@ export const siteConfig = {
     'بکس بادی',
     'دریل بادی',
     'ابزار شارژی صنعتی',
-    'پوما ایر',
+    'تکنورکس',
     'فروش ابزار صنعتی',
   ],
   phone: '۰۲۱-۶۶۹۹۰۰۰۰',
   phoneHref: '+982166990000',
-  email: 'info@pumaair.ir',
+  email: 'info@technorextools.ir',
   address: 'تهران، خیابان ولی‌عصر، مجتمع صنعتی ابزار',
   links: {
-    instagram: 'https://instagram.com/pumaair',
-    telegram: 'https://t.me/pumaair',
+    instagram: 'https://instagram.com/technorextools',
+    telegram: 'https://t.me/technorextools',
     whatsapp: 'https://wa.me/989121771587',
   },
 } as const;

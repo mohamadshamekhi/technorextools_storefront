@@ -2,11 +2,19 @@ import { Icon } from '@/components/atoms';
 import { formatToman, toPersianDigits } from '@/lib/persian';
 import { cn } from '@/lib/utils';
 
-import { FREE_SHIPPING_THRESHOLD } from '../data/shipping';
+import type { ShippingMethod } from '../types';
 
-export function FreeShippingBar({ subtotal }: { subtotal: number }) {
-  const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const progress = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+type FreeShippingBarProps = { subtotal: number; methods: ShippingMethod[] };
+
+export function FreeShippingBar({ subtotal, methods }: FreeShippingBarProps) {
+  const withThreshold = methods.filter(
+    (method): method is ShippingMethod & { freeOverAmount: number } => method.freeOverAmount !== null,
+  );
+  if (withThreshold.length === 0) return null;
+
+  const threshold = Math.min(...withThreshold.map((method) => method.freeOverAmount));
+  const freeShipping = subtotal >= threshold;
+  const progress = Math.min(100, Math.round((subtotal / threshold) * 100));
 
   return (
     <div
@@ -30,8 +38,8 @@ export function FreeShippingBar({ subtotal }: { subtotal: number }) {
             <Icon name={freeShipping ? 'check' : 'truck'} className="size-3.5" />
           </span>
           {freeShipping
-            ? 'ارسال این سفارش رایگان شد 🎉'
-            : `تا ارسال رایگان ${formatToman(FREE_SHIPPING_THRESHOLD - subtotal)} تومان باقی مانده`}
+            ? 'ارسال این سفارش رایگان شد'
+            : `تا ارسال رایگان ${formatToman(threshold - subtotal)} تومان باقی مانده`}
         </span>
         <span className="text-foreground-muted text-xs">{toPersianDigits(progress)}٪</span>
       </div>

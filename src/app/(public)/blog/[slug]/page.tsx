@@ -12,7 +12,7 @@ import { articleSchema, breadcrumbSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
 import type { PageProps } from '@/types';
 
-const AUTHOR_NAME = 'تیم فنی پوما ایر';
+const AUTHOR_NAME = 'تیم فنی تکنورکس';
 
 export const dynamicParams = true;
 
@@ -48,7 +48,7 @@ export default async function ArticlePage({ params }: PageProps<{ slug: string }
   const structuredData = [
     breadcrumbSchema([
       { name: 'خانه', path: routes.home },
-      { name: 'مجله پوما', path: routes.blog },
+      { name: 'مجله تکنورکس', path: routes.blog },
       { name: article.title, path: routes.blogPost(article.slug) },
     ]),
     articleSchema({
@@ -73,7 +73,7 @@ export default async function ArticlePage({ params }: PageProps<{ slug: string }
           </Link>
           <Icon name="chevronEnd" className="text-foreground-muted size-3.5" />
           <Link href={routes.blog} className="text-foreground-muted hover:text-brand-600">
-            مجله پوما
+            مجله تکنورکس
           </Link>
         </nav>
         <h1 className="mb-4 text-3xl leading-[1.5] font-black tracking-tight text-balance">

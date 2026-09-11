@@ -1,8 +1,16 @@
+import { OrderSummaryLines, type CartTotals } from '@/features/cart';
 import { Icon } from '@/components/atoms';
 import { formatToman, toPersianDigits } from '@/lib/persian';
 import type { CartLine } from '@/store/cart-store';
 
-export function CheckoutSummarySidebar({ lines, total }: { lines: CartLine[]; total: number }) {
+type CheckoutSummarySidebarProps = {
+  lines: CartLine[];
+  totals: CartTotals;
+  /** Applied discount code, for the "تخفیف کد X" line — empty when none is applied. */
+  discountCode: string;
+};
+
+export function CheckoutSummarySidebar({ lines, totals, discountCode }: CheckoutSummarySidebarProps) {
   return (
     <div className="border-hairline bg-surface rounded-card sticky top-22 min-w-0 border p-6">
       <p className="mb-4.5 text-[15px] font-black">خلاصه سفارش</p>
@@ -18,19 +26,7 @@ export function CheckoutSummarySidebar({ lines, total }: { lines: CartLine[]; to
         ))}
       </div>
 
-      <div className="border-hairline flex flex-col gap-2.5 border-t pt-3.5 text-[13.5px]">
-        <div className="text-foreground-muted flex justify-between">
-          <span>هزینه ارسال</span>
-          <span>رایگان</span>
-        </div>
-        <div className="border-hairline flex items-baseline justify-between border-t pt-2.5">
-          <span className="text-[14.5px] font-bold">مبلغ نهایی</span>
-          <span className="font-display text-[19px] font-bold">
-            {formatToman(total)}{' '}
-            <span className="font-sans text-foreground-muted text-[11px] font-medium">تومان</span>
-          </span>
-        </div>
-      </div>
+      <OrderSummaryLines totals={totals} couponCode={discountCode} />
 
       <p className="text-foreground-muted mt-4.5 flex items-center justify-center gap-1.5 text-[11.5px]">
         <Icon name="shield" className="size-3.5" />

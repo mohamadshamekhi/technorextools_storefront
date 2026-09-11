@@ -1,22 +1,28 @@
 import 'server-only';
 
+import { z } from 'zod';
+
 import { apiClient } from '@/lib/api-client';
-import {
-  authTokensSchema,
-  authUserSchema,
-  type LoginInput,
-  type RegisterInput,
-} from '@/features/auth/types';
+import { authResultSchema, authUserSchema, otpRequestResultSchema } from '@/features/auth/types';
 
-/** Thin, typed wrappers over the `abzar/api` auth endpoints. */
+/** Thin, typed wrappers over `abzar/api`'s mobile/OTP auth endpoints. */
 export const authApi = {
-  login: (input: LoginInput) =>
-    apiClient.post('/auth/login', authTokensSchema, { body: input, auth: false }),
+  requestOtp: (mobile: string, referralCode?: string) =>
+    apiClient.post('/auth/otp/request', otpRequestResultSchema, {
+      body: { mobile, referralCode },
+      auth: false,
+    }),
 
-  register: (input: Omit<RegisterInput, 'confirmPassword'>) =>
-    apiClient.post('/auth/register', authTokensSchema, { body: input, auth: false }),
+  verifyOtp: (mobile: string, code: string, cartToken?: string) =>
+    apiClient.post('/auth/otp/verify', authResultSchema, {
+      body: { mobile, code, cartToken },
+      auth: false,
+    }),
 
   me: () => apiClient.get('/auth/me', authUserSchema, { next: { revalidate: 0 } }),
 
-  logout: () => apiClient.post('/auth/logout', authUserSchema.nullable().catch(null)),
+  updateProfile: (input: { fullName?: string; email?: string | null }) =>
+    apiClient.patch('/auth/me', authUserSchema, { body: input }),
+
+  logout: () => apiClient.post('/auth/logout', z.null()),
 };

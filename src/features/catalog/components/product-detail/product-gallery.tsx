@@ -13,19 +13,18 @@ type ProductGalleryProps = {
   isAmazingDeal: boolean;
 };
 
-/**
- * Image gallery. `abzar/api` returns absolute image URLs but the host is not yet
- * on the `next/image` allowlist — until then every slot is the labelled stand-in.
- */
+/** Image gallery. `abzar/api` returns absolute image URLs on the arvanstorage.ir host. */
 export function ProductGallery({ images, isAmazingDeal }: ProductGalleryProps) {
   const slots = images.length > 0 ? images : [{ id: 'main', alt: 'عکس محصول' } as Partial<ProductImage>];
   const [active, setActive] = useState(0);
+  const activeSlot = slots[active];
 
   return (
     <div>
       <div className="border-hairline bg-surface relative aspect-square overflow-hidden rounded-3xl border">
         <MediaPlaceholder
-          label={slots[active]?.alt ?? 'عکس محصول'}
+          label={activeSlot?.alt ?? 'عکس محصول'}
+          src={activeSlot?.url}
           priority
           className="size-full text-xs"
         />
@@ -49,7 +48,7 @@ export function ProductGallery({ images, isAmazingDeal }: ProductGalleryProps) {
                 active === index && 'border-brand-500',
               )}
             >
-              <MediaPlaceholder label="" className="size-full" />
+              <MediaPlaceholder label={image.alt ?? ''} src={image.url} className="size-full" />
             </button>
           ))}
         </div>

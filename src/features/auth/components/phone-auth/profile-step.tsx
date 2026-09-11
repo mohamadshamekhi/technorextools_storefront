@@ -14,14 +14,14 @@ export function ProfileStep({ auth }: { auth: PhoneAuthController }) {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<{ fullName?: string; email?: string }>({});
 
-  const submit = () => {
+  const submit = async () => {
     const parsed = profileSchema.safeParse({ fullName, email });
     if (!parsed.success) {
       const flat = parsed.error.flatten().fieldErrors;
       setErrors({ fullName: flat.fullName?.[0], email: flat.email?.[0] });
       return;
     }
-    auth.finishProfile();
+    await auth.finishProfile(parsed.data);
   };
 
   return (

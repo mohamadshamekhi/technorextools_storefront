@@ -2,20 +2,20 @@
 
 import { useCallback, useState } from 'react';
 
-import {
-  phoneSchema,
-  RESEND_SECONDS,
-  type AuthStep,
-} from '@/features/auth/types/phone-auth';
-import {
-  persistSession,
-  requestOtp,
-  verifyOtp,
-} from '@/features/auth/services/phone-auth.service';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { phoneSchema, RESEND_SECONDS, type AuthStep, type ProfileInput } from '@/features/auth/types/phone-auth';
+import { requestOtp, updateProfile, verifyOtp } from '@/features/auth/services/phone-auth.service';
 import { useResendTimer } from './use-resend-timer';
 
-/** State machine behind the phone / OTP sign-in flow. */
+/**
+ * State machine behind the phone / OTP sign-in flow — talks to the real `abzar/api`
+ * OTP endpoints through the same-origin BFF routes (`phone-auth.service.ts`). The BFF
+ * sets the HttpOnly session cookie itself on a successful verify; there is no local
+ * "persist session" step here.
+ */
 export function usePhoneAuth() {
+  const queryClient = useQueryClient();
   const [step, setStep] = useState<AuthStep>('phone');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -37,11 +37,16 @@ export function usePhoneAuth() {
       return;
     }
     setBusy(true);
-    await requestOtp(parsed.data);
-    setBusy(false);
-    setOtpError('');
-    setStep('otp');
-    resend.restart();
+    try {
+      const { resendAfter } = await requestOtp(parsed.data);
+      setOtpError('');
+      setStep('otp');
+      resend.restart(resendAfter);
+    } catch (error) {
+      setPhoneError(error instanceof Error ? error.message : 'ارسال کد ناموفق بود');
+    } finally {
+      setBusy(false);
+    }
   }, [phone, resend]);
 
   const backToPhone = useCallback(() => {
@@ -54,10 +59,11 @@ export function usePhoneAuth() {
       setBusy(true);
       try {
         const { isNewUser: isNew } = await verifyOtp(phone, code);
-        await persistSession();
         resend.stop();
         setIsNewUser(isNew);
         setStep(isNew ? 'profile' : 'done');
+        // The session cookie was just set server-side — refetch `useCurrentUser` everywhere.
+        void queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
         return true;
       } catch (error) {
         setOtpError(error instanceof Error ? error.message : 'کد نامعتبر است');
@@ -67,16 +73,34 @@ export function usePhoneAuth() {
         setBusy(false);
       }
     },
-    [phone, resend],
+    [phone, resend, queryClient],
   );
 
   const resendCode = useCallback(async () => {
     setOtpError('');
-    await requestOtp(phone);
-    resend.restart();
+    try {
+      const { resendAfter } = await requestOtp(phone);
+      resend.restart(resendAfter);
+    } catch (error) {
+      setOtpError(error instanceof Error ? error.message : 'ارسال مجدد ناموفق بود');
+    }
   }, [phone, resend]);
 
-  const finishProfile = useCallback(() => setStep('done'), []);
+  const finishProfile = useCallback(
+    async (input: ProfileInput) => {
+      setBusy(true);
+      try {
+        await updateProfile({ fullName: input.fullName, email: input.email || null });
+      } catch {
+        /* best-effort — the account page can retry this edit later */
+      } finally {
+        setBusy(false);
+        setStep('done');
+        void queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+      }
+    },
+    [queryClient],
+  );
 
   return {
     step,

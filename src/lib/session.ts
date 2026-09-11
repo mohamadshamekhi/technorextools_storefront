@@ -3,7 +3,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 
 import { env } from '@/config/env';
-import { DEV_SESSION_USER, decodeToken, isDevAuthBypass, type SessionUser } from '@/lib/jwt';
+import { decodeToken, type SessionUser } from '@/lib/jwt';
 
 export type { SessionUser } from '@/lib/jwt';
 
@@ -14,12 +14,10 @@ const COOKIE_OPTIONS = {
   path: '/',
 };
 
-/** Current user from the HttpOnly session cookie, or null. */
+/** Current user from the HttpOnly session cookie, or null. No dev bypass — always real. */
 export async function getSession(): Promise<SessionUser | null> {
   const token = (await cookies()).get(env.SESSION_COOKIE_NAME)?.value;
-  const user = token ? decodeToken(token) : null;
-  if (!user && isDevAuthBypass()) return DEV_SESSION_USER;
-  return user;
+  return token ? decodeToken(token) : null;
 }
 
 export async function setSessionCookie(token: string, maxAgeSeconds: number): Promise<void> {

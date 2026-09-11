@@ -21,7 +21,7 @@ export function AboutSection() {
         <Reveal>
           <span className="font-display text-brand-600 ring-brand-100 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-bold tracking-[0.18em] ring-1">
             <span className="bg-accent-500 size-1.5 rounded-full" aria-hidden />
-            WHY PUMA AIR
+            WHY TECHNOREXTOOLS
           </span>
           <h2 id="about-heading" className="mt-3 mb-4 text-[2.35rem] leading-tight font-black tracking-tight">
             ابزار حرفه‌ای، بدون ریسک خرید

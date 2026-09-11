@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { AuthModal } from '@/components/organisms';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 
@@ -9,7 +10,10 @@ import { ThemeProvider } from '@/providers/theme-provider';
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <QueryProvider>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider>
+        {children}
+        <AuthModal />
+      </ThemeProvider>
     </QueryProvider>
   );
 }

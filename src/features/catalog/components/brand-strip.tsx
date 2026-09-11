@@ -9,7 +9,7 @@ export async function BrandStrip() {
   return (
     <section className="bg-surface border-hairline border-b py-8" aria-label="برندهای همکار">
       <p className="text-foreground-muted mb-5 text-center text-[13px]">
-        برندهایی که با پوما ایر همکاری دارند
+        برندهایی که با تکنورکس همکاری دارند
       </p>
       <Marquee label="برندهای همکار" speed="slow" reverse>
         {brands.map((brand) => (

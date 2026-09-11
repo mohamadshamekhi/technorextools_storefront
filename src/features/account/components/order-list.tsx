@@ -28,7 +28,7 @@ export function OrderList({ orders }: { orders: Order[] }) {
       ) : (
         <div className="flex flex-col gap-3">
           {visible.map((order) => (
-            <OrderCard key={order.code} order={order} />
+            <OrderCard key={order.orderNumber} order={order} />
           ))}
         </div>
       )}

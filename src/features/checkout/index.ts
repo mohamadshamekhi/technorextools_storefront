@@ -1,3 +1,5 @@
-/** Public surface of the checkout feature. No server-only modules yet. */
+/** Public surface of the checkout feature. Server-only modules (`services/*.api.ts`) are
+ * imported directly by path from Server Components / route handlers — not re-exported here. */
 export { CheckoutPageView } from './components/checkout-page-view';
+export { CheckoutResultView } from './components/checkout-result-view';
 export { CheckoutTopbar } from './components/checkout-topbar';

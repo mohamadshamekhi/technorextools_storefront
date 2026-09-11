@@ -35,12 +35,9 @@ export function ShippingOption({ method, price, selected, onSelect }: ShippingOp
             selected ? 'bg-brand-500 text-white' : 'bg-surface-sunken text-brand-600',
           )}
         >
-          <Icon name={method.icon} className="size-4" />
+          <Icon name={method.costType === 'by_weight' ? 'weight' : 'truck'} className="size-4" />
         </span>
-        <span>
-          <span className="block text-[13px] font-bold">{method.label}</span>
-          <span className="text-foreground-muted block text-[11.5px]">{method.eta}</span>
-        </span>
+        <span className="block text-[13px] font-bold">{method.title}</span>
       </span>
       <span className="text-[12.5px] font-bold whitespace-nowrap">
         {price === 0 ? 'رایگان' : `${formatToman(price)} تومان`}

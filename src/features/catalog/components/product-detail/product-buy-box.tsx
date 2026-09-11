@@ -9,7 +9,10 @@ import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store/cart-store';
 
 import type { ProductDetail } from '../../types';
+import { KeySpecChips } from './key-spec-chips';
 import { QuantityStepper } from './quantity-stepper';
+
+const MAX_KEY_SPECS = 4;
 
 export function ProductBuyBox({ product }: { product: ProductDetail }) {
   const addItem = useCartStore((state) => state.addItem);
@@ -26,6 +29,8 @@ export function ProductBuyBox({ product }: { product: ProductDetail }) {
     [variant],
   );
 
+  const mainImage = product.images.find((image) => image.isMain) ?? product.images[0];
+
   const handleAdd = () => {
     addItem(
       {
@@ -35,6 +40,7 @@ export function ProductBuyBox({ product }: { product: ProductDetail }) {
         variant: variantLabel,
         compareAt: null,
         categorySlug: product.category.slug,
+        imageUrl: mainImage?.url,
       },
       qty,
     );
@@ -66,6 +72,8 @@ export function ProductBuyBox({ product }: { product: ProductDetail }) {
       {product.shortDesc ? (
         <p className="text-foreground-muted mt-2 text-[13.5px] leading-relaxed">{product.shortDesc}</p>
       ) : null}
+
+      <KeySpecChips specs={product.attributeValues.slice(0, MAX_KEY_SPECS)} />
 
       <p className="mt-5 flex items-baseline gap-2">
         <span className="font-display text-gradient-brand text-[27px] font-black">

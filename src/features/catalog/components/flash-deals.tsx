@@ -45,6 +45,7 @@ export async function FlashDeals() {
             >
               <MediaPlaceholder
                 label={deal.title}
+                src={deal.mainImageUrl ?? undefined}
                 sizes="(max-width: 640px) 45vw, 18vw"
                 className="aspect-square rounded-xl text-[11px] transition-transform duration-300 group-hover:scale-[1.03]"
               />

@@ -1,12 +1,11 @@
 import { UserRole } from '@/constants';
 
-const LABELS: Record<UserRole, string> = {
-  [UserRole.User]: 'Member',
-  [UserRole.Admin]: 'Administrator',
-  [UserRole.SuperAdmin]: 'Super Admin',
+const LABELS: Partial<Record<string, string>> = {
+  [UserRole.Customer]: 'مشتری',
+  [UserRole.SuperAdmin]: 'مدیر ارشد',
 };
 
-/** Human-readable label for a role enum value. */
-export function formatRole(role: UserRole): string {
-  return LABELS[role] ?? 'Unknown';
+/** Human-readable Persian label for a role slug; an unrecognized slug shows as-is. */
+export function formatRole(role: string): string {
+  return LABELS[role] ?? role;
 }

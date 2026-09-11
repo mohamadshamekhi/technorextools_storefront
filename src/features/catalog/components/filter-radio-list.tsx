@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 
 type Option = { slug: string; title: string };
@@ -12,34 +13,31 @@ type FilterRadioListProps = {
 };
 
 export function FilterRadioList({ legend, options, value, onChange }: FilterRadioListProps) {
+  const items = [{ slug: undefined, title: 'همه' }, ...options];
+
   return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1 text-sm font-bold">{legend}</legend>
-      <button
-        type="button"
-        onClick={() => onChange(undefined)}
-        className={cn(
-          'text-start text-[13px] transition-colors',
-          value === undefined ? 'text-brand-600 font-bold' : 'text-foreground-muted hover:text-foreground',
-        )}
-      >
-        همه
-      </button>
-      {options.map((option) => (
-        <button
-          key={option.slug}
-          type="button"
-          onClick={() => onChange(option.slug)}
-          className={cn(
-            'text-start text-[13px] transition-colors',
-            value === option.slug
-              ? 'text-brand-600 font-bold'
-              : 'text-foreground-muted hover:text-foreground',
-          )}
-        >
-          {option.title}
-        </button>
-      ))}
+    <fieldset className="flex flex-col gap-1">
+      <legend className="mb-2 text-sm font-bold">{legend}</legend>
+      {items.map((option) => {
+        const active = value === option.slug;
+        return (
+          <button
+            key={option.slug ?? 'all'}
+            type="button"
+            onClick={() => onChange(option.slug)}
+            aria-pressed={active}
+            className={cn(
+              'flex min-h-10 items-center justify-between gap-2 rounded-lg px-2.5 text-[13px] transition-colors',
+              active
+                ? 'text-brand-600 bg-brand-50 font-bold'
+                : 'text-foreground-muted hover:bg-surface-muted hover:text-foreground',
+            )}
+          >
+            <span className="line-clamp-1 text-start">{option.title}</span>
+            {active ? <Icon name="check" className="size-3.5 shrink-0" /> : null}
+          </button>
+        );
+      })}
     </fieldset>
   );
 }
