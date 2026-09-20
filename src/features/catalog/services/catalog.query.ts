@@ -41,13 +41,13 @@ export function parseCatalogParams(raw: RawSearchParams): CatalogParams {
 export function hasActiveFilters(params: CatalogParams): boolean {
   return Boolean(
     params.q ||
-      params.category ||
-      params.brand ||
-      params.minPrice !== undefined ||
-      params.maxPrice !== undefined ||
-      params.deal ||
-      (params.sort && params.sort !== 'newest') ||
-      (params.page && params.page > 1),
+    params.category ||
+    params.brand ||
+    params.minPrice !== undefined ||
+    params.maxPrice !== undefined ||
+    params.deal ||
+    (params.sort && params.sort !== 'newest') ||
+    (params.page && params.page > 1),
   );
 }
 

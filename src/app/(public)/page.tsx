@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { BrandStrip } from '@/features/catalog/components/brand-strip';
 import { CategoryRail } from '@/features/catalog/components/category-rail';
 import { FlashDeals } from '@/features/catalog/components/flash-deals';
 import { ProductShowcase } from '@/features/catalog/components/product-showcase';
-import { listProducts } from '@/features/catalog/services/catalog.api';
+import { ProductShowcaseSkeleton } from '@/features/catalog/components/product-showcase-skeleton';
+import { getFeaturedProduct, listProducts } from '@/features/catalog/services/catalog.api';
+import { cardPurchase } from '@/features/catalog/utils/card-variant';
 import { JournalRail } from '@/features/content/components/journal-rail';
 import {
   AboutSection,
@@ -26,7 +29,10 @@ export const metadata: Metadata = buildMetadata({
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const featured = await listProducts({ sort: 'newest' }, { take: 8 }).catch(() => null);
+  const [featured, featuredProduct] = await Promise.all([
+    listProducts({ sort: 'newest' }, { take: 8 }).catch(() => null),
+    getFeaturedProduct().catch(() => null),
+  ]);
 
   const structuredData = [
     websiteSchema(),
@@ -35,7 +41,10 @@ export default async function HomePage() {
       ? [
           itemListSchema(
             'جدیدترین ابزارهای تکنورکس',
-            featured.items.map((product) => ({ name: product.title, price: product.basePrice })),
+            featured.items.map((product) => ({
+              name: product.title,
+              price: cardPurchase(product).price,
+            })),
           ),
         ]
       : []),
@@ -48,11 +57,13 @@ export default async function HomePage() {
         // Static, server-generated structured data — XSS-safe.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Hero />
+      <Hero featuredProduct={featuredProduct} />
       <CategoryRail />
       <FlashDeals />
       <PromoCards />
-      <ProductShowcase />
+      <Suspense fallback={<ProductShowcaseSkeleton />}>
+        <ProductShowcase />
+      </Suspense>
       <PromoTicker />
       <ValueProps />
       <AboutSection />

@@ -2,7 +2,9 @@ import type { ReactNode } from 'react';
 
 /** Tool, commerce and trust icons, on a 24×24 `currentColor` grid. */
 export const TOOL_ICONS = {
-  wrench: <path d="M14.7 6.3a4 4 0 1 0 5 5L21 21H10L3.5 14.5a2 2 0 0 1 0-2.8l7.2-7.2a2 2 0 0 1 2.8 0z" />,
+  wrench: (
+    <path d="M14.7 6.3a4 4 0 1 0 5 5L21 21H10L3.5 14.5a2 2 0 0 1 0-2.8l7.2-7.2a2 2 0 0 1 2.8 0z" />
+  ),
   drill: (
     <>
       <path d="M4 6h9v6H4z" />

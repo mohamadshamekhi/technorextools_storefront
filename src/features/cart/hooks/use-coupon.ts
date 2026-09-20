@@ -8,6 +8,7 @@ import { UnauthorizedError } from '@/lib/api-error';
 import { useCartStore } from '@/store/cart-store';
 
 import type { CouponFeedback } from '../types';
+import { toSyncLines } from '../utils/sync-lines';
 
 type DiscountResult = { discountAmount: number };
 
@@ -31,13 +32,14 @@ export function useCoupon() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code,
-          lines: lines.map((line) => ({ variantId: line.id, qty: line.quantity })),
+          lines: toSyncLines(lines),
         }),
       });
       if (res.status === 401) throw new UnauthorizedError();
       const payload: unknown = await res.json().catch(() => null);
       if (!res.ok) {
-        const message = (payload as { message?: string; error?: string } | null)?.message ??
+        const message =
+          (payload as { message?: string; error?: string } | null)?.message ??
           (payload as { message?: string; error?: string } | null)?.error ??
           'کد تخفیف نامعتبر است';
         throw new Error(message);
@@ -50,7 +52,10 @@ export function useCoupon() {
     },
     onError: (error) => {
       clearDiscount();
-      setFeedback({ text: error instanceof Error ? error.message : 'کد تخفیف نامعتبر است', valid: false });
+      setFeedback({
+        text: error instanceof Error ? error.message : 'کد تخفیف نامعتبر است',
+        valid: false,
+      });
     },
   });
 

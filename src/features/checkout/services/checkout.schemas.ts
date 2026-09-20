@@ -28,3 +28,28 @@ export type CheckoutStartResult = z.infer<typeof checkoutStartResultSchema>;
 
 export const payAgainResultSchema = z.object({ paymentUrl: z.string() });
 export type PayAgainResult = z.infer<typeof payAgainResultSchema>;
+
+/** `409` payload from `POST /storefront/checkout` (`details` on the shared error envelope). */
+export const checkoutConflictSchema = z.object({
+  /** `checkout_in_progress` = the customer's own first request is still running.
+   * `pending_order_exists` = they already have an unpaid order (`orderNumber` always set). */
+  code: z.enum(['checkout_in_progress', 'pending_order_exists']),
+  orderNumber: z.string().nullable().default(null),
+});
+export type CheckoutConflict = z.infer<typeof checkoutConflictSchema>;
+
+export const inFlightOrderSchema = z.object({
+  orderNumber: z.string(),
+  status: z.string(),
+  total: z.number(),
+  paymentMethod: z.enum(['online', 'cash']),
+  /** ISO deadline after which `abzar/api` releases the order. */
+  expiresAt: z.string(),
+});
+
+export const checkoutInFlightSchema = z.object({
+  /** `true` while a checkout is still running or an unpaid order is holding the cart. */
+  locked: z.boolean(),
+  order: inFlightOrderSchema.nullable(),
+});
+export type CheckoutInFlight = z.infer<typeof checkoutInFlightSchema>;

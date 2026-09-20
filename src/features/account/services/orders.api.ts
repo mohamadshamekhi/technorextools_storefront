@@ -2,7 +2,7 @@ import 'server-only';
 
 import { apiClient } from '@/lib/api-client';
 
-import { orderDetailSchema, orderListSchema } from './orders.schemas';
+import { orderDetailSchema, orderListSchema, orderStatsSchema } from './orders.schemas';
 
 /** Server-only wrappers over `abzar/api`'s authenticated, owner-scoped orders endpoints. */
 export const ordersApi = {
@@ -15,6 +15,11 @@ export const ordersApi = {
       next: { revalidate: 0 },
     });
   },
+
+  stats: () =>
+    apiClient.get('/storefront/orders/stats', orderStatsSchema, {
+      next: { revalidate: 0 },
+    }),
 
   detail: (orderNumber: string) =>
     apiClient.get(`/storefront/orders/${encodeURIComponent(orderNumber)}`, orderDetailSchema, {

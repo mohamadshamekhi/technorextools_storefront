@@ -37,7 +37,9 @@ export function CartPageView({ upsellPool, shippingMethods }: CartPageViewProps)
     lines.map((line) => line.id),
   );
 
-  const categoryByProductId = new Map(upsellPool.map((product) => [product.id, product.categorySlug]));
+  const categoryByProductId = new Map(
+    upsellPool.map((product) => [product.id, product.categorySlug]),
+  );
   const resolveCategory = (line: CartLine) => line.categorySlug ?? categoryByProductId.get(line.id);
 
   return (

@@ -12,7 +12,7 @@ export function AccountSidebar({ user }: { user: SessionUser }) {
   return (
     <aside className="border-hairline hidden w-64 shrink-0 border-e p-5 lg:block">
       <div className="bg-brand-50 ring-brand-100 mb-6 flex items-center gap-3 rounded-2xl p-3.5 ring-1">
-        <span className="bg-brand-500 bg-(image:--gradient-brand) shadow-(--shadow-brand) grid size-11 shrink-0 place-items-center rounded-full text-base font-bold text-white">
+        <span className="bg-brand-500 grid size-11 shrink-0 place-items-center rounded-full bg-(image:--gradient-brand) text-base font-bold text-white shadow-(--shadow-brand)">
           {initial(user.name)}
         </span>
         <div className="min-w-0">

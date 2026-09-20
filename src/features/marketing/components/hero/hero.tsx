@@ -1,6 +1,7 @@
 import { Container, Icon, PillLink } from '@/components/atoms';
 import { Reveal } from '@/components/molecules';
 import { routes } from '@/config/routes';
+import type { ProductDetail } from '@/features/catalog';
 
 import { HeroBadge } from './hero-badge';
 import { HeroHeadline } from './hero-headline';
@@ -8,10 +9,15 @@ import { HeroShowcase } from './hero-showcase';
 import { HeroStats } from './hero-stats';
 import styles from './hero.module.css';
 
-export function Hero() {
+type HeroProps = {
+  /** `isFeatured` product to spotlight; `null` shows the static fallback art. */
+  featuredProduct: ProductDetail | null;
+};
+
+export function Hero({ featuredProduct }: HeroProps) {
   return (
     <section
-      className="relative overflow-hidden py-16 sm:py-24 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)]"
+      className="relative overflow-hidden py-16 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)] sm:py-24 lg:py-28"
       aria-labelledby="hero-heading"
     >
       <span className={styles.blobWarm} aria-hidden />
@@ -24,8 +30,8 @@ export function Hero() {
           <HeroBadge />
           <HeroHeadline />
           <p className="text-foreground-muted max-w-xl text-[17px] leading-relaxed">
-            پیچ‌گوشتی، دریل، بکس و چکش بادی و شارژی — گارانتی اصالت، قطعات یدکی همیشه موجود و مشاورهٔ
-            فنی رایگان پیش از خرید.
+            پیچ‌گوشتی، دریل، بکس و چکش بادی و شارژی — گارانتی اصالت، قطعات یدکی همیشه موجود و
+            مشاورهٔ فنی رایگان پیش از خرید.
           </p>
           <div className="flex flex-wrap gap-3.5">
             <PillLink href={routes.products} size="lg">
@@ -40,7 +46,7 @@ export function Hero() {
           <HeroStats />
         </Reveal>
         <Reveal>
-          <HeroShowcase />
+          <HeroShowcase product={featuredProduct} />
         </Reveal>
       </Container>
     </section>

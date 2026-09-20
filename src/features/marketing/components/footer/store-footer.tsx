@@ -13,7 +13,7 @@ export function StoreFooter() {
   return (
     <footer
       id={SECTION.contact}
-      className="surface-ink texture-grid relative scroll-mt-24 pt-16 text-white/85"
+      className="surface-ink texture-grid relative scroll-mt-24 pt-20 text-white/85"
     >
       <span
         aria-hidden

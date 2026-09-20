@@ -24,7 +24,7 @@ export function AuthField({ label, icon, invalid, className, ...input }: AuthFie
           id={id}
           aria-invalid={invalid || undefined}
           className={cn(
-            'bg-surface w-full rounded-2xl border-[1.5px] px-4 py-3.5 text-[15px] outline-none transition-colors',
+            'bg-surface w-full rounded-2xl border-[1.5px] px-4 py-3.5 text-[15px] transition-colors outline-none',
             'focus:border-brand-500 focus:ring-brand-500/15 focus:ring-2',
             invalid ? 'border-sale' : 'border-hairline',
             icon && 'pe-11',

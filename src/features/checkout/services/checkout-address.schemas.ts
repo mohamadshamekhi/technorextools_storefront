@@ -19,12 +19,22 @@ export const addressListSchema = z.array(addressSchema);
 
 export const createAddressInputSchema = z.object({
   receiverName: z.string().trim().min(2).max(120),
-  receiverMobile: z.string().trim().regex(/^09\d{9}$/, 'شماره موبایل معتبر نیست'),
+  receiverMobile: z
+    .string()
+    .trim()
+    .regex(/^09\d{9}$/, 'شماره موبایل معتبر نیست'),
   province: z.string().trim().min(2).max(60),
   city: z.string().trim().min(2).max(60),
   fullAddress: z.string().trim().min(5).max(500),
-  postalCode: z.string().trim().regex(/^\d{10}$/, 'کد پستی باید ۱۰ رقم باشد'),
+  postalCode: z
+    .string()
+    .trim()
+    .regex(/^\d{10}$/, 'کد پستی باید ۱۰ رقم باشد'),
   isDefault: z.boolean().optional(),
 });
 
 export type CreateAddressInput = z.infer<typeof createAddressInputSchema>;
+
+export const updateAddressInputSchema = createAddressInputSchema.partial();
+
+export type UpdateAddressInput = z.infer<typeof updateAddressInputSchema>;

@@ -12,7 +12,7 @@ export function FooterSocialLinks() {
           aria-label={social.label}
           rel="noopener noreferrer"
           target="_blank"
-          className="hover:border-accent-500 hover:text-accent-500 hover:bg-white/5 grid size-10 place-items-center rounded-xl border border-white/15 text-white/80 transition-colors"
+          className="hover:border-accent-500 hover:text-accent-500 grid size-10 place-items-center rounded-xl border border-white/15 text-white/80 transition-colors hover:bg-white/5"
         >
           <Icon name={social.icon} className="size-[19px]" />
         </a>

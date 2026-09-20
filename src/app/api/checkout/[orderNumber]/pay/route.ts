@@ -5,7 +5,10 @@ import { getSession } from '@/lib/session';
 import { checkoutApi } from '@/features/checkout/services/checkout.api';
 
 /** BFF: re-opens a payment session for a pending `online` order (retry after failure). */
-export async function POST(request: Request, { params }: { params: Promise<{ orderNumber: string }> }) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ orderNumber: string }> },
+) {
   const session = await getSession();
   if (!session) return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
 

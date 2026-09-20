@@ -14,7 +14,7 @@ const COPY = {
 export function CatalogEmptyState({ variant = 'empty' }: { variant?: keyof typeof COPY }) {
   const copy = COPY[variant];
   return (
-    <div className="border-hairline bg-surface flex flex-col items-center gap-3 rounded-card border py-16 text-center">
+    <div className="border-hairline bg-surface rounded-card flex flex-col items-center gap-3 border py-16 text-center">
       <span className="bg-surface-sunken text-foreground-muted grid size-12 place-items-center rounded-2xl">
         <Icon name="box" className="size-6" />
       </span>

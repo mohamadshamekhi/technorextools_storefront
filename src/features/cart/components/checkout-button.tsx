@@ -31,7 +31,7 @@ export function CheckoutButton() {
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        className="bg-brand-500 bg-(image:--gradient-brand) shadow-(--shadow-brand) mt-5 flex h-13 w-full items-center justify-center gap-2 rounded-xl text-[15px] font-extrabold text-white transition-transform hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-70"
+        className="bg-brand-500 mt-5 flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-(image:--gradient-brand) text-[15px] font-extrabold text-white shadow-(--shadow-brand) transition-transform hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-70"
       >
         {isPending ? <Spinner className="size-4.5" /> : <Icon name="lock" className="size-4.5" />}
         تکمیل سفارش و پرداخت

@@ -26,7 +26,10 @@ export function CatalogPagination({
         type="button"
         disabled={page <= 1}
         onClick={() => goToPage(page - 1)}
-        className={cn('border-hairline grid size-10 place-items-center rounded-xl border', page <= 1 && 'opacity-40')}
+        className={cn(
+          'border-hairline grid size-10 place-items-center rounded-xl border',
+          page <= 1 && 'opacity-40',
+        )}
       >
         <Icon name="chevronEnd" className="size-4 rotate-180" />
       </button>

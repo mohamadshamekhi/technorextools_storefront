@@ -23,7 +23,8 @@ export function OrderSummary({ shippingMethods }: { shippingMethods: ShippingMet
   // choice no longer exists in the list) — persisted from here on, carried into checkout.
   useEffect(() => {
     if (shippingMethods.length === 0) return;
-    if (shippingMethodId && shippingMethods.some((method) => method.id === shippingMethodId)) return;
+    if (shippingMethodId && shippingMethods.some((method) => method.id === shippingMethodId))
+      return;
     const first = shippingMethods[0];
     if (first) setShippingMethod(first.id, first.cost);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the list itself changes

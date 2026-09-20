@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 import { Icon } from '@/components/atoms';
@@ -5,12 +7,14 @@ import { routes } from '@/config/routes';
 import { toPersianDigits } from '@/lib/persian';
 import type { SessionUser } from '@/lib/session';
 
-import { UNREAD_COUNT } from '../data/notifications';
+import { useUnreadNotificationsCount } from '../hooks/use-notifications';
 
 const initial = (name?: string) => name?.trim().charAt(0) || 'ک';
 
 /** Slim account-area header — logo, notifications shortcut, identity. */
 export function AccountTopbar({ user }: { user: SessionUser }) {
+  const unreadCount = useUnreadNotificationsCount();
+
   return (
     <header className="border-hairline bg-surface/95 sticky top-0 z-40 border-b backdrop-blur">
       <div className="flex items-center justify-between px-5 py-3.5 sm:px-8">
@@ -28,9 +32,9 @@ export function AccountTopbar({ user }: { user: SessionUser }) {
             className="border-hairline bg-surface relative grid size-9 place-items-center rounded-xl"
           >
             <Icon name="bell" className="text-foreground-muted size-4" />
-            {UNREAD_COUNT ? (
+            {unreadCount ? (
               <span className="bg-brand-500 absolute -end-1 -top-1 grid size-4 place-items-center rounded-full text-[9.5px] font-bold text-white">
-                {toPersianDigits(UNREAD_COUNT)}
+                {toPersianDigits(unreadCount)}
               </span>
             ) : null}
           </Link>
@@ -38,9 +42,7 @@ export function AccountTopbar({ user }: { user: SessionUser }) {
             <span className="bg-brand-500 grid size-8 place-items-center rounded-full text-[13px] font-bold text-white">
               {initial(user.name)}
             </span>
-            <span className="hidden text-[13px] font-bold sm:inline">
-              {user.name ?? 'کاربر'}
-            </span>
+            <span className="hidden text-[13px] font-bold sm:inline">{user.name ?? 'کاربر'}</span>
           </div>
         </div>
       </div>

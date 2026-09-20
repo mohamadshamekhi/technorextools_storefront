@@ -3,16 +3,14 @@ import { z } from 'zod';
 
 import { ApiError } from '@/lib/api-client';
 import { getSession } from '@/lib/session';
+import { cartSyncLinesSchema } from '@/features/cart/services/cart.schemas';
 import { syncCartToServer } from '@/features/cart/services/cart.api';
 import { checkoutApi } from '@/features/checkout/services/checkout.api';
 import { startCheckoutInputSchema } from '@/features/checkout/services/checkout.schemas';
 
 const bodySchema = z.object({
   input: startCheckoutInputSchema,
-  lines: z
-    .array(z.object({ variantId: z.string().length(24), qty: z.number().int().min(1).max(999) }))
-    .min(1)
-    .max(50),
+  lines: cartSyncLinesSchema,
 });
 
 /**

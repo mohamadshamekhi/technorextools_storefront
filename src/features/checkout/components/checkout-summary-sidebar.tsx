@@ -10,7 +10,11 @@ type CheckoutSummarySidebarProps = {
   discountCode: string;
 };
 
-export function CheckoutSummarySidebar({ lines, totals, discountCode }: CheckoutSummarySidebarProps) {
+export function CheckoutSummarySidebar({
+  lines,
+  totals,
+  discountCode,
+}: CheckoutSummarySidebarProps) {
   return (
     <div className="border-hairline bg-surface rounded-card sticky top-22 min-w-0 border p-6">
       <p className="mb-4.5 text-[15px] font-black">خلاصه سفارش</p>

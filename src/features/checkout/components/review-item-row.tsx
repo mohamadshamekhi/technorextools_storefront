@@ -12,7 +12,7 @@ export function ReviewItemRow({ line }: { line: CartLine }) {
       </div>
       <span className="font-display text-[14px] font-bold whitespace-nowrap">
         {formatToman(line.price * line.quantity)}{' '}
-        <span className="font-sans text-foreground-muted text-[11px] font-medium">تومان</span>
+        <span className="text-foreground-muted font-sans text-[11px] font-medium">تومان</span>
       </span>
     </div>
   );

@@ -1,11 +1,13 @@
 import type { PromoCard, Testimonial, ValueProp } from '../types';
 
-export const HERO_WORDS = [
-  'کارهای سنگین',
-  'خط تولید صنعتی',
-  'تعمیرگاه خودرو',
-  'کارگاه نجاری',
-];
+export const HERO_WORDS = ['کارهای سنگین', 'خط تولید صنعتی', 'تعمیرگاه خودرو', 'کارگاه نجاری'];
+
+/** Used when no `isFeatured` product exists yet in `abzar/api`. */
+export const HERO_SHOWCASE_FALLBACK = {
+  label: 'پیچ‌گوشتی بادی تکنورکس',
+  torque: '۱۲۰۰ Nm',
+  warranty: '۱۸ ماه',
+};
 
 export const HERO_STATS = [
   { value: 14, suffix: '+', label: 'سال تجربه' },
@@ -15,25 +17,22 @@ export const HERO_STATS = [
 
 export const PROMO_CARDS: PromoCard[] = [
   {
-    title: 'خرید اقساطی ابزار',
-    description: 'تا ۲۰ میلیون تومان اعتبار خرید برای کارگاه‌ها',
-    cta: 'شرایط خرید',
-    tint: 'oklch(0.94 0.04 250)',
-    ink: 'oklch(0.28 0.08 250)',
+    title: 'خرید عمده کارگاهی',
+    description: 'قیمت ویژه و مشاور اختصاصی برای سفارش‌های عمده کارگاه‌ها',
+    cta: 'استعلام قیمت عمده',
+    icon: 'handshake',
   },
   {
     title: 'پکیج کامل کارگاهی',
     description: 'ست ابزار بادی به‌همراه کمپرسور با تخفیف ویژه',
     cta: 'مشاهده پکیج',
-    tint: 'oklch(0.95 0.05 150)',
-    ink: 'oklch(0.28 0.08 155)',
+    icon: 'box',
   },
   {
     title: 'سرویس و تعمیر رایگان',
     description: 'اولین سرویس دوره‌ای ابزار روی ماست',
     cta: 'رزرو نوبت',
-    tint: 'oklch(0.95 0.05 85)',
-    ink: 'oklch(0.32 0.08 70)',
+    icon: 'wrench',
   },
 ];
 
@@ -85,15 +84,13 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     name: 'علی صادقی',
     role: 'صاحب کارگاه نجاری',
-    quote:
-      'چهار سال است از پیچ‌گوشتی بادی این برند استفاده می‌کنم و حتی یک بار زمین‌گیر نشده.',
+    quote: 'چهار سال است از پیچ‌گوشتی بادی این برند استفاده می‌کنم و حتی یک بار زمین‌گیر نشده.',
     rating: 5,
   },
   {
     name: 'رضا کریمی',
     role: 'مدیر خط تولید صنعتی',
-    quote:
-      'قطعات یدکی همیشه موجود است و همین باعث شد برای خط تولید ما به گزینه اول تبدیل شوند.',
+    quote: 'قطعات یدکی همیشه موجود است و همین باعث شد برای خط تولید ما به گزینه اول تبدیل شوند.',
     rating: 5,
   },
   {

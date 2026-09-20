@@ -8,6 +8,8 @@ import {
   getProductComments,
   listProducts,
 } from '@/features/catalog/services/catalog.api';
+import { buildExtras, mergeSpecs, withDownloadHrefs } from '@/features/catalog/utils/pdp-extras';
+import { listSpareParts } from '@/features/spare-parts/services/spare-parts.api';
 import { ApiError } from '@/lib/api-client';
 import { breadcrumbSchema, productSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
@@ -22,9 +24,7 @@ export async function generateStaticParams(): Promise<ProductParams[]> {
   return (result?.items ?? []).map((product) => ({ slug: product.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps<ProductParams>): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<ProductParams>): Promise<Metadata> {
   const { slug } = await params;
   try {
     const product = await getProduct(slug);
@@ -57,6 +57,14 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
     averageRating: null,
   }));
 
+  const spareParts = await listSpareParts({ productSlug: slug, take: 12 })
+    .then((result) => result.items)
+    .catch(() => []);
+
+  const extras = buildExtras(product);
+  const documents = withDownloadHrefs(extras.documents);
+  const specs = mergeSpecs(product, extras);
+
   const structuredData = [
     breadcrumbSchema([
       { name: 'خانه', path: routes.home },
@@ -70,7 +78,8 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
       brand: product.brand?.title ?? 'تکنورکس',
       price: product.basePrice,
       path: routes.product(slug),
-      inStock: product.variants.some((variant) => variant.stockQty > 0) || product.variants.length === 0,
+      inStock:
+        product.variants.some((variant) => variant.stockQty > 0) || product.variants.length === 0,
       rating: comments.averageRating ?? 0,
       reviewCount: comments.total,
     }),
@@ -83,7 +92,14 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
         // Static, server-generated structured data — XSS-safe.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <ProductDetailView product={product} comments={comments} />
+      <ProductDetailView
+        product={product}
+        comments={comments}
+        extras={extras}
+        documents={documents}
+        specs={specs}
+        spareParts={spareParts}
+      />
     </>
   );
 }

@@ -20,11 +20,7 @@ export function ReviewSection({ icon, title, onEdit, children }: ReviewSectionPr
           {title}
         </h3>
         {onEdit ? (
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-brand-600 text-[12.5px] font-bold"
-          >
+          <button type="button" onClick={onEdit} className="text-brand-600 text-[12.5px] font-bold">
             ویرایش
           </button>
         ) : null}

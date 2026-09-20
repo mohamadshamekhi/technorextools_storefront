@@ -10,7 +10,7 @@ export function HeaderActions() {
     <div className="flex shrink-0 items-center gap-2.5">
       <Link
         href={routes.account}
-        className="border-hairline bg-surface hover:border-brand-300 hover:-translate-y-0.5 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-(--shadow-soft) transition-[transform,border-color]"
+        className="border-hairline bg-surface hover:border-brand-300 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-(--shadow-soft) transition-[transform,border-color] hover:-translate-y-0.5"
       >
         <Icon name="user" className="text-brand-500 size-[17px]" />
         <span className="hidden sm:inline">حساب کاربری</span>

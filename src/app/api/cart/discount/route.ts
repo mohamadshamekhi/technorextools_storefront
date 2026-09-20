@@ -4,12 +4,11 @@ import { z } from 'zod';
 import { ApiError } from '@/lib/api-client';
 import { getSession } from '@/lib/session';
 import { cartApi, syncCartToServer } from '@/features/cart/services/cart.api';
+import { cartSyncLineSchema } from '@/features/cart/services/cart.schemas';
 
 const bodySchema = z.object({
   code: z.string().trim().min(1).max(60),
-  lines: z
-    .array(z.object({ variantId: z.string().length(24), qty: z.number().int().min(1).max(999) }))
-    .max(50),
+  lines: z.array(cartSyncLineSchema).max(50),
 });
 
 /**

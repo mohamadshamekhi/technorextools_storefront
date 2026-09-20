@@ -18,6 +18,7 @@ export type CategoryNode = {
   id: string;
   title: string;
   slug: string;
+  imageUrl: string | null;
   sortOrder: number;
   children: CategoryNode[];
 };
@@ -27,6 +28,7 @@ export const categoryNodeSchema: z.ZodType<CategoryNode> = z.lazy(() =>
     id: z.string(),
     title: z.string(),
     slug: z.string(),
+    imageUrl: z.string().nullable(),
     sortOrder: z.number(),
     children: z.array(categoryNodeSchema),
   }),
@@ -43,6 +45,9 @@ export const productCardSchema = z.object({
   isAmazingDeal: z.boolean(),
   brand: z.object({ title: z.string(), slug: z.string() }).nullable(),
   mainImageUrl: z.string().nullable(),
+  firstVariant: z
+    .object({ id: z.string(), effectivePrice: z.number(), stockQty: z.number() })
+    .nullable(),
 });
 
 export const productListSchema = z.object({
@@ -50,6 +55,15 @@ export const productListSchema = z.object({
   total: z.number(),
   skip: z.number(),
   take: z.number(),
+});
+
+/** Exploded-view part from `abzar/api`; `hotspot` is a percent offset on `explodedViewUrl`. */
+export const productPartSchema = z.object({
+  number: z.number().int().positive(),
+  name: z.string(),
+  code: z.string(),
+  sellable: z.boolean(),
+  hotspot: z.object({ x: z.number(), y: z.number() }).nullable(),
 });
 
 export const productDetailSchema = z.object({
@@ -62,6 +76,8 @@ export const productDetailSchema = z.object({
   isAmazingDeal: z.boolean(),
   datasheetUrl: z.string().nullable(),
   model3dUrl: z.string().nullable(),
+  explodedViewUrl: z.string().nullable().default(null),
+  parts: z.array(productPartSchema).default([]),
   category: z.object({ id: z.string(), title: z.string(), slug: z.string() }),
   brand: z
     .object({

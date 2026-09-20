@@ -12,7 +12,7 @@ export function ContactChannels() {
       {CONTACT_CHANNELS.map((channel) => {
         const body = (
           <>
-            <span className="bg-brand-50 text-brand-600 ring-brand-100 mx-auto grid size-12 place-items-center rounded-xl ring-1 transition-colors group-hover:bg-brand-500 group-hover:text-white">
+            <span className="bg-brand-50 text-brand-600 ring-brand-100 group-hover:bg-brand-500 mx-auto grid size-12 place-items-center rounded-xl ring-1 transition-colors group-hover:text-white">
               <Icon name={channel.icon} className="size-5" />
             </span>
             <p className="mt-4 text-[13px] font-bold">{channel.title}</p>

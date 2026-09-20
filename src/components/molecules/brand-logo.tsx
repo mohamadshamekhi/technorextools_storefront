@@ -19,10 +19,10 @@ export function BrandLogo({ tone = 'default', className }: BrandLogoProps) {
     >
       <span
         aria-hidden
-        className="bg-brand-500 bg-(image:--gradient-brand) font-display text-surface relative grid size-10 place-items-center rounded-xl text-xl font-black shadow-(--shadow-brand)"
+        className="bg-brand-500 font-display text-surface relative grid size-10 place-items-center rounded-xl bg-(image:--gradient-brand) text-xl font-black shadow-(--shadow-brand)"
       >
         T
-        <span className="bg-accent-500 absolute -end-1 -top-1 size-2.5 rounded-full ring-2 ring-surface" />
+        <span className="bg-accent-500 ring-surface absolute -end-1 -top-1 size-2.5 rounded-full ring-2" />
       </span>
       <span
         className={cn(

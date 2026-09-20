@@ -20,12 +20,12 @@ export function OrderStatusTimeline({ history }: { history: OrderDetail['statusH
           <li key={`${entry.status}-${entry.at}`} className="flex gap-3">
             <div className="flex flex-col items-center">
               <span
-                className="grid size-7 shrink-0 place-items-center rounded-full"
+                className="ring-surface grid size-8 shrink-0 place-items-center rounded-full ring-4"
                 style={{ backgroundColor: meta.tint, color: meta.ink }}
               >
-                <Icon name={meta.icon} className="size-3.5" />
+                <Icon name={meta.icon} className="size-4" />
               </span>
-              {!isLast ? <span className="bg-hairline w-px flex-1" /> : null}
+              {!isLast ? <span className="bg-brand-200 w-0.5 flex-1" /> : null}
             </div>
             <div className={cn('flex flex-1 flex-col gap-0.5 pb-6', isLast && 'pb-0')}>
               <div className="flex flex-wrap items-center justify-between gap-2">

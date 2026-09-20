@@ -19,29 +19,9 @@ export type OrderStatusMeta = {
   ink: string;
 };
 
-export type Address = {
-  id: string;
-  title: string;
-  body: string;
-  isDefault: boolean;
-};
+export type { WishlistItem } from '../services/wishlist.schemas';
 
-export type WishlistItem = {
-  id: string;
-  title: string;
-  price: number;
-};
-
-export type AccountNotification = {
-  id: string;
-  title: string;
-  body: string;
-  time: string;
-  icon: IconName;
-  tint: string;
-  ink: string;
-  unread: boolean;
-};
+export type { Notification, NotificationType } from '../services/notifications.schemas';
 
 /** A headline metric on the overview page. */
 export type StatCard = {
@@ -54,6 +34,13 @@ export type StatCard = {
 };
 
 export type TrendPoint = { label: string; percent: number };
+
+export type Membership = {
+  tier: string;
+  progress: number;
+  toNextLabel: string;
+  lifetimePoints: string;
+};
 
 export type AccountNavItem = {
   href: string;

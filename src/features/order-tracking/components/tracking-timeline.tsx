@@ -27,9 +27,7 @@ export function TrackingTimeline({
               <span
                 className={cn(
                   'grid size-5 shrink-0 place-items-center rounded-full',
-                  done
-                    ? 'bg-brand-500 text-white'
-                    : 'border-hairline bg-surface border',
+                  done ? 'bg-brand-500 text-white' : 'border-hairline bg-surface border',
                 )}
               >
                 {done ? <Icon name="check" className="size-3" /> : null}

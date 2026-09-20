@@ -13,7 +13,10 @@ import { useAuthModalStore } from '@/store/auth-modal-store';
  * as `redirectTo` so `PhoneAuthFlow`'s success step can send the visitor right back. */
 function handleUnauthorized(error: unknown) {
   if (!(error instanceof UnauthorizedError)) return;
-  const redirectTo = typeof window === 'undefined' ? undefined : `${window.location.pathname}${window.location.search}`;
+  const redirectTo =
+    typeof window === 'undefined'
+      ? undefined
+      : `${window.location.pathname}${window.location.search}`;
   useAuthModalStore.getState().open(redirectTo);
 }
 
@@ -26,7 +29,8 @@ export function QueryProvider({ children }: { children: ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: QUERY_STALE_TIME,
-            retry: (failureCount, error) => !(error instanceof UnauthorizedError) && failureCount < 1,
+            retry: (failureCount, error) =>
+              !(error instanceof UnauthorizedError) && failureCount < 1,
             refetchOnWindowFocus: false,
           },
         },

@@ -18,9 +18,10 @@ export function useCartTotals(methods: ShippingMethod[], shippingId: string): Ca
     const subtotal = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
     const discount = Math.min(Math.max(discountAmount, 0), subtotal);
     const method = methods.find((candidate) => candidate.id === shippingId);
-    const freeShipping = method?.freeOverAmount !== null && method?.freeOverAmount !== undefined
-      ? subtotal >= method.freeOverAmount
-      : false;
+    const freeShipping =
+      method?.freeOverAmount !== null && method?.freeOverAmount !== undefined
+        ? subtotal >= method.freeOverAmount
+        : false;
     const shippingCost = freeShipping ? 0 : (method?.cost ?? 0);
     const total = subtotal - discount + shippingCost;
 

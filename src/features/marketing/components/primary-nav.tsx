@@ -21,7 +21,7 @@ export function PrimaryNav() {
         ))}
         <Link
           href={routes.orderTracking}
-          className="text-brand-700 bg-brand-50 ring-brand-100 me-auto ms-2 flex items-center gap-1.5 rounded-full px-3 py-1.5 whitespace-nowrap ring-1"
+          className="text-brand-700 bg-brand-50 ring-brand-100 ms-2 me-auto flex items-center gap-1.5 rounded-full px-3 py-1.5 whitespace-nowrap ring-1"
         >
           <Icon name="truck" className="size-4" />
           پیگیری سفارش

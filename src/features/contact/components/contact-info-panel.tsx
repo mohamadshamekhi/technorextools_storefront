@@ -29,9 +29,7 @@ export function ContactInfoPanel() {
         </span>
         <div>
           <p className="text-[13.5px] font-bold">پشتیبانی فنی می‌خواهید؟</p>
-          <p className="text-foreground-muted text-xs">
-            همین حالا با کارشناسان ما تماس بگیرید.
-          </p>
+          <p className="text-foreground-muted text-xs">همین حالا با کارشناسان ما تماس بگیرید.</p>
         </div>
       </div>
     </div>

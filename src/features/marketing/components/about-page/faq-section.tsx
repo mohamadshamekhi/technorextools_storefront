@@ -12,12 +12,12 @@ type FaqItemProps = {
 /** Native disclosure — zero JS, keyboard-accessible, indexable content. */
 function FaqItem({ question, answer }: FaqItemProps) {
   return (
-    <details className="border-hairline group rounded-2xl border bg-surface px-5 py-1 open:bg-surface-muted">
+    <details className="border-hairline group bg-surface open:bg-surface-muted rounded-2xl border px-5 py-1">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-bold [&::-webkit-details-marker]:hidden">
         {question}
         <span
           aria-hidden
-          className="text-brand-600 grid size-7 shrink-0 place-items-center rounded-full bg-brand-50 text-lg leading-none transition-transform duration-300 group-open:rotate-45"
+          className="text-brand-600 bg-brand-50 grid size-7 shrink-0 place-items-center rounded-full text-lg leading-none transition-transform duration-300 group-open:rotate-45"
         >
           +
         </span>
@@ -32,7 +32,11 @@ export function FaqSection() {
   return (
     <section className="pb-24">
       <Container className="max-w-3xl">
-        <AboutSectionHeading eyebrow="پرسش‌های متداول" title="سؤال‌های پرتکرار مشتریان" id="faq-heading" />
+        <AboutSectionHeading
+          eyebrow="پرسش‌های متداول"
+          title="سؤال‌های پرتکرار مشتریان"
+          id="faq-heading"
+        />
         <Reveal className="flex flex-col gap-3">
           {ABOUT_FAQ.map((item) => (
             <FaqItem key={item.question} {...item} />

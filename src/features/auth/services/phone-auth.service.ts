@@ -19,7 +19,8 @@ export async function requestOtp(mobile: string): Promise<{ resendAfter: number 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ mobile }),
   });
-  if (!res.ok) throw new Error(await parseErrorMessage(res, 'ارسال کد ناموفق بود. دوباره تلاش کنید.'));
+  if (!res.ok)
+    throw new Error(await parseErrorMessage(res, 'ارسال کد ناموفق بود. دوباره تلاش کنید.'));
   return (await res.json()) as { resendAfter: number };
 }
 
@@ -30,11 +31,15 @@ export async function verifyOtp(mobile: string, code: string): Promise<OtpVerifi
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ mobile, code }),
   });
-  if (!res.ok) throw new Error(await parseErrorMessage(res, 'کد وارد شده صحیح نیست. دوباره تلاش کنید.'));
+  if (!res.ok)
+    throw new Error(await parseErrorMessage(res, 'کد وارد شده صحیح نیست. دوباره تلاش کنید.'));
   return (await res.json()) as OtpVerification;
 }
 
-export async function updateProfile(input: { fullName: string; email: string | null }): Promise<void> {
+export async function updateProfile(input: {
+  fullName: string;
+  email: string | null;
+}): Promise<void> {
   const res = await fetch('/api/auth/me', {
     method: 'PATCH',
     credentials: 'same-origin',

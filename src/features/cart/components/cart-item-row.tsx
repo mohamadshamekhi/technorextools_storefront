@@ -60,7 +60,7 @@ export function CartItemRow({ line, categorySlug, onChangeQuantity, onRemove }: 
 
       <p className="font-display col-span-2 text-[17px] font-bold sm:col-span-1 sm:text-start">
         {formatToman(line.price * line.quantity)}{' '}
-        <span className="font-sans text-foreground-muted text-[11px] font-medium">تومان</span>
+        <span className="text-foreground-muted font-sans text-[11px] font-medium">تومان</span>
       </p>
     </div>
   );

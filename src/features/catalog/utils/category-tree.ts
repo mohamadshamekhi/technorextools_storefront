@@ -6,10 +6,7 @@ export function flattenCategories(nodes: CategoryNode[]): CategoryNode[] {
 }
 
 /** Find one category anywhere in the tree by slug. */
-export function findCategoryNode(
-  nodes: CategoryNode[],
-  slug: string,
-): CategoryNode | undefined {
+export function findCategoryNode(nodes: CategoryNode[], slug: string): CategoryNode | undefined {
   return flattenCategories(nodes).find((node) => node.slug === slug);
 }
 

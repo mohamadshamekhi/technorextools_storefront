@@ -7,9 +7,10 @@ import { z } from 'zod';
  */
 export const cartLineViewSchema = z.object({
   id: z.string(),
-  kind: z.enum(['variant', 'bundle']),
+  kind: z.enum(['variant', 'bundle', 'spare_part']),
   variantId: z.string().nullable(),
   bundleId: z.string().nullable(),
+  sparePartId: z.string().nullable(),
   productId: z.string().nullable(),
   productTitle: z.string(),
   productSlug: z.string().nullable(),
@@ -22,6 +23,14 @@ export const cartLineViewSchema = z.object({
   stockQty: z.number(),
   available: z.boolean(),
 });
+
+/** One line of the client cart pushed to the server cart — a variant or a spare part. */
+export const cartSyncLineSchema = z.union([
+  z.object({ variantId: z.string().length(24), qty: z.number().int().min(1).max(999) }),
+  z.object({ sparePartId: z.string().length(24), qty: z.number().int().min(1).max(999) }),
+]);
+export const cartSyncLinesSchema = z.array(cartSyncLineSchema).min(1).max(50);
+export type CartSyncLine = z.infer<typeof cartSyncLineSchema>;
 
 export const cartViewSchema = z.object({
   token: z.string(),

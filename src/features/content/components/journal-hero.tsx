@@ -6,10 +6,10 @@ export function JournalHero() {
     <section className="relative overflow-hidden pt-14 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)]">
       <Container className="relative">
         <div className="mb-3 flex items-center gap-2.5">
-          <span className="bg-brand-500 bg-(image:--gradient-brand) text-white shadow-(--shadow-brand) grid size-[34px] place-items-center rounded-[11px]">
+          <span className="bg-brand-500 grid size-[34px] place-items-center rounded-[11px] bg-(image:--gradient-brand) text-white shadow-(--shadow-brand)">
             <Icon name="doc" className="size-[17px]" />
           </span>
-          <span className="font-display text-brand-600 ring-brand-100 rounded-full bg-brand-50 px-3 py-1 text-[12px] font-bold tracking-[0.18em] ring-1">
+          <span className="font-display text-brand-600 ring-brand-100 bg-brand-50 rounded-full px-3 py-1 text-[12px] font-bold tracking-[0.18em] ring-1">
             TECHNOREXTOOLS JOURNAL
           </span>
         </div>

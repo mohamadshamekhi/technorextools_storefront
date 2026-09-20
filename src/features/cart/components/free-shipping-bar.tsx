@@ -8,7 +8,8 @@ type FreeShippingBarProps = { subtotal: number; methods: ShippingMethod[] };
 
 export function FreeShippingBar({ subtotal, methods }: FreeShippingBarProps) {
   const withThreshold = methods.filter(
-    (method): method is ShippingMethod & { freeOverAmount: number } => method.freeOverAmount !== null,
+    (method): method is ShippingMethod & { freeOverAmount: number } =>
+      method.freeOverAmount !== null,
   );
   if (withThreshold.length === 0) return null;
 

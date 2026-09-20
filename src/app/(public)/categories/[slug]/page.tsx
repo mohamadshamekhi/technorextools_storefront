@@ -83,7 +83,12 @@ export default async function CategoryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <Container className="pt-8">
-        <CategoryHero title={category.title} slug={slug} count={result?.total ?? 0} />
+        <CategoryHero
+          title={category.title}
+          slug={slug}
+          count={result?.total ?? 0}
+          imageUrl={category.imageUrl}
+        />
       </Container>
       <PromoTicker />
       <Container className="py-10">

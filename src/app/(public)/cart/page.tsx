@@ -6,6 +6,7 @@ import { CartBreadcrumb, CartPageView } from '@/features/cart';
 import { listShippingMethods } from '@/features/cart/services/shipping.api';
 import type { UpsellProduct } from '@/features/cart/types';
 import { listProducts } from '@/features/catalog/services/catalog.api';
+import { cardPurchase } from '@/features/catalog/utils/card-variant';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
@@ -20,9 +21,9 @@ export default async function CartPage() {
     listShippingMethods().catch(() => []),
   ]);
   const upsellPool: UpsellProduct[] = (result?.items ?? []).map((product) => ({
-    id: product.id,
+    id: cardPurchase(product).id,
     title: product.title,
-    price: product.basePrice,
+    price: cardPurchase(product).price,
     slug: product.slug,
     categorySlug: product.slug,
     imageUrl: product.mainImageUrl,

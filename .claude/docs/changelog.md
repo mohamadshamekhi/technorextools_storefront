@@ -5,6 +5,272 @@
 
 ---
 
+## 2026-09-20 — Feat: repair request page + header nav (قطعات یدکی / درخواست تعمیر)
+
+- `PRIMARY_NAV` + footer "دسترسی سریع" (`features/marketing/data/navigation.ts`): added «قطعات یدکی» → `routes.spareParts` and «درخواست تعمیر» → `routes.repairRequest`.
+- `routes.repairRequest = '/repair-request'`; added `/spare-parts` + `/repair-request` to `PUBLIC_PATHS`; sitemap entry (0.6, monthly).
+- New `features/repairs/`: `types/index.ts` (`repairFormSchema` mirroring `POST /storefront/repairs` bounds, `repairRequestSchema`, `REPAIR_STATUSES`), `hooks/use-repair-form.ts` (fields + field errors + submitted flag), `components/{repair-form,repair-sent,repair-login-notice}.tsx`, barrel `index.ts`.
+- BFF `POST /api/repairs`: `getSession()` gate → 401, Zod `safeParse` → 400 + `fieldErrors`, then `apiClient.post('/storefront/repairs')`; upstream 400/404 → 400 "سریال نامعتبر", other → 502.
+- Page `(public)/repair-request/page.tsx` (RSC): `buildMetadata` + breadcrumb JSON-LD, `getSession()` decides `RepairForm` (client) vs `RepairLoginNotice` (link to `/login?next=/repair-request`); static 3-step aside.
+- State flow: form state lives in `useRepairForm` (client leaf); page stays server-rendered, no store slice.
+
+## 2026-09-20 — Feat: checkout 409 conflicts + `checkout/in-flight`
+
+- Schemas (`checkout.schemas.ts`): `checkoutConflictSchema` (`details.code` = `checkout_in_progress` | `pending_order_exists`, `orderNumber` nullable), `checkoutInFlightSchema` (`{locked, order|null}` with `orderNumber/status/total/paymentMethod/expiresAt`).
+- `checkoutApi.inFlight()` (`cache: 'no-store'`) + BFF `GET /api/checkout/in-flight` (session-gated, `private, no-store`).
+- `services/checkout-errors.ts`: `CheckoutConflictError` (carries the parsed conflict) + `toCheckoutConflict(details)`; replaces the earlier `CheckoutInFlightError`.
+- `hooks/use-checkout-in-flight.ts`: react-query poll every 3s while a conflict is open, stops itself on `locked === false` — replaces the 20s guess timer.
+- `use-checkout.ts` owns `conflict`; exposes `conflict` / `blockingOrder` / `conflictResolved`, keeps `confirming` true while locked, and clears the conflict on the next confirm.
+- `components/checkout-conflict-notice.tsx`: spinner while processing, "می‌توانید دوباره ثبت کنید" once unlocked with no order, or an order card (number, total, minutes left to `expiresAt`) with "پرداخت همین سفارش" (`useRetryPayment`, now exported from `features/account`) + link to the order detail. Threaded through `review-step.tsx` ← `checkout-page-view.tsx`.
+
+## 2026-09-20 — Feat: exploded-view parts from `abzar/api`
+
+- `productPartSchema` + `productDetailSchema.parts` (`catalog.schemas.ts`) — `{number, name, code, sellable, hotspot: {x,y}|null}`, sorted by `number`, `[]` when none.
+- `utils/pdp-extras.ts` builds `explodedView` from `explodedViewUrl` + `parts` (null only when both are empty); mock parts dropped from `data/pdp-mock.ts` (`pdpMock` is now `Omit<ProductExtras,'explodedView'>`).
+- `exploded/part-hotspots.tsx` renders markers for parts with a `hotspot` (percent of the image); `PartInfoCard` shows only when at least one hotspot exists. Gallery "انفجاری" mode hidden when no image and no parts; "ساختار و قطعات" section (PartsTable) hidden when no parts.
+- Still open with `abzar/api`: parts carry no `sparePartId`, so "سفارش قطعه" links to `/search?q=<code>`.
+
+## 2026-09-19 — Feat: spare parts (storefront)
+
+- New `features/spare-parts/`: `services/spare-parts.{schemas,api}.ts` (server-only fetchers, ISR 5m, tags `spare-parts`), `components/{add-spare-part-button,spare-part-card,spare-part-grid,spare-part-detail-view}.tsx`, barrel `index.ts`.
+- Pages: `(public)/spare-parts` (search `q`, Zod-parsed) and `(public)/spare-parts/[slug]`; `routes.spareParts/sparePart`; sitemap entries.
+- PDP: `products/[slug]/page.tsx` fetches `listSpareParts({productSlug})` → `ProductDetailView.spareParts` → `DetailSection#spare-parts` + tab.
+- Cart state: `CartLine.kind?: 'spare_part'` (id = sparePartId; absent = variant). `features/cart/utils/sync-lines.ts#toSyncLines` maps lines → `{variantId|sparePartId, qty}` (`cartSyncLinesSchema`) for `/api/checkout` + `/api/cart/discount`; `syncCartToServer` calls `cartApi.addSparePart` (`POST /storefront/cart/spare-parts`) for parts.
+- Not covered: no nav link; discounts targeted at product/category don't apply to parts (API side).
+
+## 2026-09-19 — Change: cart schema accepts spare parts
+
+- `features/cart/services/cart.schemas.ts`: `cartLineViewSchema.kind` += `'spare_part'`, new `sparePartId: string | null`. Prevents 502 on carts containing spare parts. No UI consumes `kind`/`productSlug` yet.
+- Not built (needs decision): `/spare-parts` pages, PDP "قطعات یدکی" section (`GET storefront/spare-parts?productSlug=`), add-to-cart (`POST storefront/cart/spare-parts`). Backoffice work belongs to the admin panel.
+
+## 2026-09-19 — Change: exploded view = admin-uploaded image
+
+- `productDetailSchema.explodedViewUrl` (from `abzar/api` `EXPLODED_VIEW` media). Exploded mode/section render only when it exists (`utils/pdp-extras.ts`).
+- Removed SVG diagram + explode controls. `exploded/exploded-view.tsx` now: zoomable image (`PhotoStage` + `Lightbox`), optional `part-hotspots.tsx` markers (`ExplodedPart.hotspot` %, none in mock), `part-info-card.tsx`, `parts-table.tsx`. State (hover/pinned part) owned by `ExplodedView`; gallery rail gets an exploded thumb.
+- Blocked on `abzar/api`: no parts list / hotspot coordinates per product — parts are still mock (`data/pdp-mock.ts`).
+
+## 2026-09-18 — Feat: PDP v2 (gallery modes, 3D, exploded view, docs, mobile bar)
+
+- `features/catalog/components/product-detail/` split into `gallery/` (mode switcher, thumb rail, hover-zoom stage, mobile swiper, lightbox), `viewer/` (R3F + drei Draco GLB, `dynamic ssr:false`, hotspots, toolbar, WebGL/error fallback), `exploded/` (SVG diagram + accessible parts table, two-way hover/focus sync, explode toggle/slider), `buy-box/`, `mobile/` (sticky bar, bottom sheet), `sections/` (tab bar scroll-spy, description read-more, bento, zebra specs, Q&A, progress bar, mobile accordion), `documents/`, `reviews/`, `carousels/`.
+- State: `ProductBuyBox` (client) owns qty/variant/city/sheet; `useAddToCart` owns add sequence (spinner → store commit → `flyToCart` → mini-cart drawer). `ProductGallery` owns mode + photo index. Cart store unchanged; `CartButton` gets `data-cart-target` + badge pop.
+- Data: `services/pdp.schemas.ts` (Zod) → `types/pdp.ts`; `data/pdp-mock.ts` (documents, model3d, exploded view, specs, Q&A, highlights) + `data/delivery.ts` — **mock**, `abzar/api` has no such fields (except `datasheetUrl`, `model3dUrl`, overlaid in `utils/pdp-extras.ts`).
+- `app/api/documents/[id]/route.ts`: per-request expiring HMAC file URL (`services/document-signing.ts`), env `DOCUMENT_SIGNING_SECRET` (required in prod).
+- New: `store/toast-store.ts`, `components/molecules/toaster.tsx`, hooks `use-tweened-number|scroll-direction|in-view|recently-viewed`, keyframes in `styles/animations.css`.
+- Removed: `product-buy-box.tsx`, `product-gallery.tsx`, `product-reviews.tsx`, `quantity-stepper.tsx`, `key-spec-chips.tsx`, `spec-list.tsx` (old flat versions).
+
+## 2026-09-18 — Fix: card price/cart id from first variant
+
+- `abzar/api`: `StorefrontProductCardView.firstVariant {id, effectivePrice, stockQty} | null` (list + `related`), new `ProductVariantRepository.findActiveByProductIds`.
+- Storefront: `productCardSchema.firstVariant`, `features/catalog/utils/card-variant.ts` (`cardPurchase`) used by `product-card`, `flash-deals`, cart upsell pool, home JSON-LD. Cart line id = first variant id (matches buy box).
+
+## 2026-09-18 — Feat: card cart stepper
+
+- `features/catalog/hooks/use-cart-line-quantity.ts` (hydration-safe line qty), `components/card-quantity-stepper.tsx` (+/−, − at 1 removes).
+- `add-to-cart-button.tsx` `compact` mode swaps to the stepper once the line is in the cart. State owner: `useCartStore` (`setQuantity`).
+- Blocked on `abzar/api`: card list payload has no first variant (id/effectivePrice) — card still uses `basePrice` and `product.id` as cart line id.
+
+## 2026-09-18 — UI: product card v2 (replaces catalog card redesign below)
+
+- `product-card.tsx`: inset image tile (`surface-muted`, multiply blend) inside a ring card; brand as muted label; price left, round icon-only cart button right; wishlist top-end.
+- `add-to-cart-button.tsx`: new `compact` prop (44px round icon button, aria-label).
+- Removed `coming-soon-card.tsx` + filler logic and `minRowSize` prop from `product-grid.tsx` / `product-showcase.tsx`.
+
+## 2026-09-18 — UI: catalog card redesign
+
+- `features/catalog/components/product-card.tsx`: brand moved from image pill to uppercase label above title; hover = lift (`-translate-y-1`, reduced-motion safe) instead of scale; dashed price divider.
+- `coming-soon-card.tsx`: dashed brand-tinted centered filler tile (no duplicated image block), `min-h-80`.
+- `add-to-cart-button.tsx`: pointer cursor + focus-visible outline.
+
+## 2026-09-18 — Fix: homepage QA pass — USP strip, trust-card palette, product skeletons, testimonial nav
+
+Continuation of the homepage redesign already in progress (hero/promo-card/value-props work
+below). Fixed the remaining brief gaps and screenshot defects:
+
+- `announcement-bar.tsx`: sticky USP strip now shows all 4 items (shipping/warranty/returns/
+  payment) as a horizontally scrollable row on mobile (`overflow-x-auto`) instead of hiding two
+  of them behind `hidden sm:flex`.
+- `promo-card.tsx` + `promo-cards.tsx`: removed the per-card `style={{ backgroundColor, color }}`
+  arbitrary-`oklch` inline styling (banned static inline style + mixed-palette violation) —
+  3 cards now cycle a single brand/accent token scheme (`--gradient-brand`, `bg-ink`,
+  `bg-brand-50`). `types/index.ts` + `data/content.ts`: dropped the now-unused `tint`/`ink`
+  fields from `PromoCard`. Cards get `items-stretch` + `h-full` for equal-height alignment (the
+  "misaligned trust-badge grid" defect).
+- `components/molecules/reveal.tsx`: added an optional `delayMs` prop (the one sanctioned
+  runtime-computed inline style — grid stagger position) so `product-grid.tsx` and
+  `promo-cards.tsx` can pass `index * 60` for a proper scroll-triggered stagger instead of every
+  card animating in sync.
+- New `product-card-skeleton.tsx`, `product-grid-skeleton.tsx`, `product-showcase-skeleton.tsx`
+  (catalog feature) — shimmer loaders (wires up the previously-unused `shimmer` keyframe) matching
+  the real grid's column layout. `page.tsx` now wraps `<ProductShowcase>` in
+  `<Suspense fallback={<ProductShowcaseSkeleton />}>` so the new-arrivals grid streams in with a
+  shimmer placeholder instead of ever showing an empty/broken card.
+- `testimonials.tsx`: added prev/next chevron buttons (manual nav beyond the dot tabs), pause
+  autoplay on `mouseenter`/`focus` (resume on leave/blur), and a crossfade+slide entrance per
+  slide via new `animate-carousel-in` keyframe in `animations.css` (respects
+  `prefers-reduced-motion` through the existing global override).
+- `overview-view.tsx` (account/dashboard, unrelated in-progress work already in the tree): dropped
+  an unused `buildMembership` import and unused `tier` destructure to get `pnpm lint` back to
+  zero warnings — no behavior change.
+
+Verified `pnpm typecheck && pnpm lint && pnpm build` all green.
+
+## 2026-09-18 — Fix: promo cards — remove fake installment offer, redesign card visuals
+
+`content.ts`: replaced non-existent "خرید اقساطی ابزار" (installment purchase — not an offered
+service) with "خرید عمده کارگاهی" (bulk/wholesale pricing for workshops), added `icon` field to
+all three `PROMO_CARDS`. `types/index.ts`: `PromoCard.icon: IconName`. `promo-card.tsx`: added
+icon badge (frosted-glass square), tightened title/description spacing, CTA restyled as a pill
+button instead of bare text+chevron.
+
+## 2026-09-18 — Redesign: full homepage hero (intro) polish pass
+
+`hero-badge.tsx`: merged the pulsing-dot + clashing amber "رسمی" pill into one cohesive badge —
+brand-tinted shield-icon circle + single trailing accent dot. `hero-stats.tsx`: bare
+number/divider list → 3 icon-chip stat cards (`award`/`user`/`box`, matched by label text),
+reusing the same icon-chip visual language as the floating spec cards for a consistent system.
+`hero.module.css`: toned down `.blobWarm`/`.blobCool` opacity (0.42/0.4 → 0.16/0.14) and shrank
+them so they read as an ambient glow instead of washing the whole white section; `.ring` opacity
+0.35 → 0.22 and spin slowed 46s → 60s; added `.ground` (soft radial contact-shadow ellipse under
+the product shot for grounding). `hero-showcase.tsx`: wired in `.ground`, dropped the inner glow
+opacity 0.25 → 0.14, `rounded-[2rem]` → canonical `rounded-4xl`. Builds on the floating-card
+redesign below.
+
+## 2026-09-18 — Redesign: hero showcase floating spec cards (homepage)
+
+`hero-floating-card.tsx` restyled: dropped inline icon box, added a small corner-pinned check
+badge (`-inset-s-2`/`-inset-e-2`, `badgeSide` prop) over a glass surface (`bg-surface/90` +
+`backdrop-blur-md`), tighter value/label stack. `hero-showcase.tsx`: cut `MAX_SPECS` 6 → 3 and
+replaced the 6-slot grid with 3 sparse corner slots (top-start, top-end, bottom-end), removed the
+now-unused `IconName`/`iconForAttr` icon-per-attribute logic. Fixes cluttered/overlapping cards on
+the homepage hero art.
+
+## 2026-09-17 — Feature: wishlist heart button on product card + product detail
+
+New `WishlistButton` (`features/account/components/wishlist-button.tsx`) — optimistic toggle,
+`overlay` variant (round, over product-card image) and `inline` variant (square, buy box). Added
+`useAddWishlistItem` mutation to `hooks/use-wishlist.ts` alongside existing `useRemoveWishlistItem`;
+both invalidate the `['account','wishlist']` query key. Exported via `features/account/index.ts`.
+Wired into `ProductCard` (`catalog/components/product-card.tsx`, absolute top-end over image) and
+`ProductBuyBox` (`catalog/components/product-detail/product-buy-box.tsx`, badge row). 401 on click
+bounces to `/login` via existing `UnauthorizedError`/`QueryProvider` global handler — no eager
+wishlist fetch on public pages, so anonymous browsing is unaffected.
+
+## 2026-09-17 — Fix: `/dashboard/notifications` wired to real data (was fully static)
+
+`NotificationsView` rendered a hardcoded `NOTIFICATIONS` array (`features/account/data/notifications.ts`,
+removed); `AccountTopbar`/`AccountNavLink` badges read a static `UNREAD_COUNT`. Backend has no
+`/storefront/notifications` resource yet — needs `GET /storefront/notifications`,
+`PATCH /storefront/notifications/:id/read`, `POST /storefront/notifications/read-all` (list item:
+`id`, `type` enum `order_shipped|order_delivered|order_cancelled|discount|system`, `title`,
+`body`, `createdAt` ISO, `read` boolean — no icon/color fields, those stay presentation-only).
+Frontend built ready to wire in against that contract:
+- `notifications.schemas.ts`/`notifications.api.ts` (server-only, same shape as `wishlist.api.ts`).
+- BFF: `app/api/account/notifications/route.ts` (GET list, POST read-all),
+  `app/api/account/notifications/[id]/read/route.ts` (PATCH one).
+- `hooks/use-notifications.ts`: `useNotifications`, `useUnreadNotificationsCount` (shares the
+  list query, no extra fetch), `useMarkNotificationRead`, `useMarkAllNotificationsRead`.
+- `data/notification-type-meta.ts`: `type` → icon/tint/ink lookup (presentation only).
+- `lib/persian.ts`: added `formatRelativeTime()`.
+- `NotificationsView`/`NotificationRow` now loading/error/empty states; row is clickable and
+  marks itself read. `ACCOUNT_NAV`'s notifications badge and `AccountTopbar`'s bell badge now
+  read `useUnreadNotificationsCount()` instead of the static count.
+
+## 2026-09-17 — Fix: `/dashboard/wishlist` wired to real data (was fully static)
+
+`WishlistView` rendered a hardcoded `WISHLIST` array (`features/account/data/wishlist.ts`,
+removed). Now backed by `abzar/api`'s `/storefront/wishlist` (list/add/remove), matching the
+`addresses` page's pattern:
+- `wishlist.schemas.ts` extended with `addToWishlistInputSchema` (`productId`, Mongo-id regex)
+  and `addToWishlistResultSchema`; `wishlist.api.ts` extended with `add`/`remove`.
+- New BFF routes: `app/api/account/wishlist/route.ts` (GET, POST) and
+  `app/api/account/wishlist/[productId]/route.ts` (DELETE, 204).
+- New `features/account/hooks/use-wishlist.ts` — `useWishlist()` (TanStack Query) +
+  `useRemoveWishlistItem()` (mutation, invalidates on success), same shape as
+  `checkout/hooks/use-addresses.ts`.
+- `WishlistView` → client component, reads `useWishlist()`, handles pending/error/empty states.
+  `WishlistCard` now links to the product page, shows brand + real image, and calls
+  `onRemove`/`removing` props instead of local `useState` fake-delete.
+- `features/account/types/index.ts`'s `WishlistItem` now re-exports the Zod-inferred type
+  (`productId`/`brand`/`addedAt`, not the old `id`/`price` shape).
+
+## 2026-09-17 — Fix: `/dashboard` overview wired to real data (was fully static)
+
+`OverviewView`'s 4-stat grid, 6-month purchase-trend chart, and membership-tier card were all
+hardcoded (`features/account/data/overview.ts`). First pass removed the 3 unbackable cards; API
+then added the missing endpoints (non-breaking, additive) and they're now wired in:
+- `orders.schemas.ts`/`orders.api.ts`: `orderStatsSchema` + `ordersApi.stats()` →
+  `GET /storefront/orders/stats` (`totalSpend`, `paidOrderCount`, zero-filled 6-month
+  `monthlyTrend`).
+- New `loyalty.schemas.ts`/`loyalty.api.ts`: `loyaltyApi.summary()` →
+  `GET /storefront/loyalty`, now carries a `tier` field (`lifetimePoints`, current/next tier,
+  `progressPercent`) alongside the existing points `balance`.
+- New `discounts.schemas.ts`/`discounts.api.ts`: `discountsApi.active()` →
+  `GET /storefront/discounts/active` (customer's currently-usable discount codes).
+- `lib/persian.ts`: added `formatPersianMonth()` (Gregorian `"YYYY-MM"` → Jalali month name via
+  `Intl` `fa-IR-u-ca-persian`, no new dependency) for the trend chart's x-axis labels.
+- `data/overview.ts`: `buildStatCards()` now takes `totalSpend`/`bestDiscount` too (discount card
+  only renders when an active discount exists); added `buildTrendPoints()` and
+  `buildMembership()`. Restored `purchase-trend-card.tsx`/`membership-card.tsx` as prop-driven
+  components (no more direct static-data imports).
+- `dashboard/page.tsx` fetches `orders.list` + `orders.stats` + `wishlist.list` +
+  `loyalty.summary({ take: 1 })` + `discounts.active` in parallel, each independently
+  `.catch()`-guarded with a zero/empty fallback so one endpoint failing doesn't blank the page.
+
+---
+
+## 2026-09-17 — Polish: homepage visual pass (elevation, rhythm, motion), broken hero image fixed
+
+`PRODUCT_SHOT` (`src/features/marketing/data/media.ts`) pointed at a `public/products/` file that
+was never committed (only a README there), so `MediaPlaceholder` rendered a broken-image icon in
+the hero. `hero-showcase.tsx` no longer passes `src` — falls back to the built-in striped stand-in
+surface. Confirmed no other homepage component passes a `src` to a nonexistent `public/` path
+(product/article cards already omit `src` when no real image URL exists).
+
+No token changes — reused existing `--shadow-soft/lift/float`, `--gradient-brand/spark`, `ink`
+tokens more deliberately across the homepage:
+- `testimonial-quote.tsx`: rebuilt as a proper card (`shadow-float`, `ring-white/10` panel, large
+  quote-mark glyph, gradient-spark avatar-fallback with the reviewer's initial) instead of bare
+  centered text.
+- `value-prop.tsx` / `value-props.tsx`: each item is now a bordered, shadowed card with hover lift
+  (was a flat icon+text row); section wrapped items in `Reveal`.
+- `pillar-card.tsx`, `promo-card.tsx`: resting shadow bumped `shadow-soft` → `shadow-lift`, hover
+  `shadow-lift`/`shadow-float` → `shadow-float` for clearer primary-card elevation.
+- `category-rail.tsx`, `product-grid.tsx`: items wrapped in `Reveal` (was un-animated), matching
+  the stagger-on-load pattern already used by `PromoCards`/`AboutSection`/`JournalRail`.
+- Section vertical rhythm stepped up on desktop (`py-20 lg:py-28` / `py-16 sm:py-24 lg:py-28`
+  pattern) in `hero.tsx`, `product-showcase.tsx`, `about-section.tsx`, `testimonials.tsx`,
+  `newsletter-cta.tsx`, `journal-rail.tsx`, `store-footer.tsx` (`pt-16` → `pt-20`) — was a flat
+  `py-20`/`py-24` with no desktop step-up.
+
+No API/schema/data changes; no new tokens added.
+
+---
+
+## 2026-09-13 — Feature: `/dashboard/addresses` wired to real `abzar/api` data (was static mock)
+
+`AddressesView` listed a hardcoded `ADDRESSES` array with fake edit/delete buttons. Now reuses
+the checkout feature's address stack instead of duplicating it: `useAddresses`,
+`useCreateAddress`, `useUpdateAddress` (new), `useDeleteAddress` (new) — all re-exported from
+`features/checkout/index.ts` — plus a new BFF route `src/app/api/checkout/addresses/[addressId]/route.ts`
+(`PATCH`/`DELETE`, safeParse via new `updateAddressInputSchema`, owner-scoped via session cookie)
+and `checkoutAddressApi.update`/`.remove` server fetchers (`PATCH`/`DELETE`
+`/storefront/addresses/:id`).
+
+New in `features/account/components/`: `address-form-dialog.tsx` (client, wraps the shared
+`Modal`, branches create vs. edit by whether an `address` prop is passed), `address-form-fields.tsx`
++ `address-form-field.tsx` (extracted so the dialog stays under the 150-line cap). `address-card.tsx`
+now takes `onEdit`/`onDelete`/`deleting` and renders the real `Address` shape (`receiverName`,
+`province`/`city`/`fullAddress`) instead of the old mock `{title, body}`; delete requires a second
+click to confirm (no dedicated confirm dialog). `add-address-button.tsx` now takes `onClick` to
+open the dialog. `addresses-view.tsx` owns loading/error/empty states and the open dialog's target
+(`Address | 'new' | null`).
+
+Removed: `features/account/data/addresses.ts` (mock data), the account-local `Address` type in
+`features/account/types/index.ts` (superseded by `features/checkout`'s real `Address`, which
+mirrors `abzar/api`'s `/storefront/addresses` resource).
+
+---
+
 ## 2026-09-11 — Feature: `/checkout/result` gateway return page (was 404)
 
 `window.location.assign(result.paymentUrl)` in `use-checkout.ts` sends the customer to the

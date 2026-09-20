@@ -32,8 +32,7 @@ export function findDemoOrder(code: string, mobile: string): TrackedOrder | null
   const normalizedMobile = mobile.trim();
   return (
     DEMO_ORDERS.find(
-      (order) =>
-        order.code.toUpperCase() === normalizedCode && order.mobile === normalizedMobile,
+      (order) => order.code.toUpperCase() === normalizedCode && order.mobile === normalizedMobile,
     ) ?? null
   );
 }

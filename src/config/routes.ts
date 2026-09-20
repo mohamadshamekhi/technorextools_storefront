@@ -8,12 +8,15 @@ export const routes = {
   contact: '/contact',
   products: '/products',
   product: (slug: string) => `/products/${slug}`,
+  spareParts: '/spare-parts',
+  sparePart: (slug: string) => `/spare-parts/${slug}`,
   category: (slug: string) => `/categories/${slug}`,
   search: '/search',
   cart: '/cart',
   checkout: '/checkout',
   checkoutResult: '/checkout/result',
   orderTracking: '/order-tracking',
+  repairRequest: '/repair-request',
   account: '/dashboard',
   blog: '/blog',
   blogPost: (slug: string) => `/blog/${slug}`,
@@ -54,6 +57,8 @@ export const PUBLIC_PATHS = [
   '/cart',
   '/checkout',
   '/order-tracking',
+  '/spare-parts',
+  '/repair-request',
 ] as const;
 export const AUTH_PATHS = ['/login', '/register', '/forgot-password'] as const;
 export const DASHBOARD_PREFIX = '/dashboard';

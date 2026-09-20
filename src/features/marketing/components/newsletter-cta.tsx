@@ -14,10 +14,18 @@ export function NewsletterCta() {
   const fieldError = state && !state.ok ? state.fieldErrors?.contact?.[0] : undefined;
 
   return (
-    <Container as="section" className="py-20" aria-labelledby="newsletter-heading">
-      <Reveal className={cn(styles.panel, 'bg-brand-600 bg-(image:--gradient-brand) relative grid items-center gap-11 overflow-hidden rounded-[2rem] p-12 text-white shadow-(--shadow-float) lg:grid-cols-2')}>
+    <Container as="section" className="py-20 lg:py-28" aria-labelledby="newsletter-heading">
+      <Reveal
+        className={cn(
+          styles.panel,
+          'bg-brand-600 relative grid items-center gap-11 overflow-hidden rounded-[2rem] bg-(image:--gradient-brand) p-12 text-white shadow-(--shadow-float) lg:grid-cols-2',
+        )}
+      >
         <div className="relative">
-          <h2 id="newsletter-heading" className="mb-3 text-[2.1rem] leading-tight font-black tracking-tight">
+          <h2
+            id="newsletter-heading"
+            className="mb-3 text-[2.1rem] leading-tight font-black tracking-tight"
+          >
             اول از تخفیف‌ها باخبر شو
           </h2>
           <p className="text-[15px] leading-relaxed text-white/85">

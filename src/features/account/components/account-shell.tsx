@@ -18,7 +18,7 @@ export function AccountShell({ user, children }: AccountShellProps) {
       <AccountTopbar user={user} />
       <div className="mx-auto flex max-w-[1360px]">
         <AccountSidebar user={user} />
-        <main className="min-w-0 flex-1 px-5 pb-20 pt-4 sm:px-8">
+        <main className="min-w-0 flex-1 px-5 pt-4 pb-20 sm:px-8">
           <AccountMobileNav />
           <div className="pt-6">{children}</div>
         </main>

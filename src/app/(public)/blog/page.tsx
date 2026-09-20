@@ -22,7 +22,9 @@ export const metadata: Metadata = buildMetadata({
   path: routes.blog,
 });
 
-export default async function BlogPage({ searchParams }: PageProps<Record<string, never>, BlogSearch>) {
+export default async function BlogPage({
+  searchParams,
+}: PageProps<Record<string, never>, BlogSearch>) {
   const { page = 1 } = searchSchema.parse(await searchParams);
   const result = await listArticles({ page, take: 12 }).catch(() => null);
   const articles = result?.items ?? [];

@@ -24,7 +24,7 @@ export function CatalogFilters({ categories, brands, lockedCategory }: CatalogFi
     (!lockedCategory && Boolean(params.category));
 
   return (
-    <aside className="border-hairline bg-surface flex flex-col gap-6 rounded-card border p-5 shadow-(--shadow-soft) lg:sticky lg:top-24">
+    <aside className="border-hairline bg-surface rounded-card flex flex-col gap-6 border p-5 shadow-(--shadow-soft) lg:sticky lg:top-24">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-bold">
           <Icon name="sliders" className="text-brand-600 size-4" />

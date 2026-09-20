@@ -1,10 +1,10 @@
-import { STAT_CARDS } from '../data/overview';
+import type { StatCard as StatCardData } from '../types';
 import { StatCard } from './stat-card';
 
-export function StatCardGrid() {
+export function StatCardGrid({ cards }: { cards: StatCardData[] }) {
   return (
     <div className="mb-7 grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-      {STAT_CARDS.map((card) => (
+      {cards.map((card) => (
         <StatCard key={card.label} card={card} />
       ))}
     </div>

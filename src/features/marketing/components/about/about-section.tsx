@@ -12,18 +12,21 @@ export function AboutSection() {
       as="section"
       id={SECTION.about}
       aria-labelledby="about-heading"
-      className="grid scroll-mt-24 items-center gap-16 py-24 lg:grid-cols-2"
+      className="grid scroll-mt-24 items-center gap-16 py-20 lg:grid-cols-2 lg:py-28"
     >
       <Reveal>
         <AboutMedia />
       </Reveal>
       <div>
         <Reveal>
-          <span className="font-display text-brand-600 ring-brand-100 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-bold tracking-[0.18em] ring-1">
+          <span className="font-display text-brand-600 ring-brand-100 bg-brand-50 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.18em] ring-1">
             <span className="bg-accent-500 size-1.5 rounded-full" aria-hidden />
             WHY TECHNOREXTOOLS
           </span>
-          <h2 id="about-heading" className="mt-3 mb-4 text-[2.35rem] leading-tight font-black tracking-tight">
+          <h2
+            id="about-heading"
+            className="mt-3 mb-4 text-[2.35rem] leading-tight font-black tracking-tight"
+          >
             ابزار حرفه‌ای، بدون ریسک خرید
           </h2>
           <p className="text-foreground-muted mb-8 text-base leading-relaxed">

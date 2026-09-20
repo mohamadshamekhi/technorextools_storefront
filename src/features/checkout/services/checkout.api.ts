@@ -3,6 +3,7 @@ import 'server-only';
 import { apiClient } from '@/lib/api-client';
 
 import {
+  checkoutInFlightSchema,
   checkoutStartResultSchema,
   payAgainResultSchema,
   type StartCheckoutInput,
@@ -20,6 +21,12 @@ export const checkoutApi = {
 
   start: (input: StartCheckoutInput) =>
     apiClient.post('/storefront/checkout', checkoutStartResultSchema, { body: input }),
+
+  /** Whether a checkout is still running / an unpaid order is holding the cart. Never cached. */
+  inFlight: () =>
+    apiClient.get('/storefront/checkout/in-flight', checkoutInFlightSchema, {
+      cache: 'no-store',
+    }),
 
   payAgain: (orderNumber: string) =>
     apiClient.post(

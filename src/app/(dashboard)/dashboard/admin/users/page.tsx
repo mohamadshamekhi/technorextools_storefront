@@ -17,7 +17,7 @@ export default async function AdminUsersPage() {
   return (
     <div>
       <h1 className="text-xl font-black tracking-tight sm:text-[1.35rem]">مدیریت کاربران</h1>
-      <div className="border-hairline bg-surface mt-6 grid place-items-center gap-3 rounded-card border px-6 py-16 text-center shadow-(--shadow-soft)">
+      <div className="border-hairline bg-surface rounded-card mt-6 grid place-items-center gap-3 border px-6 py-16 text-center shadow-(--shadow-soft)">
         <span className="bg-brand-50 text-brand-600 ring-brand-100 grid size-14 place-items-center rounded-2xl ring-1">
           <Icon name="user" className="size-7" />
         </span>

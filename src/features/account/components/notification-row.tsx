@@ -1,21 +1,34 @@
+'use client';
+
 import { Icon } from '@/components/atoms';
+import { formatRelativeTime } from '@/lib/persian';
 import { cn } from '@/lib/utils';
 
-import type { AccountNotification } from '../types';
+import { NOTIFICATION_TYPE_META } from '../data/notification-type-meta';
+import { useMarkNotificationRead } from '../hooks/use-notifications';
+import type { Notification } from '../types';
 
-export function NotificationRow({ notification }: { notification: AccountNotification }) {
+export function NotificationRow({ notification }: { notification: Notification }) {
+  const meta = NOTIFICATION_TYPE_META[notification.type];
+  const { mutate: markRead, isPending } = useMarkNotificationRead();
+
   return (
-    <div
+    <button
+      type="button"
+      disabled={!notification.read && isPending}
+      onClick={() => {
+        if (!notification.read) markRead(notification.id);
+      }}
       className={cn(
-        'border-hairline flex items-start gap-3.5 rounded-2xl border p-4',
-        notification.unread ? 'bg-brand-50/40' : 'bg-surface',
+        'border-hairline flex w-full items-start gap-3.5 rounded-2xl border p-4 text-start transition-colors',
+        notification.read ? 'bg-surface' : 'bg-brand-50/40 hover:bg-brand-50/60',
       )}
     >
       <span
         className="grid size-9 shrink-0 place-items-center rounded-xl"
-        style={{ backgroundColor: notification.tint, color: notification.ink }}
+        style={{ backgroundColor: meta.tint, color: meta.ink }}
       >
-        <Icon name={notification.icon} className="size-4" />
+        <Icon name={meta.icon} className="size-4" />
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-[13.5px] font-bold">{notification.title}</p>
@@ -24,8 +37,8 @@ export function NotificationRow({ notification }: { notification: AccountNotific
         </p>
       </div>
       <span className="text-foreground-muted shrink-0 text-[11px] whitespace-nowrap">
-        {notification.time}
+        {formatRelativeTime(notification.createdAt)}
       </span>
-    </div>
+    </button>
   );
 }

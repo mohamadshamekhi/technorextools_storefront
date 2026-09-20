@@ -23,7 +23,7 @@ export function SubjectChips({ value, onChange }: Props) {
               'rounded-full px-4 py-1.5 text-[12.5px] font-bold transition-colors',
               value === item
                 ? 'bg-brand-500 bg-(image:--gradient-brand) text-white shadow-(--shadow-brand)'
-                : 'border-hairline bg-surface text-foreground-muted border hover:border-brand-300',
+                : 'border-hairline bg-surface text-foreground-muted hover:border-brand-300 border',
             )}
           >
             {item}

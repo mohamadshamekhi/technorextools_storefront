@@ -24,7 +24,9 @@ export function FailedStep({ order }: { order: OrderDetail }) {
 
       <div className="bg-surface-sunken mx-auto mb-8 flex max-w-xs items-center justify-center gap-2.5 rounded-2xl px-5 py-3.5">
         <span className="text-foreground-muted text-[13px]">کد پیگیری سفارش</span>
-        <span className="font-display text-[16px] font-bold tracking-wide">{order.orderNumber}</span>
+        <span className="font-display text-[16px] font-bold tracking-wide">
+          {order.orderNumber}
+        </span>
       </div>
 
       <div className="mx-auto flex max-w-xs flex-col items-center gap-3">

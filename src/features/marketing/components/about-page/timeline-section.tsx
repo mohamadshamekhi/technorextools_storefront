@@ -15,14 +15,14 @@ type TimelineRowProps = {
 
 function TimelineRow({ year, title, description, flipped }: TimelineRowProps) {
   return (
-    <li className="relative pb-9 lg:grid lg:grid-cols-[1fr_40px_1fr] lg:items-center lg:gap-0 lg:pb-0 lg:mb-9">
+    <li className="relative pb-9 lg:mb-9 lg:grid lg:grid-cols-[1fr_40px_1fr] lg:items-center lg:gap-0 lg:pb-0">
       <span
         aria-hidden
         className="border-surface-muted bg-brand-500 absolute start-0 top-1.5 size-4 rounded-full border-4 lg:static lg:col-start-2 lg:row-start-1 lg:mx-auto"
       />
       <Reveal
         className={cn(
-          'ps-8 lg:ps-0 lg:row-start-1',
+          'ps-8 lg:row-start-1 lg:ps-0',
           flipped ? 'lg:col-start-3 lg:text-right' : 'lg:col-start-1 lg:text-left',
         )}
       >

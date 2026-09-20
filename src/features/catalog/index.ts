@@ -24,6 +24,7 @@ export { categoryPresentation } from './data/presentation';
 export type {
   Brand,
   CategoryNode,
+  ProductAttributeValue,
   ProductCard as ProductCardData,
   ProductComment,
   ProductComments,

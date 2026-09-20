@@ -10,7 +10,7 @@ export function HeaderSearch({ className }: { className?: string }) {
       method="get"
       role="search"
       className={cn(
-        'bg-surface-sunken border-hairline focus-within:border-brand-400 focus-within:bg-surface focus-within:ring-4 focus-within:ring-brand-500/12 flex items-center gap-2.5 rounded-2xl border px-4 transition-[background-color,border-color,box-shadow]',
+        'bg-surface-sunken border-hairline focus-within:border-brand-400 focus-within:bg-surface focus-within:ring-brand-500/12 flex items-center gap-2.5 rounded-2xl border px-4 transition-[background-color,border-color,box-shadow] focus-within:ring-4',
         className,
       )}
     >

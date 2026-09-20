@@ -4,8 +4,7 @@ export type PromoCard = {
   title: string;
   description: string;
   cta: string;
-  tint: string;
-  ink: string;
+  icon: IconName;
 };
 
 /** Compact benefit line used in strips. */

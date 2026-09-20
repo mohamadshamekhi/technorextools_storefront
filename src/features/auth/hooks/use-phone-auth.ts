@@ -4,7 +4,12 @@ import { useCallback, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 
-import { phoneSchema, RESEND_SECONDS, type AuthStep, type ProfileInput } from '@/features/auth/types/phone-auth';
+import {
+  phoneSchema,
+  RESEND_SECONDS,
+  type AuthStep,
+  type ProfileInput,
+} from '@/features/auth/types/phone-auth';
 import { requestOtp, updateProfile, verifyOtp } from '@/features/auth/services/phone-auth.service';
 import { useResendTimer } from './use-resend-timer';
 

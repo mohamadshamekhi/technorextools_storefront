@@ -16,6 +16,8 @@ const serverSchema = clientSchema.extend({
   API_BASE_URL: z.string().url(),
   API_SERVICE_TOKEN: z.string().default(''),
   SESSION_COOKIE_NAME: z.string().min(1).default('abzar_session'),
+  /** HMAC key for expiring document download links. Required in production. */
+  DOCUMENT_SIGNING_SECRET: z.string().min(16).optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
@@ -30,6 +32,7 @@ const raw = {
         API_BASE_URL: process.env.API_BASE_URL,
         API_SERVICE_TOKEN: process.env.API_SERVICE_TOKEN,
         SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME,
+        DOCUMENT_SIGNING_SECRET: process.env.DOCUMENT_SIGNING_SECRET,
         NODE_ENV: process.env.NODE_ENV,
       }
     : {}),

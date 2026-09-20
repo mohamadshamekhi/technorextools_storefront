@@ -21,7 +21,9 @@ export function OrderSummaryLines({ totals, couponCode }: OrderSummaryLinesProps
 
       <div className="text-foreground-muted flex justify-between">
         <span>هزینه ارسال</span>
-        <span>{totals.shippingCost === 0 ? 'رایگان' : `${formatToman(totals.shippingCost)} تومان`}</span>
+        <span>
+          {totals.shippingCost === 0 ? 'رایگان' : `${formatToman(totals.shippingCost)} تومان`}
+        </span>
       </div>
 
       {totals.discount > 0 ? (
@@ -35,7 +37,7 @@ export function OrderSummaryLines({ totals, couponCode }: OrderSummaryLinesProps
         <span className="text-[15px] font-bold">مبلغ قابل پرداخت</span>
         <span className="font-display text-[21px] font-bold">
           {formatToman(totals.total)}{' '}
-          <span className="font-sans text-foreground-muted text-xs font-medium">تومان</span>
+          <span className="text-foreground-muted font-sans text-xs font-medium">تومان</span>
         </span>
       </div>
     </div>

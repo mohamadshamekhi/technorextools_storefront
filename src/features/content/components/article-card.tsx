@@ -10,11 +10,14 @@ export function ArticleCard({ article }: { article: ArticleCardData }) {
   return (
     <Link
       href={routes.blogPost(article.slug)}
-      className="border-hairline bg-surface group block overflow-hidden rounded-card border shadow-(--shadow-soft) transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:border-brand-300 hover:shadow-(--shadow-float)"
+      className="border-hairline bg-surface group rounded-card hover:border-brand-300 block overflow-hidden border shadow-(--shadow-soft) transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:shadow-(--shadow-float)"
     >
       <div className="overflow-hidden">
         <MediaPlaceholder
-          label="عکس مقاله"
+          label={article.title}
+          src={article.coverImage ?? undefined}
+          fit="cover"
+          sizes="(max-width: 768px) 100vw, 33vw"
           className="aspect-[16/10] text-[12px] transition-transform duration-500 group-hover:scale-[1.05]"
         />
       </div>

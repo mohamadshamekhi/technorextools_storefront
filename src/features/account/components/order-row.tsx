@@ -21,13 +21,14 @@ export function OrderRow({ order }: { order: Order }) {
       <div className="min-w-0 flex-1">
         <p className="text-[13.5px] font-bold">سفارش {order.orderNumber}</p>
         <p className="text-foreground-muted text-[12px]">
-          {itemCountLabel(order)} · {paymentMethodLabel(order.paymentMethod)} · {formatJalaliDate(order.placedAt)}
+          {itemCountLabel(order)} · {paymentMethodLabel(order.paymentMethod)} ·{' '}
+          {formatJalaliDate(order.placedAt)}
         </p>
       </div>
       <OrderStatusBadge meta={meta} />
       <p className="font-display hidden text-[14px] font-bold whitespace-nowrap sm:block">
         {formatToman(order.total)}{' '}
-        <span className="font-sans text-foreground-muted text-[11px] font-medium">تومان</span>
+        <span className="text-foreground-muted font-sans text-[11px] font-medium">تومان</span>
       </p>
     </div>
   );

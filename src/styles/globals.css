@@ -58,8 +58,11 @@
   /* Signature gradients */
   --gradient-brand: linear-gradient(135deg, oklch(0.6 0.21 262) 0%, oklch(0.47 0.2 268) 100%);
   --gradient-spark: linear-gradient(135deg, oklch(0.83 0.17 82) 0%, oklch(0.7 0.19 45) 100%);
-  --gradient-ink:
-    radial-gradient(120% 140% at 12% 0%, oklch(0.32 0.06 265) 0%, oklch(0.19 0.035 266) 55%);
+  --gradient-ink: radial-gradient(
+    120% 140% at 12% 0%,
+    oklch(0.32 0.06 265) 0%,
+    oklch(0.19 0.035 266) 55%
+  );
 
   --font-sans:
     var(--font-vazirmatn), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;

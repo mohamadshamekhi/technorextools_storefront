@@ -14,10 +14,20 @@ disagree, the collection wins — update this summary.
 ## `/storefront/*` — public site + customer dashboard
 
 `catalog` (categories, brands, products, `products/:id/comments`, bundles) ·
-`cart` (items CRUD, `cart/bundles`) · `checkout` (`quote` → `checkout` → `checkout/:id/pay`) ·
-`orders` · `addresses` · `wishlist` · `discounts/validate` · `loyalty` (+ `referrals`) ·
-`tickets` (+ `messages`) · `repairs` · `warranty/verify?serial=` · `shipping/methods` ·
+`cart` (items CRUD, `cart/bundles`) · `checkout` (`quote` → `checkout` → `checkout/:id/pay`;
+`checkout/in-flight` → `{locked, order|null}`; `POST /checkout` `409` carries
+`details.code` = `checkout_in_progress` (own request running, `orderNumber` may be null) or
+`pending_order_exists` (unpaid order holds the cart, `orderNumber` always set)) ·
+`media/upload` (multipart `file` + optional `alt`, JPEG/PNG/WebP/PDF ≤ 10MB → `MediaView.id`) ·
+`orders` · `addresses` · `wishlist` · `notifications` (+ `:id/read`, `read-all`) ·
+`discounts/validate` · `loyalty` (+ `referrals`) ·
+`tickets` (+ `messages`) · `repairs` — attachments are `mediaIds[]` (≤ 5, from `media/upload`);
+`attachmentUrl` is gone. Responses carry `attachments: [{id, url, contentType, originalName}]`
+and each ticket message has an `id`. · `warranty/verify?serial=` · `shipping/methods` ·
 `content` (`articles`, `branches`, `seo`, `settings/public`)
+
+**Error envelope:** `{statusCode, error, message, fieldErrors?, details?, path, timestamp}` —
+`details` is endpoint-specific (see checkout `409` above).
 
 ## `/backoffice/*` — admin portal only (RBAC-gated)
 

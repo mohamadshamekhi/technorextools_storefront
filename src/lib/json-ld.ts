@@ -103,9 +103,7 @@ export function productSchema(input: {
       '@type': 'Offer',
       price: input.price,
       priceCurrency: 'IRR',
-      availability: input.inStock
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
+      availability: input.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       url: absoluteUrl(input.path, siteConfig.url),
       seller: { '@type': 'Organization', name: siteConfig.name },
     },

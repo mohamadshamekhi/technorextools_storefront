@@ -11,7 +11,8 @@ export function OrderDetailSummary({ order }: { order: OrderDetail }) {
   const canRetry = order.paymentMethod === 'online' && order.status === 'pending_payment';
 
   return (
-    <div className="border-hairline bg-surface flex flex-col gap-2.5 rounded-2xl border p-5 text-[13.5px]">
+    <div className="border-hairline bg-surface shadow-soft flex flex-col gap-2.5 rounded-(--radius-card) border p-5 text-[13.5px] sm:p-6">
+      <h2 className="mb-1 text-[14.5px] font-black">خلاصه پرداخت</h2>
       <Row label="جمع کالاها" value={`${formatToman(order.subtotal)} تومان`} />
       {order.discountAmount > 0 ? (
         <Row
@@ -24,9 +25,12 @@ export function OrderDetailSummary({ order }: { order: OrderDetail }) {
         label="هزینه ارسال"
         value={order.shippingCost === 0 ? 'رایگان' : `${formatToman(order.shippingCost)} تومان`}
       />
-      <div className="border-hairline flex items-baseline justify-between border-t pt-3">
-        <span className="text-[14.5px] font-bold">مبلغ نهایی</span>
-        <span className="font-display text-[18px] font-bold">{formatToman(order.total)} تومان</span>
+
+      <div className="bg-brand-50 mt-1 flex items-baseline justify-between rounded-xl px-3.5 py-3">
+        <span className="text-brand-700 text-[14.5px] font-bold">مبلغ نهایی</span>
+        <span className="font-display text-brand-700 text-[19px] font-bold">
+          {formatToman(order.total)} تومان
+        </span>
       </div>
 
       <div className="border-hairline mt-1 flex flex-col gap-1.5 border-t pt-3">
@@ -35,6 +39,7 @@ export function OrderDetailSummary({ order }: { order: OrderDetail }) {
           <Row
             label="وضعیت پرداخت"
             value={order.payment.status === 'success' ? 'موفق' : 'در انتظار'}
+            tone={order.payment.status === 'success' ? 'success' : undefined}
           />
         ) : null}
       </div>
@@ -53,7 +58,7 @@ function Row({ label, value, tone }: { label: string; value: string; tone?: 'suc
     <div
       className={cn(
         'flex justify-between',
-        tone === 'success' ? 'text-[oklch(0.5_0.14_155)]' : 'text-foreground-muted',
+        tone === 'success' ? 'text-success' : 'text-foreground-muted',
       )}
     >
       <span>{label}</span>

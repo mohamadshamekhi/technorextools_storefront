@@ -12,14 +12,21 @@ export async function JournalRail() {
   if (!result || result.items.length === 0) return null;
 
   return (
-    <Container as="section" aria-labelledby="journal-heading" className="scroll-mt-24 pb-24">
+    <Container
+      as="section"
+      aria-labelledby="journal-heading"
+      className="scroll-mt-24 pb-20 lg:pb-28"
+    >
       <SectionHeading
         id="journal-heading"
         eyebrow="JOURNAL"
         title="راهنمای خرید و نگهداری ابزار"
         className="mb-9"
         action={
-          <Link href={routes.blog} className="text-brand-600 flex items-center gap-1.5 text-sm font-bold">
+          <Link
+            href={routes.blog}
+            className="text-brand-600 flex items-center gap-1.5 text-sm font-bold"
+          >
             همهٔ مقالات
             <Icon name="chevronEnd" className="size-4" />
           </Link>

@@ -9,7 +9,10 @@ export function FooterNavColumn({ column }: { column: FooterColumn }) {
       <ul className="flex flex-col gap-3 text-sm">
         {column.links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className="hover:text-accent-500 text-white/80 transition-colors">
+            <Link
+              href={link.href}
+              className="hover:text-accent-500 text-white/80 transition-colors"
+            >
               {link.label}
             </Link>
           </li>

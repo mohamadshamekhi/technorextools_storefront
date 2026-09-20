@@ -21,12 +21,17 @@ export async function CatalogView({ params, lockedCategory }: CatalogViewProps) 
   const [tree, brands, result] = await Promise.all([
     getCategoryTree().catch(() => []),
     listBrands().catch(() => []),
-    listProducts(params, lockedCategory ? { category: lockedCategory } : undefined).catch(() => null),
+    listProducts(params, lockedCategory ? { category: lockedCategory } : undefined).catch(
+      () => null,
+    ),
   ]);
 
   if (!result) return <CatalogEmptyState variant="error" />;
 
-  const categories = flattenCategories(tree).map((node) => ({ slug: node.slug, title: node.title }));
+  const categories = flattenCategories(tree).map((node) => ({
+    slug: node.slug,
+    title: node.title,
+  }));
   const brandOptions = brands.map((brand) => ({ slug: brand.slug, title: brand.title }));
   const page = params.page ?? 1;
 

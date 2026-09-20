@@ -15,12 +15,16 @@ export function CartButton() {
   return (
     <Link
       href={routes.cart}
+      data-cart-target
       className="bg-brand-500 shadow-brand-500/30 hover:bg-brand-600 relative flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-colors"
     >
       <Icon name="cart" className="size-[17px]" />
       <span className="hidden sm:inline">سبد خرید</span>
       {quantity > 0 ? (
-        <span className="bg-ink absolute -top-1.5 -left-1.5 grid size-5 place-items-center rounded-full text-[11px] font-bold text-white">
+        <span
+          key={quantity}
+          className="animate-badge-pop bg-ink absolute -top-1.5 -left-1.5 grid size-5 place-items-center rounded-full text-[11px] font-bold text-white"
+        >
           {toPersianDigits(quantity)}
         </span>
       ) : null}

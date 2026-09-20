@@ -6,6 +6,7 @@ import { routes } from '@/config/routes';
 import { formatToman } from '@/lib/persian';
 
 import { listProducts } from '../services/catalog.api';
+import { cardPurchase } from '../utils/card-variant';
 import { DealsCountdown } from './deals-countdown';
 
 export async function FlashDeals() {
@@ -14,7 +15,7 @@ export async function FlashDeals() {
 
   return (
     <Container as="section" aria-labelledby="deals-heading" className="scroll-mt-24 pt-14">
-      <Reveal className="bg-sale grid overflow-hidden rounded-3xl shadow-(--shadow-float) bg-[linear-gradient(150deg,oklch(0.62_0.22_25)_0%,oklch(0.5_0.2_18)_100%)] lg:grid-cols-[240px_1fr]">
+      <Reveal className="bg-sale grid overflow-hidden rounded-3xl bg-[linear-gradient(150deg,oklch(0.62_0.22_25)_0%,oklch(0.5_0.2_18)_100%)] shadow-(--shadow-float) lg:grid-cols-[240px_1fr]">
         <div className="flex flex-col gap-4 p-7 text-white">
           <div className="flex items-center gap-2.5">
             <span className="grid size-9 place-items-center rounded-xl bg-white/15">
@@ -53,7 +54,7 @@ export async function FlashDeals() {
                 {deal.title}
               </h3>
               <p className="font-display text-base font-bold">
-                {formatToman(deal.basePrice)}
+                {formatToman(cardPurchase(deal).price)}
                 <span className="text-foreground-muted ms-1 font-sans text-[11px] font-medium">
                   تومان
                 </span>

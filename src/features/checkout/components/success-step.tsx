@@ -10,8 +10,8 @@ export function SuccessStep({ order }: { order: PlacedOrder }) {
   return (
     <div className="border-hairline bg-surface relative overflow-hidden rounded-3xl border p-12 text-center">
       <div className="relative mx-auto mb-6 size-24">
-        <span className="absolute -inset-3.5 rounded-full bg-[oklch(0.5_0.14_155/0.15)] animate-[auth-pulse_1.8s_ease-in-out_infinite]" />
-        <span className="relative grid size-24 place-items-center rounded-full bg-[oklch(0.95_0.04_150)] text-[oklch(0.5_0.14_155)] animate-[auth-pop_0.5s_cubic-bezier(0.22,1,0.36,1)]">
+        <span className="absolute -inset-3.5 animate-[auth-pulse_1.8s_ease-in-out_infinite] rounded-full bg-[oklch(0.5_0.14_155/0.15)]" />
+        <span className="relative grid size-24 animate-[auth-pop_0.5s_cubic-bezier(0.22,1,0.36,1)] place-items-center rounded-full bg-[oklch(0.95_0.04_150)] text-[oklch(0.5_0.14_155)]">
           <Icon name="check" className="size-11" />
         </span>
       </div>
@@ -23,7 +23,9 @@ export function SuccessStep({ order }: { order: PlacedOrder }) {
 
       <div className="bg-surface-sunken mx-auto mb-7 flex max-w-xs items-center justify-center gap-2.5 rounded-2xl px-5 py-3.5">
         <span className="text-foreground-muted text-[13px]">کد پیگیری سفارش</span>
-        <span className="font-display text-[16px] font-bold tracking-wide">{order.orderNumber}</span>
+        <span className="font-display text-[16px] font-bold tracking-wide">
+          {order.orderNumber}
+        </span>
       </div>
 
       <div className="mx-auto mb-8 grid max-w-lg grid-cols-3 gap-3.5">

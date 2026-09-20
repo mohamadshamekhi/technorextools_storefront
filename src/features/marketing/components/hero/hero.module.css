@@ -64,26 +64,35 @@
 .blobWarm {
   inset-block-start: -160px;
   inset-inline-start: -110px;
-  width: 560px;
-  height: 560px;
-  background: radial-gradient(circle, oklch(0.7 0.19 260 / 0.42) 0%, transparent 68%);
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, oklch(0.7 0.19 260 / 0.16) 0%, transparent 70%);
   animation: hero-blob 15s ease-in-out infinite;
 }
 .blobCool {
   inset-block-end: -200px;
   inset-inline-end: -90px;
-  width: 480px;
-  height: 480px;
-  background: radial-gradient(circle, oklch(0.84 0.16 82 / 0.4) 0%, transparent 68%);
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, oklch(0.84 0.16 82 / 0.14) 0%, transparent 70%);
   animation: hero-blob 19s ease-in-out infinite;
 }
 
 .ring {
   position: absolute;
-  inset: -3%;
-  border: 1px dashed oklch(0.56 0.21 261 / 0.35);
+  inset: -4%;
+  border: 1px dashed oklch(0.56 0.21 261 / 0.22);
   border-radius: 50%;
-  animation: hero-spin 46s linear infinite;
+  animation: hero-spin 60s linear infinite;
+}
+
+.ground {
+  position: absolute;
+  inset-inline: 12%;
+  inset-block-end: -6%;
+  height: 14%;
+  background: radial-gradient(50% 100% at 50% 50%, oklch(0.3 0.04 265 / 0.16) 0%, transparent 75%);
+  filter: blur(2px);
 }
 
 .dot {

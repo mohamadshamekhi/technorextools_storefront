@@ -7,9 +7,6 @@ import styles from './article-body.module.css';
  */
 export function ArticleBody({ html }: { html: string }) {
   return (
-    <div
-      className={styles.prose}
-      dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(html) }}
-    />
+    <div className={styles.prose} dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(html) }} />
   );
 }

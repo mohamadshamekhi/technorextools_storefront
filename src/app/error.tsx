@@ -17,7 +17,7 @@ export default function GlobalError({
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-4 px-6 text-center">
-      <span className="bg-[oklch(0.95_0.04_25)] text-sale grid size-16 place-items-center rounded-2xl text-3xl font-black">
+      <span className="text-sale grid size-16 place-items-center rounded-2xl bg-[oklch(0.95_0.04_25)] text-3xl font-black">
         !
       </span>
       <h1 className="text-2xl font-black tracking-tight">مشکلی پیش آمد</h1>

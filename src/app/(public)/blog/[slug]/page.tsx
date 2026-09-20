@@ -89,7 +89,11 @@ export default async function ArticlePage({ params }: PageProps<{ slug: string }
       <Container className="max-w-4xl">
         <Reveal>
           <MediaPlaceholder
-            label="تصویر شاخص مقاله"
+            label={article.title}
+            src={article.coverImage ?? undefined}
+            fit="cover"
+            sizes="(max-width: 768px) 100vw, 896px"
+            priority
             className="border-hairline aspect-[16/9] rounded-3xl border"
           />
         </Reveal>

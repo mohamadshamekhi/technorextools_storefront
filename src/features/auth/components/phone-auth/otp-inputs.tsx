@@ -28,7 +28,7 @@ export function OtpInputs({ inputs, invalid, shake }: OtpInputsProps) {
           maxLength={1}
           aria-label={`رقم ${index + 1} کد تأیید`}
           className={cn(
-            'font-display bg-surface size-14 rounded-2xl border-[1.5px] text-center text-2xl font-bold outline-none transition-colors',
+            'font-display bg-surface size-14 rounded-2xl border-[1.5px] text-center text-2xl font-bold transition-colors outline-none',
             'focus:border-brand-500 focus:ring-brand-500/15 focus:ring-2',
             invalid ? 'border-sale' : input.value ? 'border-brand-500' : 'border-hairline',
           )}

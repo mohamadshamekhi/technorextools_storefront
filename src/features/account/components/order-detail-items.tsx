@@ -1,3 +1,4 @@
+import { Icon } from '@/components/atoms';
 import { formatToman, toPersianDigits } from '@/lib/persian';
 
 import type { OrderDetail } from '../types';
@@ -8,12 +9,15 @@ export function OrderDetailItems({ items }: { items: OrderDetail['items'] }) {
       {items.map((item, index) => (
         <div
           key={`${item.sku ?? item.productTitle}-${index}`}
-          className="border-hairline flex items-center justify-between gap-3 border-b pb-3 text-[13.5px] last:border-b-0 last:pb-0"
+          className="border-hairline bg-surface-muted flex items-center gap-3 rounded-xl border p-3 text-[13.5px]"
         >
+          <span className="bg-surface text-brand-500 grid size-10 shrink-0 place-items-center rounded-lg">
+            <Icon name="box" className="size-4.5" />
+          </span>
           <div className="min-w-0 flex-1">
             <p className="truncate font-bold">{item.productTitle}</p>
-            <p className="text-foreground-muted text-[12px]">
-              {toPersianDigits(item.qty)} × {formatToman(item.unitPrice)} تومان
+            <p className="text-foreground-muted mt-0.5 text-[12px]">
+              {toPersianDigits(item.qty)} عدد × {formatToman(item.unitPrice)} تومان
             </p>
           </div>
           <p className="font-display shrink-0 font-bold">{formatToman(item.lineTotal)} تومان</p>

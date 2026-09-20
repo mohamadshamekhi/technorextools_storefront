@@ -10,7 +10,11 @@ const CODE_META: Record<CheckoutPaymentMethod['code'], { icon: IconName; fallbac
   cash: { icon: 'cash', fallbackDesc: 'پرداخت نقدی یا کارت‌خوان هنگام تحویل سفارش' },
 };
 
-type PaymentOptionProps = { method: CheckoutPaymentMethod; selected: boolean; onSelect: () => void };
+type PaymentOptionProps = {
+  method: CheckoutPaymentMethod;
+  selected: boolean;
+  onSelect: () => void;
+};
 
 export function PaymentOption({ method, selected, onSelect }: PaymentOptionProps) {
   const meta = CODE_META[method.code];

@@ -19,7 +19,7 @@ export function CouponField({ value, onChange, onApply, pending = false }: Coupo
         placeholder="کد تخفیف"
         dir="ltr"
         disabled={pending}
-        className="border-hairline focus:border-brand-500 focus:ring-brand-500/15 flex-1 rounded-lg border px-3.5 py-2.5 text-center text-[13.5px] outline-none transition-colors focus:ring-2 disabled:opacity-60"
+        className="border-hairline focus:border-brand-500 focus:ring-brand-500/15 flex-1 rounded-lg border px-3.5 py-2.5 text-center text-[13.5px] transition-colors outline-none focus:ring-2 disabled:opacity-60"
       />
       <button
         type="button"

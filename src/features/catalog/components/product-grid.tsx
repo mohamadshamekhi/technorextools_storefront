@@ -1,11 +1,8 @@
 import { Icon } from '@/components/atoms';
+import { Reveal } from '@/components/molecules';
 
 import type { ProductCard as ProductCardData } from '../types';
-import { ComingSoonCard } from './coming-soon-card';
 import { ProductCard } from './product-card';
-
-/** Below this count, filler tiles round the grid out to a full first row. */
-const MIN_ROW_SIZE = 3;
 
 type ProductGridProps = {
   products: ProductCardData[];
@@ -28,15 +25,12 @@ export function ProductGrid({
     );
   }
 
-  const fillerCount = Math.max(0, MIN_ROW_SIZE - products.length);
-
   return (
     <div className={className}>
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-      {Array.from({ length: fillerCount }, (_, index) => (
-        <ComingSoonCard key={`filler-${index}`} />
+      {products.map((product, index) => (
+        <Reveal key={product.id} delayMs={index * 60}>
+          <ProductCard product={product} />
+        </Reveal>
       ))}
     </div>
   );

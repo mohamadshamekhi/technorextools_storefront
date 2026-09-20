@@ -13,15 +13,26 @@ export function FeaturedArticle({ article }: { article: ArticleCardData }) {
       <Container>
         <Link
           href={routes.blogPost(article.slug)}
-          className="border-hairline bg-surface group relative grid overflow-hidden rounded-3xl border transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-brand-400/50 hover:shadow-2xl lg:grid-cols-[1.1fr_1fr]"
+          className="border-hairline bg-surface group hover:border-brand-400/50 relative grid overflow-hidden rounded-3xl border transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:shadow-2xl lg:grid-cols-[1.1fr_1fr]"
         >
-          <span className="bg-ink/85 absolute top-4 start-4 z-2 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11.5px] font-bold text-white">
-            <span className="bg-accent-500 inline-block size-1.5 animate-pulse rounded-full" />
-            تازه‌ترین مقاله
-          </span>
-          <MediaPlaceholder label="تصویر شاخص مقاله" className="min-h-56 rounded-none lg:rounded-s-3xl" />
+          <div className="relative min-h-56 overflow-hidden lg:rounded-s-3xl">
+            <span className="bg-ink/85 absolute start-4 top-4 z-2 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11.5px] font-bold text-white">
+              <span className="bg-accent-500 inline-block size-1.5 animate-pulse rounded-full" />
+              تازه‌ترین مقاله
+            </span>
+            <MediaPlaceholder
+              label={article.title}
+              src={article.coverImage ?? undefined}
+              fit="cover"
+              sizes="(max-width: 1024px) 100vw, 55vw"
+              priority
+              className="absolute inset-0 h-full rounded-none transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          </div>
           <div className="flex flex-col justify-center p-8 lg:p-9">
-            <h2 className="mb-3.5 text-2xl leading-[1.5] font-black text-balance">{article.title}</h2>
+            <h2 className="mb-3.5 text-2xl leading-[1.5] font-black text-balance">
+              {article.title}
+            </h2>
             {article.excerpt ? (
               <p className="text-foreground-muted mb-5 text-sm leading-loose">{article.excerpt}</p>
             ) : null}

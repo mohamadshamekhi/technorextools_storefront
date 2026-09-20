@@ -22,7 +22,9 @@ export default async function SearchPage({
   searchParams,
 }: PageProps<Record<string, never>, { q?: string }>) {
   const { q } = querySchema.parse(await searchParams);
-  const result = q ? await listProducts({ q, sort: 'newest' }, { take: 24 }).catch(() => null) : null;
+  const result = q
+    ? await listProducts({ q, sort: 'newest' }, { take: 24 }).catch(() => null)
+    : null;
 
   return (
     <Container className="py-16">
@@ -37,7 +39,7 @@ export default async function SearchPage({
         />
         <button
           type="submit"
-          className="bg-brand-500 bg-(image:--gradient-brand) shrink-0 rounded-xl px-5 text-sm font-bold text-white shadow-(--shadow-brand)"
+          className="bg-brand-500 shrink-0 rounded-xl bg-(image:--gradient-brand) px-5 text-sm font-bold text-white shadow-(--shadow-brand)"
         >
           جست‌وجو
         </button>

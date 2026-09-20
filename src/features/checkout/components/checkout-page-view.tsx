@@ -62,7 +62,11 @@ export function CheckoutPageView({ shippingMethods, paymentMethods }: CheckoutPa
   const payment = paymentMethods.find((item) => item.code === checkout.paymentMethod);
 
   const handleConfirm = () => {
-    checkout.confirm({ lines, shippingMethodId: selectedShippingId, discountCode: discountCode || null });
+    checkout.confirm({
+      lines,
+      shippingMethodId: selectedShippingId,
+      discountCode: discountCode || null,
+    });
   };
 
   if (checkout.step === 'success' && checkout.placedOrder) {
@@ -107,6 +111,9 @@ export function CheckoutPageView({ shippingMethods, paymentMethods }: CheckoutPa
               onEditPayment={checkout.backToPayment}
               onConfirm={handleConfirm}
               confirming={checkout.confirming}
+              conflict={checkout.conflict}
+              blockingOrder={checkout.blockingOrder}
+              conflictResolved={checkout.conflictResolved}
               confirmError={checkout.confirmError}
             />
           ) : null}

@@ -3,3 +3,11 @@
 export { CheckoutPageView } from './components/checkout-page-view';
 export { CheckoutResultView } from './components/checkout-result-view';
 export { CheckoutTopbar } from './components/checkout-topbar';
+export { NewAddressForm } from './components/new-address-form';
+export {
+  useAddresses,
+  useCreateAddress,
+  useUpdateAddress,
+  useDeleteAddress,
+} from './hooks/use-addresses';
+export type { Address } from './types';

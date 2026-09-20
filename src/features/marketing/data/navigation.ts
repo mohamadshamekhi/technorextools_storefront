@@ -5,6 +5,8 @@ import type { FooterColumn, NavItem, SocialLink } from '../types';
 
 export const PRIMARY_NAV: NavItem[] = [
   { label: 'همه محصولات', href: routes.products },
+  { label: 'قطعات یدکی', href: routes.spareParts },
+  { label: 'درخواست تعمیر', href: routes.repairRequest },
   { label: 'دسته‌بندی‌ها', href: anchor('categories') },
   { label: 'پیشنهاد شگفت‌انگیز', href: anchor('deals') },
   { label: 'مجله تکنورکس', href: routes.blog },
@@ -19,6 +21,8 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { label: 'درباره ما', href: routes.about },
       { label: 'همه محصولات', href: routes.products },
       { label: 'مجله تکنورکس', href: routes.blog },
+      { label: 'قطعات یدکی', href: routes.spareParts },
+      { label: 'درخواست تعمیر', href: routes.repairRequest },
       { label: 'پیگیری سفارش', href: routes.orderTracking },
       { label: 'نمایندگی و همکاری', href: routes.contact },
     ],

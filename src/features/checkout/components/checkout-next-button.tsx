@@ -22,7 +22,9 @@ export function CheckoutNextButton({
   className,
   disabled = false,
 }: CheckoutNextButtonProps) {
-  const arrow = <Icon name="arrowStart" className={cn('size-4', variant === 'back' && 'rotate-180')} />;
+  const arrow = (
+    <Icon name="arrowStart" className={cn('size-4', variant === 'back' && 'rotate-180')} />
+  );
 
   return (
     <button

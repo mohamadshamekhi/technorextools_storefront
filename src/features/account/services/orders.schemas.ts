@@ -78,3 +78,10 @@ export const orderDetailSchema = orderListItemSchema.extend({
     .nullable(),
 });
 export type OrderDetail = z.infer<typeof orderDetailSchema>;
+
+export const orderStatsSchema = z.object({
+  totalSpend: z.number(),
+  paidOrderCount: z.number(),
+  monthlyTrend: z.array(z.object({ month: z.string(), count: z.number(), amount: z.number() })),
+});
+export type OrderStats = z.infer<typeof orderStatsSchema>;
