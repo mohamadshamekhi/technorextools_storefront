@@ -1,16 +1,17 @@
 # Deploy — abzar-storefront
 
-Host: shared Ubuntu box with `abzar-api`. nginx + certbot run on the **host**;
-this app runs in docker and binds `127.0.0.1:3000` only (ufw allows 22/80/443).
+Host: shared Ubuntu box; the API lives at `/root/projects/api`, this app at
+`/root/projects/storefront`. nginx + certbot run on the **host** (not in docker);
+this app binds `127.0.0.1:3000` only (ufw allows 22/80/443).
 
 ## First time
 
 ```bash
-# on the server, as deploy
-git clone <repo> /home/deploy/abzar-storefront
-cd /home/deploy/abzar-storefront
-cp .env.production.example .env.production   # fill in API_SERVICE_TOKEN + DOCUMENT_SIGNING_SECRET
-sudo ./deploy/setup-server.sh                # nginx vhost + certbot (checks DNS first)
+# on the server (root)
+git clone <repo> /root/projects/storefront
+cd /root/projects/storefront
+cp deploy/env.production.example .env.production   # fill in API_SERVICE_TOKEN + DOCUMENT_SIGNING_SECRET
+./deploy/setup-server.sh                   # nginx vhost + certbot (checks DNS first)
 ./deploy/deploy.sh
 ```
 
@@ -24,7 +25,7 @@ server's IP **before** certbot runs, otherwise issuance fails.
 ## Updates
 
 ```bash
-cd /home/deploy/abzar-storefront && ./deploy/deploy.sh
+cd /root/projects/storefront && ./deploy/deploy.sh
 ```
 
 Pulls, rebuilds, restarts, waits for `/api/health`, prints logs and aborts on failure.

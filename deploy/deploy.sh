@@ -19,7 +19,7 @@ die() { printf '\033[1;31m[deploy] %s\033[0m\n' "$*" >&2; exit 1; }
 
 command -v docker >/dev/null || die "docker not found"
 docker compose version >/dev/null 2>&1 || die "docker compose plugin not found"
-[[ -f "$ENV_FILE" ]] || die "$ENV_FILE missing — copy .env.production.example and fill it in"
+[[ -f "$ENV_FILE" ]] || die "$ENV_FILE missing — cp deploy/env.production.example .env.production"
 
 # Fail fast on unset required vars instead of shipping a broken build.
 for key in NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_SITE_NAME API_BASE_URL DOCUMENT_SIGNING_SECRET; do
