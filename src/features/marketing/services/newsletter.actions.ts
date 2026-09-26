@@ -3,6 +3,7 @@
 import { z } from 'zod';
 
 import { REGEX } from '@/constants/regex';
+import { ApiError, apiClient } from '@/lib/api-client';
 import type { ActionResult } from '@/types';
 
 /** Accepts either an email or an Iranian mobile number. */
@@ -17,12 +18,12 @@ const contactSchema = z.object({
     ),
 });
 
-export type NewsletterState = ActionResult<{ contact: string }>;
+/** `created: false` means the contact was already subscribed — still a success. */
+const resultSchema = z.object({ created: z.boolean() });
 
-/**
- * Newsletter opt-in. Validates on the server, then hands off to
- * `abzar/api` (wire the real call when the endpoint exists).
- */
+export type NewsletterState = ActionResult<{ created: boolean }>;
+
+/** Newsletter opt-in → `POST /storefront/newsletter`. */
 export async function subscribeToNewsletter(
   _prev: NewsletterState | null,
   formData: FormData,
@@ -37,5 +38,17 @@ export async function subscribeToNewsletter(
     };
   }
 
-  return { ok: true, data: { contact: parsed.data.contact } };
+  try {
+    const result = await apiClient.post('/storefront/newsletter', resultSchema, {
+      auth: false,
+      body: parsed.data,
+    });
+    return { ok: true, data: { created: result.created } };
+  } catch (error) {
+    const message =
+      error instanceof ApiError && error.status === 429
+        ? 'تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.'
+        : 'ثبت عضویت ناموفق بود. دوباره تلاش کنید.';
+    return { ok: false, error: message, fieldErrors: { contact: [message] } };
+  }
 }

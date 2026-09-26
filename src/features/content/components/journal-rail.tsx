@@ -4,11 +4,11 @@ import { Container, Icon } from '@/components/atoms';
 import { Reveal, SectionHeading } from '@/components/molecules';
 import { routes } from '@/config/routes';
 
-import { listArticles } from '../services/content.api';
+import { listArticlesWithCovers } from '../services/content.api';
 import { ArticleCard } from './article-card';
 
 export async function JournalRail() {
-  const result = await listArticles({ take: 3 }).catch(() => null);
+  const result = await listArticlesWithCovers({ take: 3 }).catch(() => null);
   if (!result || result.items.length === 0) return null;
 
   return (

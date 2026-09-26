@@ -5,7 +5,7 @@ import { Container } from '@/components/atoms';
 import { Reveal } from '@/components/molecules';
 import { routes } from '@/config/routes';
 import { ArticleCard, FeaturedArticle, JournalHero } from '@/features/content';
-import { listArticles } from '@/features/content/services/content.api';
+import { listArticlesWithCovers } from '@/features/content/services/content.api';
 import { NewsletterCta } from '@/features/marketing';
 import { breadcrumbSchema, itemListSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
@@ -26,7 +26,7 @@ export default async function BlogPage({
   searchParams,
 }: PageProps<Record<string, never>, BlogSearch>) {
   const { page = 1 } = searchSchema.parse(await searchParams);
-  const result = await listArticles({ page, take: 12 }).catch(() => null);
+  const result = await listArticlesWithCovers({ page, take: 12 }).catch(() => null);
   const articles = result?.items ?? [];
   const featured = page === 1 ? articles[0] : undefined;
   const rest = featured ? articles.slice(1) : articles;

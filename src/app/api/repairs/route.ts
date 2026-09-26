@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { repairRequestSchema } from '@/features/repairs/types';
+import { MAX_REPAIR_ATTACHMENTS, repairRequestSchema } from '@/features/repairs/types';
 import { ApiError, apiClient } from '@/lib/api-client';
 import { getSession } from '@/lib/session';
 
@@ -9,6 +9,7 @@ import { getSession } from '@/lib/session';
 const payloadSchema = z.object({
   issueDescription: z.string().trim().min(10).max(2000),
   warrantySerial: z.string().trim().min(1).max(120).optional(),
+  mediaIds: z.array(z.string().min(1)).max(MAX_REPAIR_ATTACHMENTS).optional(),
 });
 
 export async function POST(request: Request) {

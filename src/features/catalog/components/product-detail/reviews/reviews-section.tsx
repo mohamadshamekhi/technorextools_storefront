@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 
-import { routes } from '@/config/routes';
 import { toPersianDigits } from '@/lib/persian';
 import { cn } from '@/lib/utils';
 
 import type { ProductComments } from '../../../types';
 import { RatingSummary } from './rating-summary';
 import { ReviewCard } from './review-card';
+import { ReviewForm } from './review-form';
 
 const FILTERS: Array<{ id: number | 'all'; label: string }> = [
   { id: 'all', label: 'همه' },
@@ -18,13 +17,7 @@ const FILTERS: Array<{ id: number | 'all'; label: string }> = [
   { id: 3, label: '۳ ستاره و کمتر' },
 ];
 
-export function ReviewsSection({
-  comments,
-  productPath,
-}: {
-  comments: ProductComments;
-  productPath: string;
-}) {
+export function ReviewsSection({ comments, slug }: { comments: ProductComments; slug: string }) {
   const [filter, setFilter] = useState<number | 'all'>('all');
   const shown = comments.items.filter((item) => {
     const stars = Math.round(item.rating);
@@ -57,25 +50,17 @@ export function ReviewsSection({
         ) : null}
 
         {comments.items.length === 0 ? (
-          <div className="border-hairline bg-surface-muted rounded-2xl border border-dashed p-8 text-center">
+          <div className="border-hairline bg-surface-muted rounded-2xl border border-dashed p-5 text-center">
             <p className="text-base font-bold">هنوز کسی این محصول را ارزیابی نکرده است</p>
             <p className="text-foreground-muted mt-2 text-sm leading-7">
-              تجربه‌تان از کار با این ابزار به خریداران بعدی کمک می‌کند.
+              اولین دیدگاه را همین‌جا بنویسید.
             </p>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6">
-              <Link
-                href={`${routes.auth.login}?next=${encodeURIComponent(`${productPath}#reviews`)}`}
-                className="bg-accent-500 text-ink hover:bg-accent-400 focus-visible:ring-brand-500 inline-flex h-12 items-center rounded-xl px-6 text-sm font-extrabold transition-colors focus-visible:ring-2 focus-visible:outline-none"
-              >
-                اولین دیدگاه را بنویسید
-              </Link>
-              <a
-                href="#qa"
-                className="text-brand-600 inline-flex min-h-11 items-center text-sm font-semibold hover:underline"
-              >
-                سؤالی دارید؟ به بخش پرسش و پاسخ بروید
-              </a>
-            </div>
+            <a
+              href="#qa"
+              className="text-brand-600 mt-2 inline-flex min-h-11 items-center text-sm font-semibold hover:underline"
+            >
+              سؤالی دارید؟ به بخش پرسش و پاسخ بروید
+            </a>
           </div>
         ) : shown.length === 0 ? (
           <p className="text-foreground-muted text-sm">
@@ -84,6 +69,8 @@ export function ReviewsSection({
         ) : (
           shown.map((review) => <ReviewCard key={review.id} review={review} />)
         )}
+
+        <ReviewForm slug={slug} />
       </div>
     </div>
   );

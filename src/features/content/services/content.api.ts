@@ -2,6 +2,7 @@ import 'server-only';
 
 import { apiClient } from '@/lib/api-client';
 
+import { firstImageFromHtml } from '../utils/cover';
 import { articleDetailSchema, articleListSchema } from './content.schemas';
 
 const BASE = '/storefront/content';
@@ -22,4 +23,21 @@ export function getArticle(slug: string) {
     auth: false,
     next: { revalidate, tags: [`content:article:${slug}`] },
   });
+}
+
+/**
+ * `listArticles` with the body-image cover fallback applied (see
+ * `utils/cover.ts`). Costs one extra cached request per article that has no
+ * `COVER` media row; drop it once the admin panel always uploads a cover.
+ */
+export async function listArticlesWithCovers(opts: { page?: number; take?: number } = {}) {
+  const result = await listArticles(opts);
+  const items = await Promise.all(
+    result.items.map(async (article) => {
+      if (article.coverImage) return article;
+      const detail = await getArticle(article.slug).catch(() => null);
+      return { ...article, coverImage: firstImageFromHtml(detail?.body) };
+    }),
+  );
+  return { ...result, items };
 }

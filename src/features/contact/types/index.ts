@@ -10,7 +10,7 @@ export const CONTACT_SUBJECTS = [
 
 export type ContactSubject = (typeof CONTACT_SUBJECTS)[number];
 
-/** Client-side validation for the contact form (demo — no `abzar/api` yet). */
+/** Client-side mirror of the `POST /storefront/contact` body, validated again in the BFF. */
 export const contactFormSchema = z.object({
   name: z.string().trim().min(2, 'نام و نام خانوادگی را وارد کنید'),
   phone: z

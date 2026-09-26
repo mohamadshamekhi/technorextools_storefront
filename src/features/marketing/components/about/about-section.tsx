@@ -12,7 +12,7 @@ export function AboutSection() {
       as="section"
       id={SECTION.about}
       aria-labelledby="about-heading"
-      className="grid scroll-mt-24 items-center gap-16 py-20 lg:grid-cols-2 lg:py-28"
+      className="grid scroll-mt-24 items-center gap-16 py-20 lg:grid-cols-2 lg:py-16"
     >
       <Reveal>
         <AboutMedia />

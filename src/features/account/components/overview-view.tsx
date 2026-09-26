@@ -1,12 +1,13 @@
 import type { SessionUser } from '@/lib/session';
 
-import { buildStatCards, buildTrendPoints } from '../data/overview';
+import { buildMembership, buildStatCards, buildTrendPoints } from '../data/overview';
 import type { ActiveDiscount } from '../services/discounts.schemas';
 import type { LoyaltyTierProgress } from '../services/loyalty.schemas';
 import type { OrderStats } from '../services/orders.schemas';
 import type { Order } from '../types';
-import { PageHeading } from './page-heading';
+import { OverviewHero } from './overview-hero';
 import { PurchaseTrendCard } from './purchase-trend-card';
+import { QuickActionsCard } from './quick-actions-card';
 import { RecentOrders } from './recent-orders';
 import { StatCardGrid } from './stat-card-grid';
 
@@ -16,6 +17,7 @@ export function OverviewView({
   totalOrders,
   wishlistCount,
   orderStats,
+  tier,
   bestDiscount,
 }: {
   user: SessionUser;
@@ -27,11 +29,9 @@ export function OverviewView({
   bestDiscount: ActiveDiscount | null;
 }) {
   return (
-    <div>
-      <PageHeading
-        title={`سلام${user.name ? `، ${user.name}` : ''} 👋`}
-        subtitle="خلاصه‌ای از فعالیت حساب کاربری شما"
-      />
+    <div className="flex flex-col gap-5">
+      <OverviewHero user={user} membership={buildMembership(tier)} />
+
       <StatCardGrid
         cards={buildStatCards({
           totalOrders,
@@ -40,9 +40,12 @@ export function OverviewView({
           bestDiscount,
         })}
       />
-      <div className="mb-7">
+
+      <div className="grid gap-5 xl:grid-cols-[1.7fr_1fr]">
         <PurchaseTrendCard points={buildTrendPoints(orderStats.monthlyTrend)} />
+        <QuickActionsCard />
       </div>
+
       <RecentOrders orders={recentOrders} />
     </div>
   );

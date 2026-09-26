@@ -1,9 +1,10 @@
 import type { ChangeEvent } from 'react';
 
 import type { CreateAddressInput } from '@/features/checkout/services/checkout-address.schemas';
+import { fieldClassName, fieldInvalidClassName } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 
-import { ADDRESS_FIELD_CLASS, AddressFormField } from './address-form-field';
+import { AddressFormField } from './address-form-field';
 
 type FieldErrors = Partial<Record<keyof CreateAddressInput, string>>;
 
@@ -58,7 +59,11 @@ export function AddressFormFields({ form, errors, onFieldChange }: AddressFormFi
           rows={3}
           value={form.fullAddress}
           onChange={onFieldChange('fullAddress')}
-          className={cn(ADDRESS_FIELD_CLASS, 'resize-none', errors.fullAddress && 'border-sale')}
+          className={cn(
+            fieldClassName,
+            'resize-none py-3',
+            errors.fullAddress && fieldInvalidClassName,
+          )}
         />
         {errors.fullAddress ? (
           <p className="text-sale mt-1 text-[12px]">{errors.fullAddress}</p>

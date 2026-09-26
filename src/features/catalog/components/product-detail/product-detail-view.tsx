@@ -1,6 +1,5 @@
 import { Container } from '@/components/atoms';
 import { Toaster } from '@/components/molecules/toaster';
-import { routes } from '@/config/routes';
 import { SparePartGrid, type SparePart } from '@/features/spare-parts';
 
 import type { ProductComments, ProductDetail } from '../../types';
@@ -15,7 +14,6 @@ import { ProductGallery } from './gallery/product-gallery';
 import { ReviewsSection } from './reviews/reviews-section';
 import { DescriptionSection } from './sections/description-section';
 import { DetailSection } from './sections/detail-section';
-import { KeyFeatures } from './sections/key-features';
 import { PdpBreadcrumb } from './sections/pdp-breadcrumb';
 import { PdpTabBar, type PdpTab } from './sections/pdp-tab-bar';
 import { QaSection } from './sections/qa-section';
@@ -28,6 +26,7 @@ type ProductDetailViewProps = {
   extras: ProductExtras;
   documents: DownloadableDocument[];
   specs: SpecRow[];
+  descriptionHtml: string | null;
   spareParts?: SparePart[];
 };
 
@@ -37,17 +36,18 @@ export function ProductDetailView({
   extras,
   documents,
   specs,
+  descriptionHtml,
   spareParts = [],
 }: ProductDetailViewProps) {
   const { explodedView } = extras;
   const catalog = documents.find((doc) => doc.type === 'catalog') ?? null;
 
   const tabs: PdpTab[] = [
-    ...(product.description ? [{ id: 'description', label: 'توضیحات' }] : []),
+    ...(descriptionHtml ? [{ id: 'description', label: 'توضیحات' }] : []),
     ...(explodedView && explodedView.parts.length > 0
       ? [{ id: 'structure', label: 'ساختار و قطعات' }]
       : []),
-    { id: 'specs', label: 'مشخصات فنی' },
+    ...(specs.length > 0 ? [{ id: 'specs', label: 'مشخصات فنی' }] : []),
     ...(documents.length > 0 ? [{ id: 'documents', label: 'اسناد' }] : []),
     ...(spareParts.length > 0 ? [{ id: 'spare-parts', label: 'قطعات یدکی' }] : []),
     { id: 'reviews', label: 'دیدگاه‌ها' },
@@ -71,15 +71,14 @@ export function ProductDetailView({
 
         <div className="min-w-0 lg:col-start-1 lg:row-start-2">
           <PdpTabBar tabs={tabs} />
-          {product.description ? (
+          {descriptionHtml ? (
             <DetailSection
               id="description"
               title="توضیحات و کاربرد"
               icon="doc"
               accordion={{ defaultOpen: true }}
             >
-              <KeyFeatures items={extras.keyFeatures} />
-              <DescriptionSection text={product.description} />
+              <DescriptionSection html={descriptionHtml} />
             </DetailSection>
           ) : null}
           {explodedView && explodedView.parts.length > 0 ? (
@@ -87,9 +86,11 @@ export function ProductDetailView({
               <PartsTable parts={explodedView.parts} />
             </DetailSection>
           ) : null}
-          <DetailSection id="specs" title="مشخصات فنی" icon="gauge" accordion={{}}>
-            <SpecsTable rows={specs} />
-          </DetailSection>
+          {specs.length > 0 ? (
+            <DetailSection id="specs" title="مشخصات فنی" icon="gauge" accordion={{}}>
+              <SpecsTable rows={specs} />
+            </DetailSection>
+          ) : null}
           {documents.length > 0 ? (
             <DetailSection id="documents" title="اسناد فنی" icon="doc">
               <DocumentsCard documents={documents} />
@@ -101,10 +102,10 @@ export function ProductDetailView({
             </DetailSection>
           ) : null}
           <DetailSection id="reviews" title="نقد و نظر مشتریان" icon="star">
-            <ReviewsSection comments={comments} productPath={routes.product(product.slug)} />
+            <ReviewsSection comments={comments} slug={product.slug} />
           </DetailSection>
           <DetailSection id="qa" title="پرسش و پاسخ" icon="question">
-            <QaSection questions={extras.questions} />
+            <QaSection questions={extras.questions} slug={product.slug} />
           </DetailSection>
         </div>
       </Container>

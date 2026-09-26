@@ -32,7 +32,8 @@ export function useContactForm() {
         body: JSON.stringify({ ...parsed.data, subject }),
       });
       if (!res.ok) {
-        setErrors({ message: 'ارسال پیام ناموفق بود. دوباره تلاش کنید.' });
+        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+        setErrors({ message: payload?.error ?? 'ارسال پیام ناموفق بود. دوباره تلاش کنید.' });
         return;
       }
       setSubmitted(true);

@@ -10,9 +10,17 @@ type FilterRadioListProps = {
   options: Option[];
   value: string | undefined;
   onChange: (slug: string | undefined) => void;
+  /** Extra classes for option labels — e.g. `uppercase` for latin brand slugs. */
+  itemClassName?: string;
 };
 
-export function FilterRadioList({ legend, options, value, onChange }: FilterRadioListProps) {
+export function FilterRadioList({
+  legend,
+  options,
+  value,
+  onChange,
+  itemClassName,
+}: FilterRadioListProps) {
   const items = [{ slug: undefined, title: 'همه' }, ...options];
 
   return (
@@ -33,7 +41,9 @@ export function FilterRadioList({ legend, options, value, onChange }: FilterRadi
                 : 'text-foreground-muted hover:bg-surface-muted hover:text-foreground',
             )}
           >
-            <span className="line-clamp-1 text-start">{option.title}</span>
+            <span className={cn('line-clamp-1 text-start', option.slug && itemClassName)}>
+              {option.title}
+            </span>
             {active ? <Icon name="check" className="size-3.5 shrink-0" /> : null}
           </button>
         );

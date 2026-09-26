@@ -4,7 +4,7 @@ import { flattenCategories } from '../utils/category-tree';
 import { CatalogEmptyState } from './catalog-empty-state';
 import { CatalogFilters } from './catalog-filters';
 import { CatalogPagination } from './catalog-pagination';
-import { CatalogSort } from './catalog-sort';
+import { CatalogToolbar } from './catalog-toolbar';
 import { ProductGrid } from './product-grid';
 
 type CatalogViewProps = {
@@ -43,8 +43,15 @@ export async function CatalogView({ params, lockedCategory }: CatalogViewProps) 
         lockedCategory={lockedCategory}
       />
       <div>
-        <CatalogSort total={result.total} lockedCategory={lockedCategory} />
-        <ProductGrid products={result.items} emptyLabel="محصولی با این فیلترها یافت نشد." />
+        <CatalogToolbar
+          total={result.total}
+          page={page}
+          shown={result.items.length}
+          categories={categories}
+          brands={brandOptions}
+          lockedCategory={lockedCategory}
+        />
+        <ProductGrid products={result.items} />
         <CatalogPagination total={result.total} page={page} lockedCategory={lockedCategory} />
       </div>
     </div>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Space_Grotesk, Vazirmatn } from 'next/font/google';
 
+import { RouteProgress } from '@/components/molecules';
 import { siteConfig } from '@/config/site';
 import { organizationSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: WithChildren) {
           // JSON-LD is safe, static, server-generated structured data.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
         />
+        <RouteProgress />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

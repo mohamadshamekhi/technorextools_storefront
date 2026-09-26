@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import type { ExplodedView as ExplodedViewData } from '../../../types/pdp';
 import { Lightbox } from '../gallery/lightbox';
-import { PhotoStage } from '../gallery/photo-stage';
+import { ExplodedStage } from './exploded-stage';
 import { PartHotspots } from './part-hotspots';
 import { PartInfoCard } from './part-info-card';
 
@@ -29,19 +29,20 @@ export function ExplodedView({ view }: ExplodedViewProps) {
       <div className="flex min-h-0 flex-1 flex-col gap-3">
         <div className="border-hairline bg-surface relative min-h-0 flex-1 overflow-hidden rounded-2xl border">
           {view.imageUrl ? (
-            <PhotoStage photo={photo} onOpen={() => setZoomed(true)} />
+            <ExplodedStage src={view.imageUrl} alt={view.alt} onOpen={() => setZoomed(true)}>
+              <PartHotspots
+                parts={view.parts}
+                active={active}
+                pinned={pinned}
+                onActive={setHovered}
+                onPin={pin}
+              />
+            </ExplodedStage>
           ) : (
             <p className="text-foreground-muted grid size-full min-h-48 place-items-center p-6 text-center text-sm leading-7">
               تصویر نمای انفجاری این محصول هنوز بارگذاری نشده است.
             </p>
           )}
-          <PartHotspots
-            parts={view.parts}
-            active={active}
-            pinned={pinned}
-            onActive={setHovered}
-            onPin={pin}
-          />
         </div>
         {hasHotspots ? <PartInfoCard part={activePart} /> : null}
         {hasParts ? (

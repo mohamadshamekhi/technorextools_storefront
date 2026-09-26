@@ -4,4 +4,4 @@
  */
 export { OrderTrackingView } from './components/order-tracking-view';
 export { trackingFormSchema } from './types';
-export type { TrackedOrder, TrackingStatus } from './types';
+export type { TrackedOrder, TimelineStep } from './types';

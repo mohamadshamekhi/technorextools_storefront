@@ -9,6 +9,7 @@ export const NOTIFICATION_TYPE_META: Record<NotificationType, NotificationTypeMe
   order_shipped: { icon: 'truck', tint: 'oklch(0.94 0.035 250)', ink: 'oklch(0.53 0.16 250)' },
   order_delivered: { icon: 'check', tint: 'oklch(0.94 0.04 150)', ink: 'oklch(0.5 0.14 155)' },
   order_cancelled: { icon: 'close', tint: 'oklch(0.94 0.04 25)', ink: 'oklch(0.55 0.18 25)' },
+  repair_status: { icon: 'wrench', tint: 'oklch(0.96 0.03 45)', ink: 'oklch(0.6 0.19 45)' },
   discount: { icon: 'gift', tint: 'oklch(0.96 0.03 45)', ink: 'oklch(0.62 0.19 45)' },
   system: { icon: 'bell', tint: 'oklch(0.94 0.01 260)', ink: 'oklch(0.5 0.02 260)' },
 };

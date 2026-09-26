@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
@@ -11,6 +12,9 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '**.abzar.example' },
       { protocol: 'https', hostname: '**.arvanstorage.ir' },
+      { protocol: 'https', hostname: 'api.technorextools.com' },
+      { protocol: 'https', hostname: 'technorextools.com' },
+      { protocol: 'https', hostname: 'www.technorextools.com' },
     ],
   },
   async headers() {

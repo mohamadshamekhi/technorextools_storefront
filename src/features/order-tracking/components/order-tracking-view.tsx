@@ -6,11 +6,11 @@ import { TrackingResult } from './tracking-result';
 
 /** Client orchestrator — wires the lookup form to the result panel. */
 export function OrderTrackingView() {
-  const { order, error, submit } = useOrderTracking();
+  const { order, error, pending, submit } = useOrderTracking();
 
   return (
     <>
-      <TrackingHero error={error} onSubmit={submit} />
+      <TrackingHero error={error} pending={pending} onSubmit={submit} />
       {order ? <TrackingResult order={order} /> : null}
     </>
   );

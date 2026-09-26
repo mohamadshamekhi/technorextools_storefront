@@ -2,7 +2,7 @@
 
 import type { FormEvent } from 'react';
 
-import { Button, Icon } from '@/components/atoms';
+import { Button, Icon, fieldClassName, fieldInvalidClassName } from '@/components/atoms';
 import { FormField } from '@/components/molecules';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ import { useContactForm } from '../hooks/use-contact-form';
 import { ContactSent } from './contact-sent';
 import { SubjectChips } from './subject-chips';
 
-/** Left column: the message form. Demo-only — validated client-side. */
+/** Left column: the message form — posts to the `/api/contact` BFF route. */
 export function ContactForm() {
   const form = useContactForm();
 
@@ -62,13 +62,13 @@ export function ContactForm() {
           placeholder="پیام خود را بنویسید…"
           aria-invalid={form.errors.message ? true : undefined}
           className={cn(
-            'bg-surface w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none',
-            'focus-visible:ring-brand-500/15 focus-visible:border-brand-400 focus-visible:ring-4',
-            form.errors.message ? 'border-red-500' : 'border-black/15 dark:border-white/15',
+            fieldClassName,
+            'resize-none py-3',
+            form.errors.message && fieldInvalidClassName,
           )}
         />
         {form.errors.message ? (
-          <p className="mt-1.5 text-xs font-semibold text-red-600">{form.errors.message}</p>
+          <p className="text-sale mt-1.5 text-xs font-semibold">{form.errors.message}</p>
         ) : null}
       </div>
 

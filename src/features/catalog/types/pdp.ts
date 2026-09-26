@@ -4,7 +4,6 @@ import type {
   explodedViewSchema,
   highlightSchema,
   hotspotSchema,
-  keyFeatureSchema,
   model3dSchema,
   productDocumentSchema,
   productExtrasSchema,
@@ -19,7 +18,6 @@ export type ExplodedView = z.infer<typeof explodedViewSchema>;
 export type ExplodedPart = ExplodedView['parts'][number];
 export type SpecRow = z.infer<typeof specRowSchema>;
 export type Highlight = z.infer<typeof highlightSchema>;
-export type KeyFeature = z.infer<typeof keyFeatureSchema>;
 export type ProductQuestion = z.infer<typeof questionSchema>;
 export type ProductExtras = z.infer<typeof productExtrasSchema>;
 

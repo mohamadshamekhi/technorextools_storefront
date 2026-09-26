@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useCartStore } from '@/store/cart-store';
+import { useUiStore } from '@/store/ui-store';
 
 import type { ProductDetail } from '../../../types';
 import { flyToCart } from '../../../utils/fly-to-cart';
@@ -17,8 +18,8 @@ const DRAWER_DELAY_MS = 700;
 /** Add-to-cart sequence: spinner → commit + fly-to-cart + checkmark → mini-cart drawer. */
 export function useAddToCart({ product, lineId, price, label, qty }: Input) {
   const addItem = useCartStore((state) => state.addItem);
+  const setMiniCartOpen = useUiStore((state) => state.setMiniCartOpen);
   const [status, setStatus] = useState<AddStatus>('idle');
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const timers = useRef<number[]>([]);
 
   useEffect(() => {
@@ -47,12 +48,12 @@ export function useAddToCart({ product, lineId, price, label, qty }: Input) {
         );
         flyToCart(source, image?.url);
         setStatus('done');
-        later(() => setDrawerOpen(true), DRAWER_DELAY_MS);
+        later(() => setMiniCartOpen(true), DRAWER_DELAY_MS);
         later(() => setStatus('idle'), DONE_MS);
       }, SPIN_MS);
     },
-    [status, product, lineId, price, label, qty, addItem],
+    [status, product, lineId, price, label, qty, addItem, setMiniCartOpen],
   );
 
-  return { status, add, drawerOpen, closeDrawer: () => setDrawerOpen(false) };
+  return { status, add };
 }

@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 
+import { fieldClassName, fieldInvalidClassName } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 
 import { useCreateAddress } from '../hooks/use-addresses';
@@ -9,9 +10,6 @@ import {
   createAddressInputSchema,
   type CreateAddressInput,
 } from '../services/checkout-address.schemas';
-
-const FIELD_CLASS =
-  'rounded-xl border border-hairline px-3.5 py-3 text-[13.5px] outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15';
 
 const EMPTY_FORM: CreateAddressInput = {
   receiverName: '',
@@ -100,7 +98,11 @@ export function NewAddressForm({ onCreated }: NewAddressFormProps) {
           rows={3}
           value={form.fullAddress}
           onChange={setField('fullAddress')}
-          className={cn(FIELD_CLASS, 'w-full resize-none', errors.fullAddress && 'border-sale')}
+          className={cn(
+            fieldClassName,
+            'resize-none py-3',
+            errors.fullAddress && fieldInvalidClassName,
+          )}
         />
         {errors.fullAddress ? (
           <p className="text-sale mt-1 text-[12px]">{errors.fullAddress}</p>
@@ -134,7 +136,10 @@ type FieldProps = {
 function Field({ className, error, ...props }: FieldProps) {
   return (
     <div className={className}>
-      <input {...props} className={cn(FIELD_CLASS, 'w-full', error && 'border-sale')} />
+      <input
+        {...props}
+        className={cn(fieldClassName, 'min-h-11', error && fieldInvalidClassName)}
+      />
       {error ? <p className="text-sale mt-1 text-[12px]">{error}</p> : null}
     </div>
   );

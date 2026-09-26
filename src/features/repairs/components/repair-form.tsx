@@ -2,8 +2,9 @@
 
 import type { FormEvent } from 'react';
 
-import { Button, Icon } from '@/components/atoms';
+import { Button, Icon, fieldClassName, fieldInvalidClassName } from '@/components/atoms';
 import { FormField } from '@/components/molecules';
+import { AttachmentPicker } from '@/features/media';
 import { cn } from '@/lib/utils';
 
 import { useRepairForm } from '../hooks/use-repair-form';
@@ -51,19 +52,23 @@ export function RepairForm() {
           aria-invalid={form.errors.issueDescription ? true : undefined}
           aria-describedby={form.errors.issueDescription ? 'repair-issue-error' : undefined}
           className={cn(
-            'bg-surface w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none',
-            'focus-visible:ring-brand-500/15 focus-visible:border-brand-400 focus-visible:ring-4',
-            form.errors.issueDescription
-              ? 'border-red-500'
-              : 'border-black/15 dark:border-white/15',
+            fieldClassName,
+            'resize-none py-3',
+            form.errors.issueDescription && fieldInvalidClassName,
           )}
         />
         {form.errors.issueDescription ? (
-          <p id="repair-issue-error" className="mt-1.5 text-xs font-semibold text-red-600">
+          <p id="repair-issue-error" className="text-sale mt-1.5 text-xs font-semibold">
             {form.errors.issueDescription}
           </p>
         ) : null}
       </div>
+
+      <AttachmentPicker
+        label="عکس یا فایل (اختیاری)"
+        hint="حداکثر ۵ فایل، هرکدام تا ۱۰ مگابایت — JPEG، PNG، WebP یا PDF"
+        controller={form.attachments}
+      />
 
       {form.errors.form ? (
         <p role="alert" className="mt-4 text-xs font-semibold text-red-600">
@@ -71,7 +76,12 @@ export function RepairForm() {
         </p>
       ) : null}
 
-      <Button type="submit" size="lg" className="mt-5 w-full" disabled={form.pending}>
+      <Button
+        type="submit"
+        size="lg"
+        className="mt-5 w-full"
+        disabled={form.pending || form.attachments.uploading}
+      >
         <Icon name="wrench" className="size-4" />
         {form.pending ? 'در حال ثبت…' : 'ثبت درخواست تعمیر'}
       </Button>

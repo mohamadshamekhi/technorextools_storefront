@@ -14,8 +14,9 @@ export type CartLine = {
   categorySlug?: string;
   /** Product's main image, when the catalogue provided one. */
   imageUrl?: string | null;
-  /** Absent = product variant (`id` is the variant id); `spare_part` = `id` is the spare part id. */
-  kind?: 'spare_part';
+  /** Absent = product variant (`id` is the variant id); `spare_part` / `bundle` = `id` is the
+   * spare part / bundle id. */
+  kind?: 'spare_part' | 'bundle';
 };
 
 type CartState = {

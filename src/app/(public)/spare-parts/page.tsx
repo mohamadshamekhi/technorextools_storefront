@@ -2,7 +2,13 @@ import type { Metadata } from 'next';
 
 import { Container } from '@/components/atoms';
 import { routes } from '@/config/routes';
-import { SparePartGrid, sparePartsQuerySchema } from '@/features/spare-parts';
+import {
+  SparePartGrid,
+  SparePartsEmpty,
+  SparePartsHero,
+  SparePartsToolbar,
+  sparePartsQuerySchema,
+} from '@/features/spare-parts';
 import { listSpareParts } from '@/features/spare-parts/services/spare-parts.api';
 import { breadcrumbSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
@@ -38,6 +44,9 @@ export default async function SparePartsPage({
     { name: 'خانه', path: routes.home },
     { name: 'قطعات یدکی', path: routes.spareParts },
   ]);
+  const query = parsed.success ? parsed.data : {};
+  const inStock = query.inStock === 'true';
+  const parts = result?.items ?? [];
 
   return (
     <>
@@ -46,31 +55,18 @@ export default async function SparePartsPage({
         // Static, server-generated structured data — XSS-safe.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Container className="py-10">
-        <h1 className="mb-2 text-2xl font-black sm:text-3xl">قطعات یدکی</h1>
-        <form action={routes.spareParts} className="mb-8 flex max-w-lg gap-2" role="search">
-          <label htmlFor="sp-q" className="sr-only">
-            جستجوی قطعه
-          </label>
-          <input
-            id="sp-q"
-            name="q"
-            defaultValue={parsed.success ? parsed.data.q : undefined}
-            placeholder="نام یا شماره قطعه"
-            className="border-hairline bg-surface min-h-11 flex-1 rounded-xl border px-4 text-sm"
-          />
-          <button
-            type="submit"
-            className="bg-brand-500 min-h-11 rounded-xl px-5 text-sm font-bold text-white"
-          >
-            جستجو
-          </button>
-        </form>
-        {result && result.items.length > 0 ? (
-          <SparePartGrid parts={result.items} />
-        ) : (
-          <p className="text-foreground-muted py-16 text-center">قطعه‌ای یافت نشد.</p>
-        )}
+      <Container className="pt-6 pb-14 sm:pt-8">
+        <SparePartsHero q={query.q} inStock={inStock} />
+        <section className="mt-10">
+          {parts.length > 0 ? (
+            <>
+              <SparePartsToolbar count={parts.length} q={query.q} inStock={inStock} />
+              <SparePartGrid parts={parts} />
+            </>
+          ) : (
+            <SparePartsEmpty q={query.q} failed={result === null} />
+          )}
+        </section>
       </Container>
     </>
   );

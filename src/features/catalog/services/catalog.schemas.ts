@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+import {
+  highlightSchema,
+  hotspotSchema,
+  productDocumentSchema,
+  productPartSchema,
+  questionSchema,
+} from './pdp.schemas';
+
 /**
  * Zod mirrors of the `abzar/api` `/storefront/catalog/*` response views.
  * Source of truth: `../api/src/modules/storefront/catalog/storefront-catalog.service.ts`.
@@ -57,15 +65,6 @@ export const productListSchema = z.object({
   take: z.number(),
 });
 
-/** Exploded-view part from `abzar/api`; `hotspot` is a percent offset on `explodedViewUrl`. */
-export const productPartSchema = z.object({
-  number: z.number().int().positive(),
-  name: z.string(),
-  code: z.string(),
-  sellable: z.boolean(),
-  hotspot: z.object({ x: z.number(), y: z.number() }).nullable(),
-});
-
 export const productDetailSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -78,6 +77,11 @@ export const productDetailSchema = z.object({
   model3dUrl: z.string().nullable(),
   explodedViewUrl: z.string().nullable().default(null),
   parts: z.array(productPartSchema).default([]),
+  /** PDP content served with the product — empty arrays when the admin uploaded none. */
+  documents: z.array(productDocumentSchema).default([]),
+  highlights: z.array(highlightSchema).default([]),
+  model3dHotspots: z.array(hotspotSchema).default([]),
+  questions: z.array(questionSchema).default([]),
   category: z.object({ id: z.string(), title: z.string(), slug: z.string() }),
   brand: z
     .object({
@@ -117,20 +121,4 @@ export const productDetailSchema = z.object({
     }),
   ),
   related: z.array(productCardSchema),
-});
-
-export const productCommentsSchema = z.object({
-  items: z.array(
-    z.object({
-      id: z.string(),
-      authorName: z.string().nullable(),
-      rating: z.number(),
-      body: z.string(),
-      createdAt: z.string(),
-    }),
-  ),
-  total: z.number(),
-  skip: z.number(),
-  take: z.number(),
-  averageRating: z.number().nullable(),
 });

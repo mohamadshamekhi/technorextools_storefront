@@ -36,6 +36,30 @@ export async function POST(request: Request) {
 
   try {
     await syncCartToServer(parsed.data.lines);
+  } catch (error) {
+    // A sync failure is about the cart, not the code — don't let `abzar/api`'s «محصول مورد نظر
+    // یافت نشد» surface under the coupon field, where it reads as "this code is invalid".
+    console.error('[cart] discount sync failed', error);
+    const status = error instanceof ApiError ? error.status : 502;
+    const details = error instanceof ApiError ? error.details : undefined;
+    // `abzar/api` tags cart-line failures with a stable `details.code` and a Persian `message`
+    // meant for the customer — pass those through untouched; only fall back when it doesn't.
+    const code = (details as { code?: string } | undefined)?.code;
+    if (code && error instanceof ApiError) {
+      return NextResponse.json({ message: error.message, details }, { status });
+    }
+    return NextResponse.json(
+      {
+        message:
+          status === 404
+            ? 'یکی از کالاهای سبد روی سرور در دسترس نیست. آن را حذف و دوباره اضافه کنید.'
+            : 'هماهنگی سبد با سرور ناموفق بود. دوباره تلاش کنید.',
+      },
+      { status: status === 404 ? 409 : status },
+    );
+  }
+
+  try {
     const result = await cartApi.validateDiscount(parsed.data.code);
     return NextResponse.json(result);
   } catch (error) {

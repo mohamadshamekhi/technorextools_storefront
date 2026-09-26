@@ -1,28 +1,30 @@
-import { pdpMock } from '../data/pdp-mock';
 import type { ProductDetail, ProductCard } from '../types';
 import type { DownloadableDocument, ProductDocument, ProductExtras, SpecRow } from '../types/pdp';
 
-/** Real API attributes first; mock rows fill in labels the API doesn't carry. */
-export function mergeSpecs(product: ProductDetail, extras: ProductExtras): SpecRow[] {
-  const api = product.attributeValues.map((attr) => ({
-    label: attr.attributeTitle,
-    value: attr.unit ? `${attr.value} ${attr.unit}` : attr.value,
-  }));
-  const seen = new Set(api.map((row) => row.label));
-  return [...api, ...extras.specs.filter((row) => !seen.has(row.label))];
+/** Specs come straight from `abzar/api` attribute values — no static filler. */
+export function buildSpecs(product: ProductDetail): SpecRow[] {
+  return product.attributeValues
+    .filter((attr) => attr.value.trim().length > 0)
+    .map((attr) => ({
+      label: attr.attributeTitle,
+      value: attr.unit ? `${attr.value} ${attr.unit}` : attr.value,
+    }));
 }
 
-/** Mock extras overlaid with anything the API already provides (datasheet, 3D model). */
+/**
+ * Everything the PDP renders beyond the core product, all served by `abzar/api`.
+ * The GLB goes through `/api/models` because the media bucket sends no CORS header.
+ */
 export function buildExtras(product: ProductDetail): ProductExtras {
-  const documents: ProductDocument[] = product.datasheetUrl
-    ? pdpMock.documents.map((doc) =>
-        doc.type === 'datasheet' ? { ...doc, url: product.datasheetUrl ?? doc.url } : doc,
-      )
-    : pdpMock.documents;
-  const model3d =
-    pdpMock.model3d && product.model3dUrl
-      ? { ...pdpMock.model3d, glbUrl: product.model3dUrl }
-      : pdpMock.model3d;
+  const poster = product.images.find((image) => image.isMain) ?? product.images[0];
+  const model3d = product.model3dUrl
+    ? {
+        glbUrl: `/api/models?src=${encodeURIComponent(product.model3dUrl)}`,
+        posterUrl: poster?.url ?? '',
+        alt: `مدل سه‌بعدی ${product.title}`,
+        hotspots: product.model3dHotspots,
+      }
+    : null;
   // Image and parts both come from `abzar/api`; drop the whole view only when neither exists.
   const explodedView =
     product.explodedViewUrl || product.parts.length > 0
@@ -32,7 +34,15 @@ export function buildExtras(product: ProductDetail): ProductExtras {
           parts: product.parts,
         }
       : null;
-  return { ...pdpMock, documents, model3d, explodedView };
+
+  return {
+    documents: product.documents,
+    model3d,
+    explodedView,
+    video: null,
+    highlights: product.highlights,
+    questions: product.questions,
+  };
 }
 
 export function toProductCard(product: ProductDetail): ProductCard {
@@ -52,7 +62,17 @@ export function toProductCard(product: ProductDetail): ProductCard {
   };
 }
 
-/** Stable BFF download links; the route signs a fresh expiring URL on each hit. */
-export function withDownloadHrefs(documents: ProductDocument[]): DownloadableDocument[] {
-  return documents.map((doc) => ({ ...doc, href: `/api/documents/${doc.id}` }));
+/**
+ * Stable BFF download links. The route re-reads the document from `abzar/api` by product slug
+ * and mints a fresh expiring URL on each hit, so cached pages never carry an expired link.
+ */
+export function withDownloadHrefs(
+  documents: ProductDocument[],
+  slug: string,
+): DownloadableDocument[] {
+  const product = encodeURIComponent(slug);
+  return documents.map((doc) => ({
+    ...doc,
+    href: `/api/documents/${encodeURIComponent(doc.id)}?product=${product}`,
+  }));
 }

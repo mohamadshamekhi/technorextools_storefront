@@ -6,6 +6,7 @@ import { AboutSectionHeading } from './about-section-heading';
 
 /** Leadership grid with portrait placeholders. */
 export function TeamSection() {
+  return <></>;
   return (
     <section className="py-24">
       <Container>

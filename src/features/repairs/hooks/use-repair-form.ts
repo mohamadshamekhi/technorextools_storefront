@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { repairFormSchema } from '../types';
+import { useAttachments } from '@/features/media';
+
+import { MAX_REPAIR_ATTACHMENTS, repairFormSchema } from '../types';
 
 type FieldErrors = Partial<Record<'issueDescription' | 'warrantySerial' | 'form', string>>;
 
@@ -13,6 +15,7 @@ export function useRepairForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [pending, setPending] = useState(false);
+  const attachments = useAttachments(MAX_REPAIR_ATTACHMENTS);
 
   const submit = async () => {
     const parsed = repairFormSchema.safeParse({ issueDescription, warrantySerial });
@@ -22,6 +25,10 @@ export function useRepairForm() {
         issueDescription: flat.issueDescription?.[0],
         warrantySerial: flat.warrantySerial?.[0],
       });
+      return;
+    }
+    if (attachments.uploading) {
+      setErrors({ form: 'تا پایان بارگذاری فایل‌ها صبر کنید.' });
       return;
     }
     setErrors({});
@@ -34,6 +41,7 @@ export function useRepairForm() {
         body: JSON.stringify({
           issueDescription: parsed.data.issueDescription,
           ...(serial ? { warrantySerial: serial } : {}),
+          ...(attachments.mediaIds.length ? { mediaIds: attachments.mediaIds } : {}),
         }),
       });
       if (!res.ok) {
@@ -41,6 +49,7 @@ export function useRepairForm() {
         setErrors({ form: payload?.error ?? 'ثبت درخواست ناموفق بود. دوباره تلاش کنید.' });
         return;
       }
+      attachments.reset();
       setSubmitted(true);
     } catch {
       setErrors({ form: 'ارتباط با سرور برقرار نشد.' });
@@ -57,6 +66,7 @@ export function useRepairForm() {
     errors,
     submitted,
     pending,
+    attachments,
     submit,
   };
 }

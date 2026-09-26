@@ -30,7 +30,7 @@ export function PartHotspots({ parts, active, pinned, onActive, onPin }: PartHot
             onFocus={() => onActive(part.number)}
             onBlur={() => onActive(null)}
             className={cn(
-              'focus-visible:ring-brand-500 absolute z-10 grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-xs font-extrabold ring-2 ring-white transition-[transform,opacity] duration-200 focus-visible:outline-none',
+              'focus-visible:ring-brand-500 pointer-events-auto absolute z-10 grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-xs font-extrabold ring-2 ring-white transition-[transform,opacity] duration-200 focus-visible:outline-none',
               active === part.number
                 ? 'bg-brand-600 scale-110 text-white'
                 : 'bg-accent-500 text-ink',

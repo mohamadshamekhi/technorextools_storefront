@@ -2,22 +2,28 @@ import type { IconName } from '@/components/atoms';
 import { Icon } from '@/components/atoms';
 import { toPersianDigits } from '@/lib/persian';
 
-/** Carrier + parcel tracking number, side by side. */
+/** Carrier + parcel tracking number. Rows the API has not filled yet are omitted. */
 export function ShippingInfo({
   carrier,
   trackingNumber,
 }: {
-  carrier: string;
-  trackingNumber: string;
+  carrier: string | null;
+  trackingNumber: string | null;
 }) {
   const rows: Array<{ icon: IconName; label: string; value: string }> = [
-    { icon: 'truck', label: 'شرکت پستی', value: carrier },
-    {
-      icon: 'doc',
-      label: 'کد رهگیری مرسوله',
-      value: `IR${toPersianDigits(trackingNumber)}`,
-    },
+    ...(carrier ? [{ icon: 'truck' as const, label: 'شرکت پستی', value: carrier }] : []),
+    ...(trackingNumber
+      ? [
+          {
+            icon: 'doc' as const,
+            label: 'کد رهگیری مرسوله',
+            value: toPersianDigits(trackingNumber),
+          },
+        ]
+      : []),
   ];
+
+  if (rows.length === 0) return null;
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">

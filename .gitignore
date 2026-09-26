@@ -36,3 +36,6 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
+
+# production env (server-side only, never committed)
+.env.production

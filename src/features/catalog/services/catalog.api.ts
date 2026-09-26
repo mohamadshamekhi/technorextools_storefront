@@ -5,10 +5,12 @@ import { apiClient } from '@/lib/api-client';
 import {
   brandListSchema,
   categoryTreeSchema,
-  productCommentsSchema,
   productDetailSchema,
   productListSchema,
 } from './catalog.schemas';
+import { bundleListSchema, bundleSchema } from './bundles.schemas';
+import { productCommentsSchema } from './comments.schemas';
+import { productQuestionsSchema } from './pdp.schemas';
 import { toProductsQuery, type CatalogParams } from './catalog.query';
 
 /**
@@ -71,4 +73,28 @@ export function getProductComments(slug: string, opts: { skip?: number; take?: n
     productCommentsSchema,
     { auth: false, next: { revalidate, tags: [`catalog:comments:${slug}`] } },
   );
+}
+
+/** Approved Q&A for one product. Also embedded in `getProduct`; fetched alone after a post. */
+export function getProductQuestions(slug: string) {
+  return apiClient.get(
+    `${BASE}/products/${encodeURIComponent(slug)}/questions`,
+    productQuestionsSchema,
+    { auth: false, next: { revalidate, tags: [`catalog:questions:${slug}`] } },
+  );
+}
+
+/** Active bundles (fixed baskets of variants sold at one price). */
+export function listBundles() {
+  return apiClient.get(`${BASE}/bundles`, bundleListSchema, {
+    auth: false,
+    next: { revalidate, tags: ['catalog:bundles'] },
+  });
+}
+
+export function getBundle(slug: string) {
+  return apiClient.get(`${BASE}/bundles/${encodeURIComponent(slug)}`, bundleSchema, {
+    auth: false,
+    next: { revalidate, tags: [`catalog:bundle:${slug}`] },
+  });
 }

@@ -2,8 +2,15 @@ import type { Metadata } from 'next';
 
 import { Container } from '@/components/atoms';
 import { routes } from '@/config/routes';
-import { ContactChannels, ContactForm, ContactHero, ContactInfoPanel } from '@/features/contact';
-import { breadcrumbSchema, localBusinessSchema } from '@/lib/json-ld';
+import {
+  CONTACT_FAQ,
+  ContactChannels,
+  ContactFaq,
+  ContactForm,
+  ContactHero,
+  ContactInfoPanel,
+} from '@/features/contact';
+import { breadcrumbSchema, faqSchema, localBusinessSchema } from '@/lib/json-ld';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
@@ -20,6 +27,7 @@ export default function ContactPage() {
       { name: 'خانه', path: '/' },
       { name: 'تماس با ما', path: routes.contact },
     ]),
+    faqSchema(CONTACT_FAQ),
   ];
 
   return (
@@ -35,6 +43,7 @@ export default function ContactPage() {
         <ContactForm />
         <ContactInfoPanel />
       </Container>
+      <ContactFaq />
     </div>
   );
 }

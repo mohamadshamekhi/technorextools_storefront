@@ -21,6 +21,9 @@ export const cartApi = {
       body: { sparePartId, qty },
     }),
 
+  addBundle: (bundleId: string, qty: number) =>
+    apiClient.post('/storefront/cart/bundles', cartViewSchema, { body: { bundleId, qty } }),
+
   validateDiscount: (code: string) =>
     apiClient.post('/storefront/discounts/validate', discountValidationSchema, { body: { code } }),
 };
@@ -30,6 +33,7 @@ export async function syncCartToServer(lines: CartSyncLine[]): Promise<void> {
   await cartApi.clear();
   for (const line of lines) {
     if ('sparePartId' in line) await cartApi.addSparePart(line.sparePartId, line.qty);
+    else if ('bundleId' in line) await cartApi.addBundle(line.bundleId, line.qty);
     else await cartApi.addItem(line.variantId, line.qty);
   }
 }

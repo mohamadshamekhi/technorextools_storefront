@@ -8,7 +8,8 @@ import {
   getProductComments,
   listProducts,
 } from '@/features/catalog/services/catalog.api';
-import { buildExtras, mergeSpecs, withDownloadHrefs } from '@/features/catalog/utils/pdp-extras';
+import { buildExtras, buildSpecs, withDownloadHrefs } from '@/features/catalog/utils/pdp-extras';
+import { toDescriptionHtml } from '@/features/catalog/utils/description-html';
 import { listSpareParts } from '@/features/spare-parts/services/spare-parts.api';
 import { ApiError } from '@/lib/api-client';
 import { breadcrumbSchema, productSchema } from '@/lib/json-ld';
@@ -62,8 +63,9 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
     .catch(() => []);
 
   const extras = buildExtras(product);
-  const documents = withDownloadHrefs(extras.documents);
-  const specs = mergeSpecs(product, extras);
+  const documents = withDownloadHrefs(extras.documents, slug);
+  const specs = buildSpecs(product);
+  const descriptionHtml = toDescriptionHtml(product.description);
 
   const structuredData = [
     breadcrumbSchema([
@@ -98,6 +100,7 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
         extras={extras}
         documents={documents}
         specs={specs}
+        descriptionHtml={descriptionHtml}
         spareParts={spareParts}
       />
     </>

@@ -24,10 +24,11 @@ export const cartLineViewSchema = z.object({
   available: z.boolean(),
 });
 
-/** One line of the client cart pushed to the server cart — a variant or a spare part. */
+/** One line of the client cart pushed to the server cart — a variant, spare part or bundle. */
 export const cartSyncLineSchema = z.union([
   z.object({ variantId: z.string().length(24), qty: z.number().int().min(1).max(999) }),
   z.object({ sparePartId: z.string().length(24), qty: z.number().int().min(1).max(999) }),
+  z.object({ bundleId: z.string().length(24), qty: z.number().int().min(1).max(999) }),
 ]);
 export const cartSyncLinesSchema = z.array(cartSyncLineSchema).min(1).max(50);
 export type CartSyncLine = z.infer<typeof cartSyncLineSchema>;

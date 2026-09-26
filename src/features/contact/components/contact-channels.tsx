@@ -19,11 +19,21 @@ export function ContactChannels() {
             <p className="text-foreground-muted mt-1 text-[13px]" dir="ltr">
               {channel.value}
             </p>
+            <p className="text-foreground-muted mt-2 text-[11.5px] leading-relaxed opacity-80">
+              {channel.note}
+            </p>
           </>
         );
 
+        const external = channel.href?.startsWith('http');
+
         return channel.href ? (
-          <a key={channel.title} href={channel.href} className={CARD_CLASS}>
+          <a
+            key={channel.title}
+            href={channel.href}
+            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            className={CARD_CLASS}
+          >
             {body}
           </a>
         ) : (

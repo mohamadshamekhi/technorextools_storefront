@@ -8,4 +8,5 @@ export { ArticleBody } from './components/article-body';
 export { JournalHero } from './components/journal-hero';
 export { FeaturedArticle } from './components/featured-article';
 export { formatJalaliDate } from './utils/date';
+export { firstImageFromHtml } from './utils/cover';
 export type { ArticleCardData, ArticleDetail, ArticleList } from './types';

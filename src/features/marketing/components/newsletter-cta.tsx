@@ -14,7 +14,7 @@ export function NewsletterCta() {
   const fieldError = state && !state.ok ? state.fieldErrors?.contact?.[0] : undefined;
 
   return (
-    <Container as="section" className="py-20 lg:py-28" aria-labelledby="newsletter-heading">
+    <Container as="section" className="py-20 lg:py-16" aria-labelledby="newsletter-heading">
       <Reveal
         className={cn(
           styles.panel,
@@ -35,7 +35,9 @@ export function NewsletterCta() {
         <div className="relative">
           {state?.ok ? (
             <p className="bg-surface text-brand-600 rounded-3xl px-6 py-5 text-base font-bold">
-              ثبت شد! جدیدترین پیشنهادها به‌زودی برایت ارسال می‌شود.
+              {state.data.created
+                ? 'ثبت شد! جدیدترین پیشنهادها به‌زودی برایت ارسال می‌شود.'
+                : 'شما از قبل عضو خبرنامه هستید.'}
             </p>
           ) : (
             <form action={action} className="flex flex-wrap gap-3">

@@ -3,12 +3,10 @@ import { SparePartCard } from './spare-part-card';
 
 export function SparePartGrid({ parts }: { parts: SparePart[] }) {
   return (
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {parts.map((part) => (
         <li key={part.id} className="flex">
-          <div className="flex w-full flex-col">
-            <SparePartCard part={part} />
-          </div>
+          <SparePartCard part={part} />
         </li>
       ))}
     </ul>

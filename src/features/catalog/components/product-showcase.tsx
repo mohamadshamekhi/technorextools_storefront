@@ -23,7 +23,7 @@ export async function ProductShowcase() {
       as="section"
       id="products"
       aria-labelledby="products-heading"
-      className="scroll-mt-24 py-20 lg:py-28"
+      className="scroll-mt-24 py-20 lg:py-16"
     >
       <SectionHeading
         id="products-heading"

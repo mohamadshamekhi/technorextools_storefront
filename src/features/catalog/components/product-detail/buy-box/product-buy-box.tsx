@@ -13,7 +13,6 @@ import { AddToCartButton } from './add-to-cart-button';
 import { BuyBoxHeading } from './buy-box-heading';
 import { DeliveryEstimate } from './delivery-estimate';
 import { KeySpecs } from './key-specs';
-import { MiniCartDrawer } from './mini-cart-drawer';
 import { PriceBlock } from './price-block';
 import { QuantityStepper } from './quantity-stepper';
 import { StockLine } from './stock-line';
@@ -94,7 +93,6 @@ export function ProductBuyBox({ product, comments, extras, catalog }: ProductBuy
         <QuantityStepper value={qty} onChange={setQty} max={maxQty} />
         <DeliveryEstimate cityId={cityId} onChange={setCityId} />
       </BottomSheet>
-      <MiniCartDrawer open={cart.drawerOpen} onClose={cart.closeDrawer} />
     </div>
   );
 }

@@ -1,0 +1,62 @@
+.prose {
+  color: var(--color-foreground);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.prose > * + * {
+  margin-block-start: 1rem;
+}
+
+.prose h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-block-start: 1.5rem;
+}
+
+.prose h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-block-start: 1.25rem;
+}
+
+.prose p,
+.prose li {
+  text-wrap: pretty;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.4rem;
+}
+
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+
+.prose a {
+  color: var(--color-brand-600);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.prose blockquote {
+  border-inline-start: 3px solid var(--color-brand-400);
+  padding-inline-start: 1rem;
+  color: var(--color-foreground-muted);
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--color-hairline);
+  padding: 0.5rem 0.75rem;
+  text-align: start;
+}

@@ -1,3 +1,4 @@
+import { MiniCartDrawer } from '@/components/organisms';
 import { StoreFooter, StoreHeader } from '@/features/marketing';
 import type { WithChildren } from '@/types';
 
@@ -16,6 +17,7 @@ export default function PublicLayout({ children }: WithChildren) {
         {children}
       </main>
       <StoreFooter />
+      <MiniCartDrawer />
     </div>
   );
 }

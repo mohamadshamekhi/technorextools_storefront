@@ -30,7 +30,7 @@ function FaqItem({ question, answer }: FaqItemProps) {
 /** FAQ accordion — pairs with the FAQPage JSON-LD emitted by the page. */
 export function FaqSection() {
   return (
-    <section className="pb-24">
+    <section className="py-24">
       <Container className="max-w-3xl">
         <AboutSectionHeading
           eyebrow="پرسش‌های متداول"

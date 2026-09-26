@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { Container, Icon, MediaPlaceholder } from '@/components/atoms';
 import { Reveal } from '@/components/molecules';
 import { routes } from '@/config/routes';
-import { ArticleBody, formatJalaliDate } from '@/features/content';
+import { ArticleBody, firstImageFromHtml, formatJalaliDate } from '@/features/content';
 import { getArticle, listArticles } from '@/features/content/services/content.api';
 import { ApiError } from '@/lib/api-client';
 import { articleSchema, breadcrumbSchema } from '@/lib/json-ld';
@@ -90,7 +90,7 @@ export default async function ArticlePage({ params }: PageProps<{ slug: string }
         <Reveal>
           <MediaPlaceholder
             label={article.title}
-            src={article.coverImage ?? undefined}
+            src={article.coverImage ?? firstImageFromHtml(article.body) ?? undefined}
             fit="cover"
             sizes="(max-width: 768px) 100vw, 896px"
             priority

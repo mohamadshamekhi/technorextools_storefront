@@ -5,6 +5,589 @@
 
 ---
 
+## 2026-09-26 — زیرساخت deploy پروداکشن (Docker + nginx هاست)
+
+**افزوده:**
+- `Dockerfile` — multi-stage (deps → builder → runner) روی `node:20-alpine`، pnpm با
+  `--frozen-lockfile`. build args برای `NEXT_PUBLIC_*` (Next در build inline می‌کند) و
+  `API_BASE_URL`/`SESSION_COOKIE_NAME`/`DOCUMENT_SIGNING_SECRET` (چون `config/env.ts`
+  در prerender اعتبارسنجی می‌شود). runner فقط `.next/standalone` + `.next/static` +
+  `public` را دارد، user غیر root (`nextjs:1001`)، `HOSTNAME=0.0.0.0`،
+  `HEALTHCHECK` روی `/api/health`.
+- `.dockerignore`
+- `docker-compose.prod.yml` — تنها سرویس `web`، `restart: unless-stopped`،
+  `env_file: .env.production`، `ports: ['127.0.0.1:3000:3000']` (loopback؛ ufw فقط
+  22/80/443)، healthcheck و rotation لاگ.
+- `.env.production.example` — `API_BASE_URL=https://api.technorextools.com/api/v1`،
+  `API_SERVICE_TOKEN` (هدر `X-Service-Token`، باید با بکند یکی باشد)، `NODE_ENV`, `PORT`.
+- `deploy/deploy.sh` — الگوی abzar-api: git pull → build → up -d → poll
+  `http://127.0.0.1:3000/api/health` تا `HEALTH_TIMEOUT` (پیش‌فرض 120s)، در صورت شکست
+  لاگ می‌دهد و exit≠0؛ prune image. فلگ `--no-pull`.
+- `deploy/setup-server.sh` — یک‌بارمصرف/idempotent: preflight DNS (مقایسه A record دو
+  دامنه با IP سرور)، نصب certbot، نصب vhost، `certbot --nginx -d technorextools.com
+  -d www.technorextools.com --redirect`. به ufw دست نمی‌زند.
+- `deploy/nginx/storefront.conf` — vhost هاست (بیرون docker) برای
+  `technorextools.com` + `www`، proxy به `127.0.0.1:3000`، هدرهای
+  `X-Forwarded-*`، upgrade برای websocket، cache روی `/_next/static/`،
+  مسیر acme-challenge. عمداً فقط پورت 80 است تا certbot خودش بلاک 443 و ریدایرکت را
+  تزریق کند.
+- `deploy/nginx/map-upgrade.conf` — `map $http_upgrade $connection_upgrade`
+  (اگر هاست از قبل ندارد).
+- `deploy/README.md` — رویه‌ی نصب اول، آپدیت، چک‌ها، یادآوری CORS بکند.
+
+**تغییر:**
+- `next.config.mjs` — `output: 'standalone'` (لازمه‌ی ایمیج runner سبک) و افزودن
+  `api.technorextools.com` / `technorextools.com` / `www.technorextools.com` به
+  `images.remotePatterns`.
+- `.gitignore` — `.env.production`.
+
+**بدون تغییر state/کامپوننت.**
+
+---
+
+## 2026-09-25 — کالای ناموجود در کارت محصول
+
+- `catalog/components/add-to-cart-button.tsx`: prop جدید `disabled` — به‌جای دکمه، یک
+  `span` مرده با متن/برچسب «ناموجود» رندر می‌شود (قبلاً کالای با موجودی صفر هم قابل افزودن
+  به سبد بود).
+- `catalog/components/product-card.tsx`: `outOfStock` از `firstVariant.stockQty <= 0`؛
+  تصویر grayscale + بج «ناموجود» روی تصویر و `disabled` روی دکمه سبد.
+
+---
+
+## 2026-09-25 — `available` / `packagesInStock` مرجع خرید پکیج
+
+- `bundles.schemas.ts`: `available: boolean` و `packagesInStock: number` اضافه شد.
+- `utils/bundle.ts`: `bundleInStock` و `bundlePackagesInStock` حذف شدند (fallback محلی دیگر
+  لازم نیست — حکم سرور مرجع است)؛ فقط `memberUnavailableLabel` برای برچسب هر عضو ماند.
+- `bundle-add-button.tsx`: گیت دکمه = `bundle.available`.
+- `bundle-band-panel.tsx`: زیر CTA، وقتی `packagesInStock <= 3` پیام «فقط N پکیج موجود است».
+- `app/api/cart/discount/route.ts`: اگر خطای sync سبد `details.code` داشته باشد، همان
+  `message` فارسی و `details` عیناً pass-through می‌شود (شرط روی `code`، نه متن)؛ در غیر این
+  صورت پیام عمومی قبلی. `app/api/checkout/route.ts` از قبل `details` را برمی‌گرداند.
+
+---
+
+## 2026-09-25 — پولیش باند پکیج
+
+- `bundle-band.tsx`: اعضا به‌صورت «کالا + کالا» با جداکننده‌ی آیکن `plus` چیده می‌شوند،
+  محتوا عمودی وسط‌چین است (فضای خالی بزرگ زیر تایل‌ها حذف شد) و یک ردیف جمع‌بندی
+  «قیمت جداگانه» خط‌خورده در پایین اضافه شد. ستون‌ها `1fr + 23rem` (پنل تیره سمت چپ).
+- `bundle-member-card.tsx`: تایل عمودی با تصویر ۴:۳، بج `×تعداد` و بج قرمز «ناموجود/غیرفعال»
+  روی تصویر، عنوان دوخطی و قیمت واحد.
+- `bundle-band-panel.tsx`: قیمت خط‌خورده تکراری حذف و با برچسب «قیمت پکیج» جایگزین شد.
+- `bundle-rail.tsx`: `pb-4` تا باند به تیکر آبی نچسبد.
+
+---
+
+## 2026-09-25 — شرط خرید پکیج بر اساس `isActive` اعضا
+
+- `bundles.schemas.ts`: `items[].variant.isActive` و `items[].variant.product.isActive`
+  (هر دو `default(true)`؛ فلگ محصول شرط soft-delete را هم در خود دارد).
+- `utils/bundle.ts`: `bundleInStock` حالا علاوه بر موجودی، فعال‌بودن variant و محصول را هم
+  چک می‌کند؛ **جدید** `bundlePackagesInStock` (تعداد پکیج کامل قابل تأمین) و
+  `memberUnavailableLabel` (`غیرفعال` / `ناموجود` / `null`).
+- `bundle-member-card.tsx`: برچسب دقیق‌تر به‌جای «ناموجود» ثابت.
+
+---
+
+## 2026-09-25 — بازطراحی بخش پکیج‌ها (باند تمام‌عرض)
+
+گرید سه‌ستونه برای یک پکیج، یک کارت تنها و باریک با فضای خالی بزرگ می‌ساخت. جایگزین:
+
+- **جدید** `bundles/bundle-band.tsx`: هر پکیج یک باند تمام‌عرض
+  (`lg:grid-cols-[minmax(0,23rem)_1fr]`) — پنل تیره‌ی پیشنهاد + گرید اعضا.
+- **جدید** `bundles/bundle-band-panel.tsx`: پنل `surface-ink texture-grid` با بج «پکیج ویژه»،
+  درصد تخفیف، عنوان، قیمت خط‌خورده، قیمت پکیج و مبلغ سود + CTA.
+- **جدید** `bundles/bundle-member-card.tsx`: تایل هر عضو (تصویر ۶۴px، عنوان، رنگ/تعداد، قیمت،
+  برچسب ناموجود) و لینک به صفحه محصول.
+- حذف: `bundle-card.tsx` و `bundle-item-row.tsx`.
+- `bundle-rail.tsx`: هدر سکشن بازنویسی شد و باندها زیر هم می‌آیند (`flex flex-col gap-5`).
+- `bundle-add-button.tsx`: حالت ناموجود و سایه برای زمینه‌ی تیره تنظیم شد.
+
+---
+
+## 2026-09-25 — فیلدهای جدید پکیج (imageUrl / compareAtTotal / savingAmount)
+
+- `catalog/services/bundles.schemas.ts`: سه فیلد جدید با `default` اضافه شد.
+- `catalog/utils/bundle.ts`: `bundleListPrice` و `bundleSavings` اول مقدار API را می‌خوانند و
+  محاسبه از روی اعضا فقط fallback است؛ `bundleCoverImage` حالا `bundle.imageUrl` را ترجیح
+  می‌دهد.
+- `bundles/bundle-card.tsx`: کاور واقعی پکیج (۵۶px) جای آیکن مکعب را می‌گیرد و اگر تصویری
+  نبود آیکن می‌ماند.
+
+---
+
+## 2026-09-25 — فروش پکیجی (bundles) در صفحه اصلی
+
+- **جدید** `catalog/services/bundles.schemas.ts`: mirror شمای `GET /storefront/catalog/bundles`
+  (+ `/:slug`) — `bundleSchema`, `bundleItemSchema`, `bundleListSchema`.
+- `catalog/services/catalog.api.ts`: `listBundles()` و `getBundle(slug)` (unauth، ISR 5 دقیقه،
+  تگ‌های `catalog:bundles` / `catalog:bundle:<slug>`).
+- **جدید** `catalog/utils/bundle.ts`: `bundleListPrice`, `bundleSavings`,
+  `bundleSavingsPercent`, `bundleInStock` (همه‌ی اعضا باید به اندازه‌ی `qty` موجود باشند),
+  `bundleCoverImage`.
+- **جدید** `catalog/components/bundles/`: `bundle-rail.tsx` (سکشن RSC، اگر پکیجی نباشد چیزی
+  رندر نمی‌کند)، `bundle-card.tsx` (قیمت تکی خط‌خورده + قیمت پکیج + بج درصد و مبلغ سود)،
+  `bundle-item-row.tsx` (هر عضو با لینک به صفحه محصول)، `bundle-add-button.tsx` (client leaf).
+- سبد: `CartLine.kind` مقدار `'bundle'` گرفت؛ `cart/utils/sync-lines.ts` آن را به
+  `{bundleId, qty}` نگاشت می‌کند؛ `cartSyncLineSchema` شاخه‌ی `bundleId` گرفت؛
+  `cartApi.addBundle` → `POST /storefront/cart/bundles` و `syncCartToServer` آن را صدا می‌زند
+  (پس checkout و اعتبارسنجی کد تخفیف هم پکیج را می‌فهمند).
+- `app/(public)/page.tsx`: `<BundleRail />` بین `ProductShowcase` و `PromoTicker`.
+
+State: پکیج یک خط سبد با `id` برابر `bundle.id` است؛ سرور آن را به اعضایش باز می‌کند.
+
+---
+
+## 2026-09-25 — نوار پیشرفت تغییر مسیر (route progress)
+
+- **جدید** `components/molecules/route-progress.tsx` + `route-progress.module.css`:
+  نوار ۲px بالای صفحه. App Router رویداد ناوبری ندارد، پس شروع از کلیک روی لینک
+  same-origin (listener در فاز capture، با رد کردن کلیک میانی/مودیفایر/`target=_blank`/
+  `download`/anchor و مسیر یکسان) و `popstate`؛ پایان وقتی `usePathname` مسیر جدید را گزارش
+  می‌کند. تایم‌اوت ۱۲ ثانیه‌ای برای کلیکی که ناوبری نمی‌شود، `role="progressbar"` +
+  `aria-busy`، و حالت `prefers-reduced-motion` بدون انیمیشن.
+- `app/layout.tsx`: یک instance قبل از `AppProviders` mount شد. export از
+  `components/molecules/index.ts`.
+
+---
+
+## 2026-09-25 — هایلایت صفحه فعال در نوار پیمایش فروشگاه
+
+- **جدید** `marketing/components/primary-nav-link.tsx`: client leaf با `usePathname`؛
+  `aria-current="page"` + استایل `bg-brand-50/ring` برای مسیر فعال. تطبیق: مساوی بودن مسیر یا
+  شروع با `href + '/'`؛ لینک‌های anchor (`/#deals`) هیچ‌وقت فعال نمی‌شوند.
+- `primary-nav.tsx`: همچنان RSC، فقط لینک‌ها به کامپوننت جدید واگذار شدند.
+
+---
+
+## 2026-09-25 — سخت‌ترکردن `/checkout/result`
+
+صفحه از قبل وجود داشت (`app/(checkout)/checkout/result/page.tsx`)؛ دو حفره بسته شد:
+
+- ترتیب عوض شد: اول `searchParams` پارس می‌شود، بعد session چک می‌شود؛ و `next` لاگین حالا
+  `?orderNumber=` را هم حمل می‌کند (قبلاً بعد از لاگین شماره سفارش گم می‌شد و کاربر به لیست
+  سفارش‌ها پرت می‌شد).
+- وقتی `ordersApi.detail` شکست می‌خورد دیگر redirect بی‌صدا نمی‌کنیم؛ **جدید**
+  `checkout/components/checkout-result-missing.tsx` با شماره سفارش + «پیگیری سفارش» +
+  «سفارش‌های من» رندر می‌شود (هیچ ادعایی درباره وضعیت پرداخت نمی‌کند). export از
+  `features/checkout/index.ts`.
+
+---
+
+## 2026-09-25 — تصویر و لینک کالا در اقلام سفارش
+
+- **جدید** `lib/order-items.ts`: `ORDER_ITEM_KINDS` + `orderItemHref(kind, slug)` —
+  `variant` → `routes.product`, `spare_part` → `routes.sparePart`, `bundle` → `null`
+  (مسیر باندل در storefront وجود ندارد)، `slug` تهی → `null`.
+- `account/services/orders.schemas.ts` و `order-tracking/services/order-tracking.schemas.ts`:
+  فیلدهای `imageUrl`, `productSlug`, `kind` به هر آیتم اضافه شد (همه با `default` تا پاسخ‌های
+  قدیمی نشکنند).
+- `account/components/order-detail-items.tsx`: آیکن جعبه جای خود را به `MediaPlaceholder` با
+  تصویر واقعی داد؛ عنوان وقتی `href` دارد لینک می‌شود.
+- `order-tracking/components/tracked-items.tsx`: همان ساختار (تصویر + لینک + تعداد).
+- `.claude/docs/api-contract.md`: سه فیلد جدید مستند شد.
+
+---
+
+## 2026-09-25 — نمایش تصویر کالا در مرحله بازبینی checkout
+
+- `checkout/components/review-item-row.tsx`: `MediaPlaceholder` با `label="عکس"` ثابت و بدون
+  `src` رندر می‌شد؛ حالا `src={line.imageUrl}` و `label={line.title}` (alt درست) با
+  `sizes="52px"` و بردر می‌گیرد. `imageUrl` از قبل در `CartLine` بود.
+
+---
+
+## 2026-09-25 — پیام خطای کد تخفیف وقتی sync سبد شکست می‌خورد
+
+- `app/api/cart/discount/route.ts`: `syncCartToServer` از `validateDiscount` جدا شد. خطای sync
+  دیگر پیام upstream («محصول مورد نظر یافت نشد») را زیر فیلد کوپن نشان نمی‌دهد؛ `404` → `409` با
+  «یکی از کالاهای سبد روی سرور در دسترس نیست…» و بقیه → پیام عمومی. علت ریشه‌ای در سمت داده است:
+  خط سبدی که `variantId` آن واقعاً variant نیست (محصول بدون variant) روی
+  `POST /storefront/cart/items` ۴۰۴ می‌گیرد.
+
+---
+
+## 2026-09-25 — مینی‌کارت سراسری (کلیک روی سبد خرید هدر)
+
+- `store/ui-store.ts`: `miniCartOpen` + `setMiniCartOpen` (persist نمی‌شود — `partialize`
+  فقط `theme`/`sidebarOpen`).
+- انتقال `mini-cart-drawer.tsx` و `mini-cart-line.tsx` از
+  `features/catalog/.../buy-box/` به `components/organisms/` (مصرف‌کننده‌اش دو feature شد:
+  marketing و catalog) و export از `components/organisms/index.ts`.
+- `mini-cart-drawer.tsx`: بدون prop؛ state را از `useUiStore` می‌خواند. یک instance در
+  `app/(public)/layout.tsx` mount می‌شود.
+- `marketing/components/cart-button.tsx`: از `Link href={routes.cart}` به `button` تبدیل شد که
+  دراور را باز می‌کند (`data-cart-target` برای انیمیشن fly-to-cart حفظ شد)؛ رفتن به `/cart` از
+  دکمه‌ی داخل دراور انجام می‌شود.
+- `buy-box/use-add-to-cart.ts`: `drawerOpen`/`closeDrawer` حذف شد، بعد از افزودن
+  `setMiniCartOpen(true)` صدا می‌شود؛ `product-buy-box.tsx` دیگر دراور را رندر نمی‌کند.
+
+---
+
+## 2026-09-25 — بازطراحی مینی‌کارت (دراور افزودن به سبد)
+
+- `buy-box/mini-cart-drawer.tsx`: هدر با آیکن موفقیت + «به سبد خرید اضافه شد» و تعداد کل
+  (`selectCartQuantity`)، بدنه با کارت‌های تصویردار، فوتر: جمع کل + یادداشت هزینه ارسال +
+  CTA اصلی «مشاهده سبد و پرداخت» + «ادامه خرید»، حالت خالی، بک‌دراپ `bg-ink/45` با blur.
+- **جدید** `buy-box/mini-cart-line.tsx`: ردیف read-only سبد (تصویر ۶۴px، عنوان، variant،
+  تعداد، مبلغ ردیف) — ویرایش فقط در صفحه سبد.
+
+---
+
+## 2026-09-25 — فیکس: مینی‌کارت زیر هدر سایت می‌رفت
+
+- `catalog/components/product-detail/buy-box/mini-cart-drawer.tsx`: با `createPortal` به
+  `document.body` منتقل شد. علت باگ: `ProductBuyBox` کلاس `lg:sticky` دارد و `position: sticky`
+  یک stacking context می‌سازد، پس `z-[60]` دراور هیچ‌وقت از `z-50` هدر سایت بالاتر نمی‌رفت و
+  هدر + ردیف‌های سبد پشت هدر sticky پنهان می‌شدند. همراهش scroll-lock روی `body` هنگام باز بودن
+  و گارد `mounted` برای SSR.
+
+---
+
+## 2026-09-25 — کارت قطعه در نمای انفجاری همیشه فعال
+
+- `catalog/components/product-detail/exploded/part-info-card.tsx`: به‌جای `return <></>` وقتی
+  قطعه‌ای فعال نیست، کارت با همان `min-h-16` و حالت dashed رندر می‌شود و راهنمای «موس را روی
+  شماره‌ها ببرید» نشان می‌دهد — hover روی هاتاسپات دیگر لِی‌اوت را جابه‌جا نمی‌کند و
+  `aria-live` همیشه mount است. State بدون تغییر: `hovered ?? pinned` در `ExplodedView`.
+
+---
+
+## 2026-09-25 — تأیید/رد هزینه تخمینی تعمیر توسط مشتری
+
+- `features/repairs/types/index.ts`: `repairStatusEntrySchema.by` (`admin|customer|system`،
+  default `admin` برای ردیف‌های قدیمی) + `repairDecisionSchema` (`decision`, `note ≤500`).
+  هر دو از `features/repairs/index.ts` export شدند.
+- `features/account/services/repairs.api.ts`: `repairsApi.decision(id, body)` →
+  `POST /storefront/repairs/:id/decision`، پاسخ با `repairRequestSchema` پارس می‌شود.
+- **جدید** `app/api/account/repairs/[id]/decision/route.ts`: BFF، `getSession` → 401،
+  `safeParse` بدنه → 400 + `fieldErrors`، `404` → «درخواست تعمیر یافت نشد»، `409` → همان
+  `message` فارسی upstream، بقیه → 502.
+- **جدید** `features/account/hooks/use-repair-decision.ts`: mutation + `router.refresh()` در
+  `onSuccess` (صفحه RSC است، state محلی نگه نمی‌داریم)، `UnauthorizedError` روی 401.
+- **جدید** `features/account/components/repair-decision.tsx`: فقط وقتی
+  `status === 'awaiting_customer' && estimatedCost !== null` رندر می‌شود؛ textarea اختیاری،
+  دو دکمه تأیید/انصراف، disable بعد از کلیک، نمایش خطای سرور با `role="alert"`.
+- `repair-detail-view.tsx`: `RepairDecision` بعد از `RepairVerdict`.
+- `repair-status-timeline.tsx`: بج «ثبت‌شده توسط شما» برای `entry.by === 'customer'`.
+- `data/repairs.ts`: hint وضعیت `awaiting_customer` دیگر به تماس تلفنی ارجاع نمی‌دهد.
+- `.claude/docs/api-contract.md`: endpoint جدید + فیلد `by` مستند شد.
+
+---
+
+## 2026-09-25 — بازطراحی هدر داشبورد + صفحه نوتیفیکیشن‌ها
+
+- `features/account/components/account-topbar.tsx`: هدر هم‌تراز با کانتینر شل (`max-w-[1440px]`)،
+  ارتفاع ثابت ۶۴px، لینک «بازگشت به فروشگاه»، بج شمارنده روی زنگوله (`+۹` برای >۹) با `aria-label`
+  توصیفی، چیپ کاربر با بردر.
+- `account-sidebar.tsx`: `sticky top-[72px]` هماهنگ با ارتفاع هدر جدید.
+- `notifications-view.tsx`: تب فیلتر همه/خوانده‌نشده (state محلی `filter`)، اکشن «خواندن همه»
+  داخل `PageHeading.action`، حالت‌های loading/error/empty.
+- **جدید** `notifications-list.tsx`: `NotificationsList` (گروه‌بندی روزانه، کارت با divider) +
+  `NotificationsEmpty` (پیام متفاوت برای حالت فیلترشده).
+- **جدید** `utils/notifications.ts`: `groupNotificationsByDay` — امروز/دیروز/تاریخ فارسی،
+  ترتیب newest-first API حفظ می‌شود.
+- `notification-row.tsx`: ردیف لیستی به‌جای کارت مجزا، نوار برند برای خوانده‌نشده، نقطه unread،
+  chevron روی hover وقتی `link` داخلی دارد، زمان در موبایل زیر متن.
+
+State: لیست از `useNotifications` (React Query، کش مشترک با شمارنده هدر)؛ فیلتر فقط client-side.
+
+---
+
+## 2026-09-25 — رفع خالی‌بودن لیست تعمیرها (enum عقب‌مانده)
+
+علت: `RepairStatus` در API به هشت مقدار رسیده بود (`reviewing`, `awaiting_customer`,
+`awaiting_parts`, `delivered`, `canceled` اضافه شده) و فیلد `statusLabel` هم روی خود درخواست
+می‌آید. `z.enum(REPAIR_STATUSES)` پاسخ را رد می‌کرد → `ApiError 502` → `.catch(() => null)` در
+صفحه → لیست خالی بدون هیچ خطایی.
+
+- `features/repairs/types`: `REPAIR_STATUSES` به هر هشت مقدار به‌ترتیب پایپ‌لاین به‌روز شد و
+  `statusLabel: z.string()` به `repairRequestSchema` اضافه شد.
+- `features/account/data/repairs.ts`: `REPAIR_STATUS_META` فقط آیکن/رنگ نگه می‌دارد (لیبل همیشه
+  از API)؛ `REPAIR_STATUS_HINT` برای هر هشت وضعیت.
+- `repair-status-badge.tsx` (جدید): جایگزین استفاده از `OrderStatusBadge` در کارت و صفحه جزئیات؛
+  `label` را از `statusLabel` سرور می‌گیرد.
+- صفحه‌های `dashboard/repairs` و `dashboard/repairs/[id]`: خطای گرفته‌شده حالا
+  `console.error` می‌شود تا این دسته از mismatchها دوباره بی‌صدا به «موردی نیست» تبدیل نشود.
+
+## 2026-09-25 — هم‌سو شدن با فیلدهای جدید تعمیر و اعلان‌ها
+
+- `features/repairs/types`: `repairStatusEntrySchema` (`status`, `statusLabel`, `at`,
+  `note|null`) + فیلدهای `statusHistory`، `technicianNote`، `estimatedCost` روی
+  `repairRequestSchema` (همه `.default()` دار برای مقاومت در برابر عقب‌ماندن API).
+- `repair-progress.tsx` **حذف شد** (پیشرفت از ایندکس enum حدس زده می‌شد). جایش
+  `repair-status-timeline.tsx` تایم‌لاین واقعی `statusHistory` را با `statusLabel` سرور رندر
+  می‌کند؛ `repair-verdict.tsx` نظر کارشناس و هزینه تخمینی را نشان می‌دهد (تا وقتی هر دو `null`
+  باشند چیزی رندر نمی‌شود).
+- `notifications.schemas.ts`: نوع `repair_status` به enum اضافه شد + فیلد `link`
+  (`nullable().default(null)`). `notification-type-meta.ts` آیکن `wrench` گرفت.
+- `notification-row.tsx`: کلیک روی اعلان علاوه بر mark-as-read به `link` هم navigate می‌کند؛
+  فقط مسیرهای داخلی (`/…` و نه `//…`) پذیرفته می‌شوند تا open redirect نشود.
+- `.claude/docs/api-contract.md` با شکل جدید `notifications` و `repairs` به‌روز شد.
+
+## 2026-09-25 — صفحه پیگیری درخواست‌های تعمیر در پنل کاربر
+
+**صفحه‌ها**
+- `app/(dashboard)/dashboard/repairs/page.tsx` — لیست درخواست‌های تعمیر کاربر (`repairsApi.list`,
+  `take: 50`) → `<RepairsView>`.
+- `app/(dashboard)/dashboard/repairs/[id]/page.tsx` — جزئیات یک درخواست (`repairsApi.detail`)،
+  `notFound()` روی خطا → `<RepairDetailView>`.
+- هر دو `noindex` با `buildMetadata()`.
+
+**سرویس (server-only)**
+- `features/account/services/repairs.schemas.ts`: `repairListSchema` (`{items,total,skip,take}`)
+  بر پایه `repairRequestSchema` از `features/repairs`.
+- `features/account/services/repairs.api.ts`: `repairsApi.list` / `repairsApi.detail` روی
+  `GET /storefront/repairs` و `GET /storefront/repairs/:id` با `revalidate: 0`.
+
+**کامپوننت‌ها** (همه RSC — هیچ state کلاینتی لازم نیست)
+- `repairs-view.tsx` → `repair-card.tsx` (بج وضعیت + خلاصه مشکل + لینک به جزئیات)
+- `repair-detail-view.tsx` → `repair-progress.tsx` (سه مرحله ثابت از `REPAIR_STATUSES`؛ API تاریخچه
+  ندارد، پیشرفت از ایندکس وضعیت فعلی مشتق می‌شود) + `repair-attachments.tsx` + بازاستفاده از
+  `OrderStatusBadge`.
+- `features/account/data/repairs.ts`: `REPAIR_STATUS_META` و `REPAIR_STATUS_HINT` برای
+  `received | in_progress | done`.
+
+**اتصال‌ها**
+- `config/routes.ts`: `dashboard.repairs` + `dashboard.repairDetail(id)`.
+- `features/account/data/nav.ts`: آیتم «درخواست‌های تعمیر» (آیکن `wrench`).
+- `features/repairs/index.ts`: اکسپورت `repairRequestSchema` و تایپ `RepairAttachment`.
+- `repair-sent.tsx`: دکمه‌ی تایید حالا به `/dashboard/repairs` می‌رود، نه ریشه داشبورد.
+
+---
+
+## 2026-09-25 — هم‌ترازی هات‌اسپات‌های نمای انفجاری
+
+- `exploded/use-contain-rect.ts` (جدید): هندسه‌ی تصویر `object-contain` داخل باکس با
+  `ResizeObserver`.
+- `exploded/exploded-stage.tsx` (جدید): جایگزین `PhotoStage` در نمای انفجاری؛ overlay دقیقاً روی
+  مستطیل تصویر قرار می‌گیرد تا درصدهای ذخیره‌شده در پنل ادمین دقیقاً همان‌جا بیفتند (قبلاً
+  نسبت به کل کانتینر + `p-[7%]` محاسبه می‌شد و جابه‌جا بود).
+- `exploded/part-hotspots.tsx`: `pointer-events-auto` روی مارکرها (overlay والد
+  `pointer-events-none` است).
+
+## 2026-09-24 — پراکسی مدل سه‌بعدی (رفع CORS)
+
+- `src/app/api/models/route.ts` (جدید): `GET /api/models?src=<url>` فایل GLB را از باکت رسانه
+  استریم می‌کند. باکت آروان هدر `Access-Control-Allow-Origin` نمی‌دهد و `GLTFLoader` با fetch
+  cross-origin بلاک می‌شد؛ پراکسی same-origin مشکل را حل می‌کند. `src` با Zod اعتبارسنجی می‌شود
+  (فقط `https` + هاست‌های `.arvanstorage.ir` / `.abzar.example`) تا open proxy نشود.
+- `features/catalog/utils/pdp-extras.ts:22`: `glbUrl` حالا `/api/models?src=…` است.
+
+## 2026-09-24 — حذف کامل داده‌های ماک: PDP، پیگیری سفارش، تماس، خبرنامه
+
+**PDP — همه‌چیز از `abzar/api`**
+- `features/catalog/data/pdp-mock.ts` **حذف شد**. `documents`، `highlights`، `model3dHotspots` و
+  `questions` حالا فیلدهای `productDetailSchema` هستند (`.default([])` برای مقاومت در برابر
+  عقب‌ماندن API).
+- `services/pdp.schemas.ts` بازنویسی شد و مالک primitiveهای PDP شد (`productDocumentSchema`,
+  `hotspotSchema`, `highlightSchema`, `questionSchema`, `productPartSchema`). جهت وابستگی برعکس
+  شد: `catalog.schemas.ts` → `pdp.schemas.ts` (قبلاً برعکس بود؛ حلقه ایجاد می‌شد).
+- `services/comments.schemas.ts` (جدید): سه اسکیمای کامنت از `catalog.schemas.ts` جدا شد تا
+  سقف ۱۵۰ خط نشکند. importerها: `catalog.api.ts`, `types/index.ts`, `hooks/use-review-form.ts`,
+  `app/api/catalog/products/[slug]/comments/route.ts`.
+- `utils/pdp-extras.ts`: `buildExtras` دیگر ماک overlay نمی‌کند — `model3d` از `model3dUrl` +
+  `model3dHotspots` ساخته می‌شود، poster از تصویر اصلی محصول.
+- `utils/pdp-icon.ts` (جدید): `toPdpIcon(key)` کلید متنی آزاد API را به نام `Icon` نگاشت می‌کند،
+  fallback = `gear`. `highlightSchema.icon` از enum به `z.string()` تغییر کرد.
+- `buy-box/key-specs.tsx`: تعداد ستون‌ها داینامیک (۱/۲/۳)، با آرایه‌ی خالی رندر نمی‌شود.
+- `withDownloadHrefs(documents, slug)` حالا `?product=<slug>` می‌سازد؛
+  `app/api/documents/[id]/route.ts` سند را با `getProduct(slug)` از API پیدا می‌کند و فقط روی
+  URL برگشتی از API ریدایرکت امضاشده می‌دهد (جلوگیری از open redirect).
+
+**پرسش و پاسخ محصول (جدید)**
+- `catalog.api.ts`: `getProductQuestions(slug)` → `GET /storefront/catalog/products/:slug/questions`،
+  tag: `catalog:questions:<slug>`.
+- `app/api/catalog/products/[slug]/questions/route.ts` (جدید): POST با `getSession()` گارد،
+  `safeParse`، revalidate دو tag، نگاشت ۴۰۱/۴۲۹/۴۰۰.
+- `hooks/use-question-form.ts` + `components/product-detail/sections/question-form.tsx` (جدید) —
+  الگوی `use-review-form`/`review-form`؛ ۴۰۱ → `UnauthorizedError` → مودال ورود.
+- `qa-section.tsx`: empty-state واقعی + فرم + تاریخ پاسخ (`answeredAt`).
+
+**پیگیری سفارش — واقعی شد**
+- `features/order-tracking/data/orders.ts` (`DEMO_ORDERS`) **حذف شد**.
+- `services/order-tracking.schemas.ts` (جدید): `trackedOrderSchema` — `orderNumber`,
+  `statusLabel`, `carrier|null`, `trackingNumber|null`, `total`, `placedAt`, `timeline[]`,
+  `items[{productTitle, sku, qty, lineTotal}]`.
+- `app/api/orders/track/route.ts` (جدید): POST بدون auth → `/storefront/orders/track`؛
+  ۴۰۴/۴۰۰ → یک پیام واحد (عمداً «موبایل اشتباه» لو نمی‌رود)، ۴۲۹ → پیام محدودیت نرخ،
+  `Cache-Control: private, no-store`.
+- `use-order-tracking.ts`: از `useMutation` + fetch؛ `pending` اضافه شد و تا
+  `TrackingHero` → `TrackingForm` (اسپینر + disable) پاس می‌شود.
+- `tracking-timeline.tsx`: `done` از `step.date !== null` می‌آید — `STATUS_ORDER` و prop `current`
+  حذف شدند (کلیدهای دلخواه API پشتیبانی می‌شود).
+- `shipping-info.tsx`: ردیف‌های خالی حذف می‌شوند؛ پیشوند ثابت `IR` روی کد رهگیری برداشته شد.
+- `tracked-items.tsx`: روی `productTitle/qty/lineTotal` واقعی. `tracking-hero.tsx`: متن دمو حذف شد.
+- `types/index.ts`: regex `^PA-\d{6}$` به الگوی عمومی کد سفارش باز شد؛ `TrackingStatus` حذف.
+
+**تماس و خبرنامه**
+- `app/api/contact/route.ts`: `console.warn` جای خود را به `apiClient.post('/storefront/contact')`
+  داد → `201 {id}`؛ ۴۲۹ پیام اختصاصی. `use-contact-form.ts` پیام خطای سرور را نمایش می‌دهد.
+- `newsletter.actions.ts`: `POST /storefront/newsletter` → `{created}`؛ `NewsletterState` حالا
+  `{created: boolean}` حمل می‌کند و `newsletter-cta.tsx` پیام «قبلاً عضو بودید» را از آن می‌سازد.
+
+**باقی‌مانده‌ی استاتیک (عمدی):** محتوای مارکتینگ (`marketing/data/*`, `contact/data/contact.ts`) —
+API ندارد. `account/data/orders.ts` و `catalog/data/presentation.ts` فقط metadata نمایشی enum‌اند.
+
+---
+
+## 2026-09-24 — ریدیزاین بخش برندهای همکار (خانه)
+
+- `features/catalog/components/brand-strip.tsx` حذف و به پوشه‌ی
+  `components/brand-strip/` منتقل شد: `brand-strip.tsx` (RSC) + `brand-tile.tsx` +
+  `brand-strip.module.css`.
+- `brand-strip.tsx`: بند کامل با `SectionHeading` (eyebrow `Partners`، وسط‌چین)، زیرعنوان داینامیک
+  بر اساس تعداد برند و تعداد نمایندگی‌های رسمی، و CTA «مشاهده محصولات همه برندها» → `routes.products`.
+- چیدمان تطبیقی: کمتر از ۷ برند → گرید wrap وسط‌چین با `Reveal` (مشکل فضای خالی مارکی با ۲ برند حل شد)؛
+  ۷ به بالا → `Marquee` با ماسک محوشدگی لبه‌ها.
+- `brand-tile.tsx`: کارت لینک‌دار به `/products?brand=<slug>`، لوگوی `next/image` با
+  `width/height` (fallback: وردمارک متنی)، افکت grayscale→رنگی و shine در hover، بج امبر
+  «نمایندگی رسمی» برای `isExclusiveDistributor` (فیلدی که قبلاً از API می‌آمد و رندر نمی‌شد).
+- `brand-strip.module.css`: ماسک fade لبه‌ی مارکی + پس‌زمینه‌ی گرید بلوپرینت با هاله‌ی برند.
+- `app/(public)/page.tsx`: مسیر import به‌روز شد.
+
+---
+
+## 2026-09-24 — ریدیزاین لیوت داشبورد کاربر
+
+- `components/overview-hero.tsx` (جدید): بنر گرادیان برند با سلام، سطح عضویت و progress bar
+  (از `buildMembership(tier)` که تا حالا fetch می‌شد ولی رندر نمی‌شد).
+- `components/quick-actions-card.tsx` (جدید): ریل دسترسی سریع (سفارش‌ها، آدرس‌ها، علاقه‌مندی‌ها، ادامه خرید).
+- `overview-view.tsx`: چیدمان جدید — hero → ۴ استت‌کارت → گرید `xl:[1.7fr_1fr]` (نمودار + دسترسی سریع)
+  → سفارش‌های اخیر. `PageHeading` از این صفحه حذف شد (hero جایش را گرفت).
+- `stat-card.tsx`: لیبل بالا / عدد بزرگ پایین، هاله رنگی محو، آیکن ۴۰px.
+- `purchase-trend-card.tsx`: گریدلاین، هایلایت ماه اوج، ارتفاع حداقل برای ماه‌های صفر،
+  تولتیپ عدد فارسی، و empty state وقتی هیچ خریدی نیست.
+- `recent-orders.tsx`: کارت‌بندی‌شده با `ul/li`، ردیف‌های فشرده‌تر و empty state با CTA خرید.
+- `account-shell.tsx` / `account-sidebar.tsx` / `account-mobile-nav.tsx`: کانتینر `max-w-[1440px]`،
+  سایدبار به کارت شناور sticky با هدر گرادیانی تبدیل شد، پدینگ‌ها یکدست شد.
+
+## 2026-09-24 — آپلود عکس/فایل در فرم درخواست تعمیر
+
+- **فیچر جدید `features/media/`** (سطح عمومی، قابل استفاده برای تیکت‌ها هم):
+  - `types/index.ts`: `mediaViewSchema`، `ACCEPTED_UPLOAD_TYPES` (JPEG/PNG/WebP/PDF)،
+    `MAX_UPLOAD_BYTES` (۱۰MB)، `UPLOAD_ACCEPT_ATTR`، تایپ `Attachment`.
+  - `hooks/use-attachments.ts`: مالک state فایل‌های انتخاب‌شده — اعتبارسنجی نوع/حجم سمت کلاینت،
+    آپلود موازی هر فایل به `/api/media/upload`، وضعیت `uploading|done|error` برای هر آیتم،
+    `revokeObjectURL` روی remove و unmount، خروجی `mediaIds`/`uploading`/`reset`.
+  - `components/attachment-picker.tsx`: drag & drop + دکمه‌ی انتخاب فایل (طبق WCAG 2.2 درگ تنها
+    راه نیست) + پیام خطای rejection.
+  - `components/attachment-tile.tsx`: پیش‌نمایش تصویر (object URL به‌صورت `backgroundImage` چون
+    مقدار runtime است)، آیکن `doc` برای PDF، اسپینر حین آپلود، دکمه‌ی حذف ۴۴px.
+  - `index.ts`: بارل کلاینت‌سِیف.
+- **`app/api/media/upload/route.ts` (جدید)**: BFF برای `POST /storefront/media/upload` —
+  نیازمند session، `multipart/form-data` با فیلد `file`، اعتبارسنجی نوع و حجم قبل از forward،
+  پاسخ `MediaView`.
+- **`lib/api-client.ts`**: `apiClient.postForm(...)` اضافه شد — `FormData` را بدون
+  `Content-Type: application/json` فوروارد می‌کند (boundary حفظ می‌شود).
+- **`features/repairs/`**: `MAX_REPAIR_ATTACHMENTS = 5` و `repairAttachmentSchema` +
+  `attachments[]` در `repairRequestSchema`؛ `use-repair-form.ts` حالا `useAttachments` را مالک است
+  و `mediaIds` را در payload می‌فرستد و تا پایان آپلود submit را می‌بندد؛ `repair-form.tsx`
+  `<AttachmentPicker>` را زیر «شرح مشکل» رندر می‌کند.
+- **`app/api/repairs/route.ts`**: `mediaIds: string[] (≤5)` به Zod payload اضافه شد.
+
+State flow: `RepairForm` → `useRepairForm` → `useAttachments` (مالک لیست فایل‌ها) →
+`AttachmentPicker` (presentational) → `AttachmentTile`.
+
+---
+
+## 2026-09-24 — فرم ثبت دیدگاه روی PDP
+
+- `src/app/api/catalog/products/[slug]/comments/route.ts` (جدید): BFF برای
+  `POST /storefront/catalog/products/{slug}/comments`. session اجباری (۴۰۱)، `safeParse` روی body با
+  `createCommentSchema`، نگاشت خطا: ۴۰۹ «قبلاً دیدگاه ثبت کرده‌اید»، ۴۰۰/۴۰۴ ورودی نامعتبر، بقیه ۵۰۲.
+  در موفقیت `revalidateTag('catalog:comments:<slug>')`.
+- `catalog/services/catalog.schemas.ts`: `createCommentSchema` (rating 1..5، body ۱۰..۱۰۰۰) و
+  `createCommentResultSchema` (`{ status }`). تایپ `CreateCommentInput` در `catalog/types/index.ts`.
+- `catalog/hooks/use-review-form.ts` (جدید): state فرم + `useMutation`؛ روی ۴۰۱
+  `UnauthorizedError` پرتاب می‌شود تا `QueryProvider` مودال ورود را باز کند (بدون ریدایرکت).
+- `product-detail/reviews/rating-input.tsx` (جدید): ۵ رادیوی نیتیو با اسکین ستاره (کیبورد/SR سازگار)
+  + لیبل زنده‌ی متنی.
+- `product-detail/reviews/review-form.tsx` (جدید): عنوان، امتیاز، textarea با شمارنده و خطای inline،
+  دکمه با Spinner، و حالت موفقیت «در انتظار تأیید».
+- `reviews-section.tsx`: prop از `productPath` به `slug` تغییر کرد؛ CTA لینک‌به‌ورود حذف و
+  `<ReviewForm slug>` همیشه پایین لیست/خالی رندر می‌شود. `product-detail-view.tsx` call site به‌روز شد.
+
+---
+
+## 2026-09-24 — جستجوی قطعات یدکی بدون ریلود صفحه
+
+- `features/spare-parts/components/spare-parts-search-form.tsx`: از Server Component به
+  `'use client'` تبدیل شد. `<form action={routes.spareParts}>` برای حالت بدون JS و SEO باقی ماند،
+  ولی `onSubmit` با `preventDefault` + `router.replace(href, { scroll: false })` داخل
+  `useTransition` ناوبری نرم انجام می‌دهد — دیگر full reload رخ نمی‌دهد.
+- دکمه‌ی جستجو در حین transition `aria-busy` می‌گیرد و `Spinner` (اتم موجود) نشان می‌دهد.
+- `features/marketing/components/header-search.tsx`: همان الگو برای سرچ هدر (`/search?q=`) —
+  `'use client'` + `router.push` داخل `useTransition`، آیکن سرچ در حالت pending با `Spinner` عوض می‌شود.
+- بقیه‌ی صفحه (`(public)/spare-parts/page.tsx`، `SparePartsToolbar`) بدون تغییر — چیپ‌ها از قبل
+  `Link` بودند.
+- تأیید عملی با Chrome headless (CDP): بعد از submit، مقدار `window.__marker` باقی می‌ماند و
+  `performance.getEntriesByType('navigation').length === 1` → ناوبری نرم، بدون reload.
+
+---
+
+## 2026-09-24 — داینامیک شدن توضیحات و مشخصات فنی PDP
+
+- `utils/description-html.ts` (جدید، server-only): `toDescriptionHtml()` — توضیح محصول از `abzar/api`
+  اگر HTML بود sanitize می‌شود، اگر متن ساده بود به پاراگراف تبدیل می‌شود؛ خروجی `null` وقتی خالی است.
+- `sections/description-section.tsx`: prop از `text` به `html` تغییر کرد و با
+  `dangerouslySetInnerHTML` روی HTML پاک‌شده رندر می‌شود (دیگر تگ‌ها به‌صورت متن دیده نمی‌شوند).
+  استایل prose در `description-section.module.css`.
+- `utils/pdp-extras.ts`: `mergeSpecs` حذف و `buildSpecs(product)` جایگزین شد — فقط
+  `attributeValues` واقعی API، بدون ردیف‌های mock.
+- `data/pdp-mock.ts` + `services/pdp.schemas.ts` + `types/pdp.ts`: فیلدهای `specs` و `keyFeatures`
+  (و `keyFeatureSchema`/`KeyFeature`) حذف شدند.
+- `product-detail-view.tsx`: prop جدید `descriptionHtml`؛ تب و سکشن «توضیحات» و «مشخصات فنی»
+  فقط وقتی داده دارند رندر/لیست می‌شوند.
+- `products/[slug]/page.tsx`: `buildSpecs` + `toDescriptionHtml` صدا زده و به ویو پاس می‌دهد.
+
+## 2026-09-24 — حذف بلوک ویژگی‌های کلیدی از PDP
+
+- حذف `src/features/catalog/components/product-detail/sections/key-features.tsx`.
+- `product-detail-view.tsx`: رندر `<KeyFeatures />` و import آن از بخش «توضیحات و کاربرد» برداشته شد؛ این بخش حالا فقط `DescriptionSection` دارد.
+- `keyFeatures` در `pdp.schemas.ts` و `pdp-mock.ts` دست‌نخورده ماند (قرارداد API بدون تغییر).
+
+## 2026-09-24 — Content: `/contact` page depth (shortcuts, location, FAQ)
+
+- `data/contact.ts`: `CONTACT_CHANNELS` gains a `note` line per card and swaps the duplicated «ساعات پاسخگویی» card for WhatsApp; `WORK_HOURS` gains the Friday/holiday row; new `CONTACT_SHORTCUTS` (repair request / spare parts / order tracking), `CONTACT_FAQ` (4 Q&As) and `MAP_LINKS` (Neshan + Google Maps search built from `siteConfig.address`).
+- `contact-hero.tsx`: concrete response-time copy + two direct actions (tel: and WhatsApp).
+- New `contact-location-card.tsx`: ink card with address, visit notes and routing links — replaces the grey `MediaPlaceholder` map stand-in.
+- New `contact-shortcuts.tsx`: self-serve deflection list rendered inside `ContactInfoPanel`.
+- New `contact-faq.tsx`: `<details>` accordion (same pattern as `about-page/faq-section.tsx`); page emits `faqSchema(CONTACT_FAQ)` alongside `localBusinessSchema` + breadcrumb.
+- `contact-info-panel.tsx`: location card + hours + shortcuts + a `tel:` consultation prompt (was a static box).
+- Barrel exports `ContactFaq` + `CONTACT_FAQ` (data only, no server module).
+- State flow: unchanged — only `ContactForm` is a client leaf posting to `/api/contact`.
+
+---
+
+## 2026-09-20 — Redesign: `/products` catalog (hero, toolbar, filters, card)
+
+- `catalog-hero.tsx`: light header → ink band (`surface-ink` + `texture-grid`) matching the spare-parts hero; single column with breadcrumb/eyebrow/h1/trust row, then a full-width 3-cell stats `<dl>` strip (hairline via `gap-px` on a `bg-white/10` grid).
+- `catalog-filters.tsx`: deal label shortened to «فقط شگفت‌انگیزها» (was wrapping in the 260px rail), `sale`-tinted checked state; brand options render `uppercase` via the new `FilterRadioList` `itemClassName` prop.
+- New `catalog-toolbar.tsx` (RSC): result count + «نمایش X تا Y» range + `CatalogSort` + `ActiveFilterChips`. Replaces `CatalogSort` as the bar in `catalog-view.tsx`; `CatalogSort` is now the select only and no longer takes `total`.
+- New `active-filter-chips.tsx` (client): removable chips per active filter (category/brand/deal/min/max) + «پاک‌کردن همه», driven by `useCatalogParams`.
+- `catalog-filters.tsx`: added active-filter count badge and a mobile collapse (`useState` + `hidden lg:flex`), so the sidebar no longer pushes the grid off-screen on phones; deal checkbox gets `has-checked:` styling.
+- `product-card.tsx`: deal badge moved to top-start, brand becomes a chip, stock line from `firstVariant.stockQty` (موجود / تنها N عدد / ناموجود), price row separated by a hairline, `h-full` for equal card heights.
+- `product-grid.tsx`: empty state now renders `CatalogEmptyState` (optional `body` override) instead of a one-line `<p>`; reveal stagger capped at 7 steps; `Reveal` wrapper is `h-full`.
+- `catalog-empty-state.tsx`: icon per variant + CTAs to `routes.products` / new `routes.categories`.
+- `config/routes.ts`: added `categories: '/categories'`.
+- State flow: unchanged — filters/sort/page live in the URL via `useCatalogParams`; `CatalogView` re-fetches server-side.
+
+---
+
+## 2026-09-20 — Redesign: `/spare-parts` listing (hero, toolbar, card, empty state)
+
+- New `features/spare-parts/components/`: `spare-parts-hero.tsx` (ink band + breadcrumb + `texture-grid`, wraps search), `spare-parts-search-form.tsx` (GET form: `q` input + `inStock` checkbox chip, no client JS), `spare-parts-toolbar.tsx` (result count + «همه قطعات»/«فقط موجود» chip links preserving `q`), `spare-parts-empty.tsx` (separate copy for empty vs. upstream failure, CTAs to `routes.spareParts` / `routes.contact`).
+- `spare-part-card.tsx` rebuilt: stock/low-stock badge + part-number chip overlaid on media, compatible-tool count, hover lift + image zoom, price pinned to bottom via `mt-auto`.
+- `spare-part-grid.tsx`: gap 4→5, dropped redundant wrapper div (card is now `h-full w-full`).
+- `(public)/spare-parts/page.tsx`: inline `<h1>`/form replaced by `SparePartsHero` + `SparePartsToolbar` + `SparePartGrid`/`SparePartsEmpty`; `result === null` now renders the failure state instead of "قطعه‌ای یافت نشد".
+- Barrel `features/spare-parts/index.ts` re-exports the three new client-safe components.
+- State flow: unchanged — all filtering is URL `searchParams` → RSC fetch; only `AddSparePartButton` is a client leaf.
+
+---
+
 ## 2026-09-20 — Feat: repair request page + header nav (قطعات یدکی / درخواست تعمیر)
 
 - `PRIMARY_NAV` + footer "دسترسی سریع" (`features/marketing/data/navigation.ts`): added «قطعات یدکی» → `routes.spareParts` and «درخواست تعمیر» → `routes.repairRequest`.

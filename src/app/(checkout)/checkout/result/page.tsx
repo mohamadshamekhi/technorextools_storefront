@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { routes } from '@/config/routes';
 import { ordersApi } from '@/features/account/services/orders.api';
-import { CheckoutResultView } from '@/features/checkout';
+import { CheckoutResultMissing, CheckoutResultView } from '@/features/checkout';
 import { buildMetadata } from '@/lib/seo';
 import { getSession } from '@/lib/session';
 
@@ -27,16 +27,23 @@ export default async function CheckoutResultPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const session = await getSession();
-  if (!session) {
-    redirect(`${routes.auth.login}?next=${encodeURIComponent(routes.checkoutResult)}`);
-  }
-
   const parsed = searchParamsSchema.safeParse(await searchParams);
   if (!parsed.success) redirect(routes.dashboard.orders);
+  const { orderNumber } = parsed.data;
 
-  const order = await ordersApi.detail(parsed.data.orderNumber).catch(() => null);
-  if (!order) redirect(routes.dashboard.orders);
+  const session = await getSession();
+  if (!session) {
+    // Keep `orderNumber` on the round trip — without it the user lands back here with nothing
+    // to look up and gets bounced to the orders list.
+    const next = `${routes.checkoutResult}?orderNumber=${encodeURIComponent(orderNumber)}`;
+    redirect(`${routes.auth.login}?next=${encodeURIComponent(next)}`);
+  }
+
+  const order = await ordersApi.detail(orderNumber).catch((error: unknown) => {
+    console.error('[checkout] result lookup failed', error);
+    return null;
+  });
+  if (!order) return <CheckoutResultMissing orderNumber={orderNumber} />;
 
   return <CheckoutResultView order={order} />;
 }

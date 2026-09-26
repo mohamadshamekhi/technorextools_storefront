@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
-import { BrandStrip } from '@/features/catalog/components/brand-strip';
+import { BrandStrip } from '@/features/catalog/components/brand-strip/brand-strip';
+import { BundleRail } from '@/features/catalog/components/bundles/bundle-rail';
 import { CategoryRail } from '@/features/catalog/components/category-rail';
 import { FlashDeals } from '@/features/catalog/components/flash-deals';
 import { ProductShowcase } from '@/features/catalog/components/product-showcase';
@@ -64,6 +65,7 @@ export default async function HomePage() {
       <Suspense fallback={<ProductShowcaseSkeleton />}>
         <ProductShowcase />
       </Suspense>
+      <BundleRail />
       <PromoTicker />
       <ValueProps />
       <AboutSection />

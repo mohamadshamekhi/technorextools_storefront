@@ -4,30 +4,23 @@ import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
-const COLLAPSE_AFTER = 700;
+import styles from './description-section.module.css';
 
-/** Body copy capped at ~72ch with a gradient-faded "read more" for long descriptions. */
-export function DescriptionSection({ text }: { text: string }) {
+const COLLAPSE_AFTER = 900;
+
+/**
+ * Product description from `abzar/api`, sanitized server-side by `toDescriptionHtml`
+ * before it gets here — the only sanctioned `dangerouslySetInnerHTML` path per `security.md`.
+ * Long copy collapses behind a gradient-faded "read more".
+ */
+export function DescriptionSection({ html }: { html: string }) {
   const [open, setOpen] = useState(false);
-  const collapsible = text.length > COLLAPSE_AFTER;
-  const paragraphs = text
-    .split(/\n{2,}/)
-    .map((chunk) => chunk.trim())
-    .filter(Boolean);
+  const collapsible = html.length > COLLAPSE_AFTER;
 
   return (
-    <div className="max-w-[72ch]">
-      <div
-        className={cn(
-          'relative text-[17px] leading-[1.8]',
-          collapsible && !open && 'max-h-72 overflow-hidden',
-        )}
-      >
-        {paragraphs.map((chunk, index) => (
-          <p key={index} className="text-foreground mb-4 whitespace-pre-line">
-            {chunk}
-          </p>
-        ))}
+    <div className="">
+      <div className={cn('relative', collapsible && !open && 'max-h-72 overflow-hidden')}>
+        <div className={styles.prose} dangerouslySetInnerHTML={{ __html: html }} />
         {collapsible && !open ? (
           <div
             aria-hidden

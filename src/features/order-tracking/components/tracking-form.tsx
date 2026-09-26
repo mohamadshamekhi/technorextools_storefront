@@ -2,15 +2,16 @@
 
 import { useState, type FormEvent } from 'react';
 
-import { Button, Icon, Input } from '@/components/atoms';
+import { Button, Icon, Input, Spinner } from '@/components/atoms';
 
 type Props = {
   error: string | null;
+  pending: boolean;
   onSubmit: (values: { code: string; mobile: string }) => void;
 };
 
 /** Two-field guest lookup form. Validation lives in `useOrderTracking`. */
-export function TrackingForm({ error, onSubmit }: Props) {
+export function TrackingForm({ error, pending, onSubmit }: Props) {
   const [code, setCode] = useState('');
   const [mobile, setMobile] = useState('');
 
@@ -25,8 +26,9 @@ export function TrackingForm({ error, onSubmit }: Props) {
         <Input
           value={code}
           onChange={(event) => setCode(event.target.value)}
-          placeholder="کد سفارش (مثال: PA-249672)"
+          placeholder="کد سفارش"
           aria-label="کد سفارش"
+          disabled={pending}
           invalid={Boolean(error)}
         />
         <Input
@@ -35,9 +37,11 @@ export function TrackingForm({ error, onSubmit }: Props) {
           placeholder="شماره موبایل"
           aria-label="شماره موبایل"
           inputMode="numeric"
+          disabled={pending}
           invalid={Boolean(error)}
         />
-        <Button type="submit" size="lg" className="shrink-0">
+        <Button type="submit" size="lg" disabled={pending} className="shrink-0">
+          {pending ? <Spinner className="size-4" /> : null}
           پیگیری
         </Button>
       </div>

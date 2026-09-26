@@ -19,6 +19,8 @@ type AddToCartButtonProps = {
   quantity?: number;
   /** Round icon-only button for dense cards. */
   compact?: boolean;
+  /** Out of stock — renders a dead button instead of letting the line into the cart. */
+  disabled?: boolean;
   className?: string;
 };
 
@@ -31,6 +33,7 @@ export function AddToCartButton({
   variant,
   quantity = 1,
   compact = false,
+  disabled = false,
   className,
 }: AddToCartButtonProps) {
   const addItem = useCartStore((state) => state.addItem);
@@ -43,6 +46,25 @@ export function AddToCartButton({
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };
+
+  if (disabled) {
+    return (
+      <span
+        aria-disabled="true"
+        title="این کالا موجود نیست"
+        className={cn(
+          'bg-surface-sunken text-foreground-muted flex cursor-not-allowed items-center justify-center',
+          compact
+            ? 'size-11 shrink-0 rounded-full'
+            : 'mt-auto w-full gap-2 rounded-xl py-3 text-sm font-bold',
+          className,
+        )}
+      >
+        <Icon name="cart" className={compact ? 'size-5' : 'size-4'} />
+        {compact ? <span className="sr-only">ناموجود</span> : 'ناموجود'}
+      </span>
+    );
+  }
 
   if (compact && lineQuantity > 0) {
     return (

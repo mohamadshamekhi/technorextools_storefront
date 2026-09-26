@@ -8,6 +8,7 @@ export const ACCOUNT_NAV: AccountNavItem[] = [
   { href: routes.dashboard.orders, label: 'سفارش‌های من', icon: 'box' },
   { href: routes.dashboard.addresses, label: 'آدرس‌های من', icon: 'pin' },
   { href: routes.dashboard.profile, label: 'اطلاعات حساب', icon: 'user' },
+  { href: routes.dashboard.repairs, label: 'درخواست‌های تعمیر', icon: 'wrench' },
   { href: routes.dashboard.wishlist, label: 'علاقه‌مندی‌ها', icon: 'heart' },
   { href: routes.dashboard.notifications, label: 'نوتیفیکیشن‌ها', icon: 'bell' },
 ];

@@ -1,24 +1,14 @@
 import { Icon } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 
-import type { TimelineStep, TrackingStatus } from '../types';
+import type { TimelineStep } from '../types';
 
-const STATUS_ORDER: TrackingStatus[] = ['processing', 'packed', 'shipped', 'delivered'];
-
-/** Vertical fulfilment rail — steps up to and including `current` render as done. */
-export function TrackingTimeline({
-  steps,
-  current,
-}: {
-  steps: TimelineStep[];
-  current: TrackingStatus;
-}) {
-  const currentIndex = STATUS_ORDER.indexOf(current);
-
+/** Vertical fulfilment rail — a step counts as done once `abzar/api` stamps its date. */
+export function TrackingTimeline({ steps }: { steps: TimelineStep[] }) {
   return (
     <ol className="flex flex-col">
       {steps.map((step, index) => {
-        const done = index <= currentIndex;
+        const done = step.date !== null;
         const isLast = index === steps.length - 1;
 
         return (

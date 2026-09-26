@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { ORDER_ITEM_KINDS } from '@/lib/order-items';
+
 /**
  * Zod mirrors of `abzar/api`'s `/storefront/orders` views.
  * Source: `../api/src/modules/storefront/orders/storefront-orders.service.ts` +
@@ -57,6 +59,12 @@ export const orderDetailSchema = orderListItemSchema.extend({
     z.object({
       productTitle: z.string(),
       sku: z.string().nullable(),
+      /** Live from the catalog (unlike `productTitle`/`sku`, which are purchase-time snapshots).
+       * Always `null` for bundles — `abzar/api` has no bundle-owned media yet. */
+      imageUrl: z.string().nullable().default(null),
+      /** `null` when the catalog record was deleted — check before linking. */
+      productSlug: z.string().nullable().default(null),
+      kind: z.enum(ORDER_ITEM_KINDS).default('variant'),
       qty: z.number(),
       unitPrice: z.number(),
       lineTotal: z.number(),

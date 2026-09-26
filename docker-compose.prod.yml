@@ -1,0 +1,29 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SITE_NAME: ${NEXT_PUBLIC_SITE_NAME}
+        API_BASE_URL: ${API_BASE_URL}
+        SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME}
+        DOCUMENT_SIGNING_SECRET: ${DOCUMENT_SIGNING_SECRET}
+    image: abzar-storefront:latest
+    container_name: abzar-storefront
+    restart: unless-stopped
+    env_file: .env.production
+    # Host-only bind: nginx on the host terminates TLS and proxies here.
+    ports:
+      - '127.0.0.1:3000:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:3000/api/health']
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'

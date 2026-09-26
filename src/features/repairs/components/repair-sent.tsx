@@ -16,11 +16,11 @@ export function RepairSent() {
         کنید.
       </p>
       <Link
-        href={routes.dashboard.root}
+        href={routes.dashboard.repairs}
         className="text-brand-700 bg-brand-50 ring-brand-100 mt-5 inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm font-bold ring-1"
       >
-        <Icon name="user" className="size-4" />
-        رفتن به حساب کاربری
+        <Icon name="wrench" className="size-4" />
+        پیگیری وضعیت درخواست
       </Link>
     </div>
   );
