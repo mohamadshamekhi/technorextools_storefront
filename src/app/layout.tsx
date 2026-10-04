@@ -23,7 +23,11 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
-export const metadata: Metadata = buildMetadata();
+export const metadata: Metadata = {
+  ...buildMetadata(),
+  // Site-wide ownership tokens rendered as <meta name="…"> by Next.
+  other: { enamad: '33398049' },
+};
 
 export const viewport: Viewport = {
   themeColor: siteConfig.themeColor,

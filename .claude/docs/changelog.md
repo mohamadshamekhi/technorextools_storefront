@@ -5,6 +5,16 @@
 
 ---
 
+## 2026-10-04 — متای enamad
+
+**تغییر:**
+- `src/app/layout.tsx:26` — خروجی `buildMetadata()` با `other: { enamad: '33398049' }`
+  spread می‌شود تا Next تگ `<meta name="enamad" content="33398049">` را در `<head>`
+  همه‌ی صفحات رندر کند. دستی داخل JSX اضافه نشد (قرارداد seo.md: متادیتا فقط از طریق
+  Metadata API).
+
+---
+
 ## 2026-09-26 — زیرساخت deploy پروداکشن (Docker + nginx هاست)
 
 **افزوده:**
@@ -18,7 +28,7 @@
 - `docker-compose.prod.yml` — تنها سرویس `web`، `restart: unless-stopped`،
   `env_file: .env.production`، `ports: ['127.0.0.1:3000:3000']` (loopback؛ ufw فقط
   22/80/443)، healthcheck و rotation لاگ.
-- `.env.production.example` — `API_BASE_URL=https://api.technorextools.com/api/v1`،
+- `deploy/env.production.example` — `API_BASE_URL=https://api.technorextools.com/api/v1`،
   `API_SERVICE_TOKEN` (هدر `X-Service-Token`، باید با بکند یکی باشد)، `NODE_ENV`, `PORT`.
 - `deploy/deploy.sh` — الگوی abzar-api: git pull → build → up -d → poll
   `http://127.0.0.1:3000/api/health` تا `HEALTH_TIMEOUT` (پیش‌فرض 120s)، در صورت شکست
@@ -26,14 +36,14 @@
 - `deploy/setup-server.sh` — یک‌بارمصرف/idempotent: preflight DNS (مقایسه A record دو
   دامنه با IP سرور)، نصب certbot، نصب vhost، `certbot --nginx -d technorextools.com
   -d www.technorextools.com --redirect`. به ufw دست نمی‌زند.
-- `deploy/nginx/storefront.conf` — vhost هاست (بیرون docker) برای
-  `technorextools.com` + `www`، proxy به `127.0.0.1:3000`، هدرهای
-  `X-Forwarded-*`، upgrade برای websocket، cache روی `/_next/static/`،
-  مسیر acme-challenge. عمداً فقط پورت 80 است تا certbot خودش بلاک 443 و ریدایرکت را
-  تزریق کند.
-- `deploy/nginx/map-upgrade.conf` — `map $http_upgrade $connection_upgrade`
-  (اگر هاست از قبل ندارد).
-- `deploy/README.md` — رویه‌ی نصب اول، آپدیت، چک‌ها، یادآوری CORS بکند.
+- `deploy/nginx/abzar-storefront.conf` — vhost هاست (بیرون docker) برای
+  `technorextools.com` + `www`، proxy به `127.0.0.1:3000`. هم‌شکل با vhost موجودِ
+  `abzar-api`: بدون بلاک `upstream`، `proxy_set_header Connection ""`، لاگ اختصاصی،
+  `client_max_body_size 55m`، timeout 120s. به‌علاوه cache روی `/_next/static/`،
+  `location = /api/health` بدون access_log و مسیر acme-challenge. عمداً فقط پورت 80
+  است تا certbot خودش بلاک 443 و ریدایرکت را تزریق کند.
+- `deploy/README.md` — رویه‌ی نصب اول، آپدیت، چک‌ها، یادآوری CORS بکند. مسیر سرور:
+  `/root/projects/storefront` کنار `/root/projects/api`، اجرا با root.
 
 **تغییر:**
 - `next.config.mjs` — `output: 'standalone'` (لازمه‌ی ایمیج runner سبک) و افزودن
