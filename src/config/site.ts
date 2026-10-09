@@ -28,6 +28,10 @@ export const siteConfig = {
     telegram: 'https://t.me/technorextools',
     whatsapp: 'https://wa.me/989121771587',
   },
+  enamad: {
+    id: '8041899',
+    code: 'rHXXizBjFrxOu6r4QDN0EdlfgD0hYOS2',
+  },
 } as const;
 
 export type SiteConfig = typeof siteConfig;

@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-10-09 — نماد اعتماد الکترونیکی در فوتر
+
+**افزوده:**
+- `src/config/site.ts` — `siteConfig.enamad = { id, code }` (id: `8041899`).
+- `src/features/marketing/components/footer/footer-enamad-badge.tsx` — کامپوننت جدید؛
+  لینک رسمی `trustseal.enamad.ir` + `next/image` با `unoptimized` (لوگوی داینامیک enamad
+  باید دقیقاً همان‌طور که سرویس می‌دهد رندر شود، بدون پردازش Next).
+- `store-footer.tsx` — بج زیر `FooterSocialLinks` در ستون برند اضافه شد.
+- `next.config.mjs` — `images.remotePatterns` برای `trustseal.enamad.ir` اضافه شد.
+
+---
+
 ## 2026-10-04 — متای enamad
 
 **تغییر:**

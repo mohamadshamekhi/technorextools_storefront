@@ -5,6 +5,7 @@ import { siteConfig } from '@/config/site';
 import { SECTION } from '../../anchors';
 import { FOOTER_COLUMNS } from '../../data/navigation';
 import { FooterContact } from './footer-contact';
+import { FooterEnamadBadge } from './footer-enamad-badge';
 import { FooterNavColumn } from './footer-nav-column';
 import { FooterSocialLinks } from './footer-social-links';
 import { FooterTrustBar } from './footer-trust-bar';
@@ -29,6 +30,9 @@ export function StoreFooter() {
               پشتیبانی فنی.
             </p>
             <FooterSocialLinks />
+            <div className="mt-5">
+              <FooterEnamadBadge />
+            </div>
           </div>
           {FOOTER_COLUMNS.map((column) => (
             <FooterNavColumn key={column.title} column={column} />

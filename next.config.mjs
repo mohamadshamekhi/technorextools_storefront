@@ -15,6 +15,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'api.technorextools.com' },
       { protocol: 'https', hostname: 'technorextools.com' },
       { protocol: 'https', hostname: 'www.technorextools.com' },
+      { protocol: 'https', hostname: 'trustseal.enamad.ir' },
     ],
   },
   async headers() {
