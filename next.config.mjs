@@ -9,6 +9,14 @@ const nextConfig = {
     cpus: 1,
     workerThreads: false,
   },
+  // Disable persistent webpack filesystem cache in production builds — under memory
+  // pressure (Docker, low-RAM hosts) its pack-file serialization can corrupt mid-build,
+  // producing "Could not find the module ... in the React Client Manifest" on a random
+  // page's static export. Trades a bit of build speed for a deterministic build.
+  webpack: (config, { dev }) => {
+    if (!dev) config.cache = false;
+    return config;
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
