@@ -9,8 +9,10 @@ const nextConfig = {
   // ~2GB production host, where the extra pass was a contributing factor to OOM kills.
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  // optimizePackageImports disabled entirely: the only active experimental flag, and the
+  // prime suspect for the deterministic "Could not find the module ... mobile-tab-bar.tsx
+  // #MobileTabBar in the React Client Manifest" failure on /categories/[slug] builds.
   experimental: {
-    optimizePackageImports: ['@tanstack/react-query', '@react-three/drei'],
     cpus: 1,
     workerThreads: false,
   },
