@@ -5,7 +5,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   experimental: {
-    optimizePackageImports: ['@tanstack/react-query', 'zustand', '@react-three/drei'],
+    optimizePackageImports: ['@tanstack/react-query', '@react-three/drei'],
     cpus: 1,
     workerThreads: false,
   },
