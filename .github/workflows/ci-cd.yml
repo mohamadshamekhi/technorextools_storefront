@@ -37,7 +37,7 @@ jobs:
     needs: ci
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
-    environment: production
+    environment: Technorex
     steps:
       - name: SSH deploy
         uses: appleboy/ssh-action@v1.2.0
