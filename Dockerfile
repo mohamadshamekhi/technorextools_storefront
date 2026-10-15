@@ -28,7 +28,15 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     NODE_ENV=production \
     NODE_OPTIONS=--max-old-space-size=1280
 
-RUN pnpm build
+# Next.js has a known, unresolved intermittent bug ("Could not find the module ... in the
+# React Client Manifest") that fails a random page's static export — more likely under memory
+# pressure on this 1-core/~2GB host. Retry the whole build a few times before giving up.
+RUN for i in 1 2 3; do \
+      pnpm build && break; \
+      echo "build attempt $i failed, retrying..." >&2; \
+      rm -rf .next; \
+      [ "$i" = 3 ] && exit 1; \
+    done
 
 # ---- runner -------------------------------------------------------------
 FROM node:20-alpine AS runner
