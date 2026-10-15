@@ -4,6 +4,11 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // typecheck + lint already gate the deploy in CI (.github/workflows/ci-cd.yml) before this
+  // image ever builds — skipping Next's own pass here saves real memory/time on the 1-core,
+  // ~2GB production host, where the extra pass was a contributing factor to OOM kills.
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   experimental: {
     optimizePackageImports: ['@tanstack/react-query', '@react-three/drei'],
     cpus: 1,
