@@ -1,9 +1,12 @@
 import { MiniCartDrawer } from '@/components/organisms';
-import { StoreFooter, StoreHeader } from '@/features/marketing';
+import { getCategoryTree } from '@/features/catalog/services/catalog.api';
+import { MobileTabBar, StoreFooter, StoreHeader } from '@/features/marketing';
 import type { WithChildren } from '@/types';
 
 /** Public storefront shell. Rendered as RSC for maximum SEO + minimal JS. */
-export default function PublicLayout({ children }: WithChildren) {
+export default async function PublicLayout({ children }: WithChildren) {
+  const categories = await getCategoryTree().catch(() => []);
+
   return (
     <div className="flex min-h-dvh flex-col">
       <a
@@ -13,11 +16,12 @@ export default function PublicLayout({ children }: WithChildren) {
         رفتن به محتوای اصلی
       </a>
       <StoreHeader />
-      <main id="main" className="flex-1">
+      <main id="main" className="flex-1 pb-20 sm:pb-0">
         {children}
       </main>
       <StoreFooter />
       <MiniCartDrawer />
+      <MobileTabBar categories={categories} />
     </div>
   );
 }

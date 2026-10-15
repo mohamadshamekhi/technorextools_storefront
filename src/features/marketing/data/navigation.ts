@@ -7,7 +7,6 @@ export const PRIMARY_NAV: NavItem[] = [
   { label: 'همه محصولات', href: routes.products },
   { label: 'قطعات یدکی', href: routes.spareParts },
   { label: 'درخواست تعمیر', href: routes.repairRequest },
-  { label: 'دسته‌بندی‌ها', href: anchor('categories') },
   { label: 'پیشنهاد شگفت‌انگیز', href: anchor('deals') },
   { label: 'مجله تکنورکس', href: routes.blog },
   { label: 'درباره ما', href: routes.about },

@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import { Icon } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 
@@ -7,6 +9,8 @@ type HeroFloatingCardProps = {
   accent: string;
   badgeSide: 'start' | 'end';
   className?: string;
+  /** Entrance stagger offset in ms — runtime-computed per slot index. */
+  delayMs?: number;
 };
 
 /** Premium spec chip that hovers over the hero art, badge-pinned to the leading or trailing corner. */
@@ -16,13 +20,16 @@ export function HeroFloatingCard({
   accent,
   badgeSide,
   className,
+  delayMs,
 }: HeroFloatingCardProps) {
   return (
     <div
       className={cn(
-        'bg-surface/90 ring-hairline absolute flex flex-col gap-0.5 rounded-2xl px-4 py-2.5 shadow-(--shadow-float) ring-1 backdrop-blur-md',
+        'bg-surface/90 ring-hairline absolute hidden flex-col gap-0.5 rounded-2xl px-4 py-2.5 shadow-(--shadow-float) ring-1 backdrop-blur-md sm:flex',
         className,
       )}
+      // Genuinely runtime-computed stagger (slot index) — same sanctioned case as Reveal's delayMs.
+      style={delayMs ? ({ '--card-delay': `${delayMs}ms` } as CSSProperties) : undefined}
     >
       <span
         className={cn(

@@ -23,29 +23,48 @@ export function Hero({ featuredProduct }: HeroProps) {
       <span className={styles.blobWarm} aria-hidden />
       <span className={styles.blobCool} aria-hidden />
       <Container className="relative grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-        <Reveal className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <span id="hero-heading" className="sr-only">
             تکنورکس؛ فروش ابزار بادی و شارژی صنعتی
           </span>
-          <HeroBadge />
-          <HeroHeadline />
-          <p className="text-foreground-muted max-w-xl text-[17px] leading-relaxed">
+          <Reveal delayMs={0}>
+            <HeroBadge />
+          </Reveal>
+          <Reveal delayMs={90}>
+            <HeroHeadline />
+          </Reveal>
+          <Reveal
+            as="p"
+            delayMs={180}
+            className="text-foreground-muted max-w-xl text-[17px] leading-relaxed"
+          >
             پیچ‌گوشتی، دریل، بکس و چکش بادی و شارژی — گارانتی اصالت، قطعات یدکی همیشه موجود و
             مشاورهٔ فنی رایگان پیش از خرید.
-          </p>
-          <div className="flex flex-wrap gap-3.5">
-            <PillLink href={routes.products} size="lg">
-              <Icon name="cart" className="size-[18px]" />
+          </Reveal>
+          <Reveal delayMs={270} className="flex gap-2.5 sm:gap-3.5">
+            <PillLink
+              href={routes.products}
+              size="lg"
+              className="flex-1 gap-1.5 px-4 py-3 text-[13px] sm:flex-initial sm:gap-2.5 sm:px-8 sm:py-4 sm:text-base"
+            >
+              <Icon name="cart" className="size-4 sm:size-[18px]" />
               مشاهدهٔ محصولات
             </PillLink>
-            <PillLink href={routes.contact} size="lg" variant="outline">
-              <Icon name="headset" className="text-brand-600 size-[18px]" />
+            <PillLink
+              href={routes.contact}
+              size="lg"
+              variant="outline"
+              className="flex-1 gap-1.5 px-4 py-3 text-[13px] sm:flex-initial sm:gap-2.5 sm:px-8 sm:py-4 sm:text-base"
+            >
+              <Icon name="headset" className="text-brand-600 size-4 sm:size-[18px]" />
               مشاورهٔ رایگان خرید
             </PillLink>
-          </div>
-          <HeroStats />
-        </Reveal>
-        <Reveal>
+          </Reveal>
+          <Reveal delayMs={360}>
+            <HeroStats />
+          </Reveal>
+        </div>
+        <Reveal delayMs={150}>
           <HeroShowcase product={featuredProduct} />
         </Reveal>
       </Container>

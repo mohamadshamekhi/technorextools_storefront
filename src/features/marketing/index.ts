@@ -3,6 +3,7 @@
  * Catalog & journal now live in `@/features/catalog` and `@/features/content`.
  */
 export { StoreHeader } from './components/store-header';
+export { MobileTabBar } from './components/mobile-tab-bar';
 export { StoreFooter } from './components/footer/store-footer';
 
 export { Hero } from './components/hero/hero';

@@ -1,0 +1,28 @@
+@keyframes drawer-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Panel is anchored at the inline-start edge (right, in this app's fixed RTL)
+   via `start-0`; sliding in from `translateX(100%)` pushes it fully off that
+   same edge before animating to position. */
+@keyframes drawer-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.backdrop {
+  animation: drawer-backdrop-in 0.25s ease-out both;
+}
+
+.panel {
+  animation: drawer-panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

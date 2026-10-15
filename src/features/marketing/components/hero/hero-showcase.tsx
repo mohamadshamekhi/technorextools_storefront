@@ -67,7 +67,7 @@ export function HeroShowcase({ product }: HeroShowcaseProps) {
         src={mainImage?.url}
         priority
         sizes="(max-width: 1024px) 90vw, 45vw"
-        className="ring-hairline aspect-square rounded-4xl shadow-(--shadow-float) ring-1"
+        className={`ring-hairline aspect-square rounded-4xl shadow-(--shadow-float) ring-1 ${styles.artIn}`}
       />
       {specs.map((spec, i) => {
         const slot = SLOTS[i % SLOTS.length];
@@ -80,6 +80,7 @@ export function HeroShowcase({ product }: HeroShowcaseProps) {
             accent={slot.accent}
             badgeSide={slot.badgeSide}
             className={`${slot.anim} ${slot.pos}`}
+            delayMs={550 + i * 150}
           />
         );
       })}

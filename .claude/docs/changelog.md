@@ -5,6 +5,235 @@
 
 ---
 
+## 2026-10-15 — کارت‌های آمار هیرو: آیکون روی موبایل بالای متن
+
+**تغییریافته:**
+- `src/features/marketing/components/hero/hero-stats.tsx` — کانتینر هر
+  کارت روی موبایل `flex-col items-center text-center`؛ از `sm` به بالا
+  `flex-row` قبلی (آیکون کنار متن) برمی‌گردد.
+
+## 2026-10-15 — هیرو موبایل: دو دکمه کنار هم + کارت‌های آمار بدون کلیپ
+
+**تغییریافته:**
+- `src/features/marketing/components/hero/hero.tsx` — دو `PillLink` CTA
+  روی موبایل `flex-1` (نصف-نصف کنار هم، بدون wrap) با پدینگ/فونت کوچک‌تر
+  (`px-4 py-3 text-[13px]`)؛ از `sm` به بالا دوباره اندازهٔ کامل `lg`
+  (`sm:flex-initial sm:px-8 sm:py-4 sm:text-base`).
+- `src/features/marketing/components/hero/hero-stats.tsx` — علت کلیپ‌شدن
+  لیبل («سال ت...»): `truncate` روی متن تنگ سه‌ستونه. `truncate` حذف شد
+  (لیبل حالا دو خط می‌شکند، نه بریده)؛ آیکون/پدینگ/فونت روی موبایل
+  کوچک‌تر شدند تا فضای بیشتری به متن برسد، از `sm` اندازهٔ قبلی برمی‌گردد.
+
+## 2026-10-15 — ریورت: ترتیب قبلی هیرو برگشت
+
+تغییر قبلی (تصویر بعد از هدلاین با grid-template-areas) طبق خواست کاربر
+کامل ریورت شد — `hero.tsx` و `hero.module.css` به حالت قبل از آن تغییر
+برگشتند (متن کامل اول، تصویر در DOM/ترتیب بصری بعد از آمار، دوباره فقط
+`lg:grid-cols-[1.05fr_0.95fr]` ساده بدون named areas).
+
+## 2026-10-15 — هیرو موبایل: تصویر محصول بعد از هدلاین، نه ته صفحه
+
+فیدبک: «حس بصری ضعیفه/خسته‌کننده» — چون در استک موبایل قبلی، ترتیب DOM
+(badge+headline+پاراگراف+CTA+آمار، بعد تصویر) یعنی کاربر موبایل قبل از
+دیدن تصویر محصول باید از کل متن رد می‌شد.
+
+**تغییریافته:**
+- `src/features/marketing/components/hero/hero.module.css` — `.layout`
+  با `grid-template-areas` (موبایل: `head`→`media`→`body` عمودی؛ از
+  `lg` به بالا: دو ستونه با `media` کشیده روی هر دو ردیف — همون چیدمان
+  قبلی دسکتاپ).
+- `src/features/marketing/components/hero/hero.tsx` — سه بلاک
+  (`head`=بج+هدلاین، `media`=`HeroShowcase`، `body`=پاراگراف+CTAها+آمار)
+  به‌عنوان آیتم‌های جدا به grid areas وصل شدند؛ ترتیب DOM همونه، فقط
+  `order` بصری عوض شد.
+
+## 2026-10-15 — ریدیزاین کارت محصول (مینیمال)
+
+نسخهٔ پرکنتراست (نوار تیرهٔ قیمت/CTA + گرادیان‌ها) فیدبک «زشت و دهاتی،
+مینیمال باشه جذاب باشه» گرفت. جایگزین شد با نسخهٔ سوم: کارت تخت سفید،
+بج‌های outline ظریف (بدون گرادیان)، دکمهٔ سبد فلت (بدون گرادیان/shadow)،
+فاصله‌گذاری سبک‌تر — مطابق راهنمای Minimalism & Swiss Style (بدون سایهٔ
+غیرضروری، یک رنگ accent، تایپوگرافی تمیز).
+
+**تغییریافته:**
+- `src/features/catalog/components/product-card.tsx` — کارت به حالت
+  تخت p-3 برگشت؛ بج «شگفت‌انگیز» outline (`ring-sale/25` + متن `text-sale`
+  به‌جای fill گرادیان)؛ ردیف برند/موجودی با `·` جداکننده به‌جای چیپ پررنگ؛
+  قیمت ساده مشکی (`text-lg font-extrabold`)؛ دکمهٔ سبد compact با
+  `shadow-none` (فلت). بدون داده‌ی جدید — schema کارت فیلد تخفیف ندارد.
+
+## 2026-10-15 — ریدیزاین کارت محصول (پرکنتراست‌تر)
+
+نسخهٔ اول (edge-to-edge + حلقهٔ ظریف) فیدبک «اصلا خوب نشده» گرفت؛ نسخهٔ دوم
+عمداً پرکنتراست‌تر و جسورانه‌تر، بر پایهٔ سیستم طراحی مستند شده در
+`globals.css` («Drama comes from dark-colored sections … built on the
+ink token»).
+
+**تغییریافته:**
+- `src/features/catalog/components/product-card.tsx` —
+  - نوار پایینی تیره (`surface-ink` + `texture-grid`، همون utility
+    نوار اعلانات) حامل قیمت سفید بزرگ (`23px`) + دکمهٔ کامل
+    «افزودن به سبد خرید» با گرادیان کهربایی (`--gradient-spark`).
+  - بج «شگفت‌انگیز» با گرادیان کهربایی و سایهٔ accent به‌جای رنگ تخت.
+  - چیپ برند روی `bg-ink` سفید-روی-تیره به‌جای چیپ خاکستری کم‌کنتراست.
+  - پس‌زمینهٔ ناحیهٔ تصویر `bg-brand-50` (به‌جای خاکستری خنثی).
+  - حلقهٔ کارت ضخیم‌تر (`ring-2`) و روی hover `ring-brand-400` +
+    `shadow-(--shadow-brand)` به‌جای سایهٔ نرم خنثی.
+
+## 2026-10-15 — انیمیشن باز شدن دراور منو
+
+**افزوده:**
+- `src/features/marketing/components/mobile-menu.module.css` —
+  `drawer-backdrop-in` (fade) و `drawer-panel-in` (`translateX(100%)→0`،
+  چون پنل با `start-0` روی لبهٔ راست RTL انکر شده).
+
+**تغییریافته:**
+- `src/features/marketing/components/mobile-menu.tsx` — بک‌دراپ و پنل
+  دراور این دو کلاس انیمیشن را گرفتند.
+
+## 2026-10-15 — همبرگر منو به تب‌بار پایین + سرچ تک‌ردیفه کنار لوگو
+
+**تغییریافته:**
+- `src/features/marketing/components/mobile-menu.tsx` — `MobileMenu`
+  (با دکمهٔ تریگر داخلی) جایگزین شد با `MobileMenuDrawer({ onClose })`:
+  کامپوننت کنترل‌شده بدون دکمهٔ خودش، با همان الگوی mount/unmount شرطی
+  `CategoryBottomSheet`.
+- `src/features/marketing/components/mobile-tab-bar.tsx` — تب پنجم جدید
+  «منو» (آیکون `menu`) جایگزین تب «جست‌وجو» شد و `MobileMenuDrawer` را
+  باز می‌کند؛ ترتیب نهایی: خانه / دسته‌بندی(شیت) / سبد / منو(دراور) /
+  حساب من.
+- `src/features/marketing/components/store-header.tsx` — ردیف دوم موبایل
+  (سرچ جدا) و دکمهٔ همبرگر حذف شدند؛ `HeaderSearch` حالا همیشه در همان
+  ردیف هدر، بلافاصله کنار لوگو (`flex max-w-lg flex-1`)، در همهٔ سایزها.
+
+## 2026-10-15 — سرچ در هدر موبایل + دکمهٔ مگامنو به باتم‌شیت
+
+**افزوده:**
+- `src/features/marketing/components/category-bottom-sheet.tsx` —
+  باتم‌شیت موبایل (`createPortal` به `document.body`)، دسته‌بندی‌های
+  سطح‌اول با آیکون از `topLevelCategories` + `CategoryMegaMenuColumn`
+  موجود، تپ روی هر آیتم مستقیم ناوبری می‌کند (بدون drill-down تو خود شیت).
+
+**تغییریافته:**
+- `src/features/marketing/components/category-mega-menu-column.tsx` —
+  `className` اختیاری اضافه شد تا عرض ثابت دسکتاپی (`w-80`) در باتم‌شیت
+  موبایل (`w-full`) قابل override باشد.
+- `src/features/marketing/components/mobile-tab-bar.tsx` — تب
+  «دسته‌بندی» از `Link` به دکمهٔ بازکنندهٔ `CategoryBottomSheet` تغییر
+  کرد؛ prop جدید `categories: CategoryNode[]`.
+- `src/app/(public)/layout.tsx` — `getCategoryTree()` همین‌جا هم فراخوانی
+  و به `MobileTabBar` پاس داده می‌شود (RSC؛ کش fetch با `PrimaryNav`
+  مشترک است، درخواست دوبرابر واقعی ندارد).
+- `src/features/marketing/components/store-header.tsx` — ردیف جست‌وجوی
+  همیشه-نمایان موبایل (`md:hidden`) برگشت به زیر هدر.
+- `src/features/marketing/components/mobile-menu.tsx` — `HeaderSearch`
+  از دراور حذف شد (دیگر در هدر همیشه در دسترس است)؛ «دسته‌بندی‌ها» در
+  دراور همچنان لینک ساده به `/categories` است (باتم‌شیت جایگزینش نشده،
+  مکمل آن است).
+
+## 2026-10-15 — فیکس: دراور موبایل زیر backdrop-blur هدر جمع می‌شد
+
+**علت:** `backdrop-filter` روی ظرف هدر Containing Block برای فرزند
+`position: fixed` می‌سازد (دقیقاً همان دلیلی که `CategoryMegaMenu` را قبلاً
+`createPortal` کرده بود)؛ در نتیجه `fixed inset-0` دراور به‌جای viewport،
+نسبت به همان دیو ~۶۰px هدر محاسبه می‌شد و دراور جمع می‌شد.
+
+**تغییریافته:**
+- `src/features/marketing/components/mobile-menu.tsx` — `Drawer` با
+  `createPortal(..., document.body)` رندر می‌شود.
+
+## 2026-10-15 — سرچ و ناوبری ثانویه موبایل داخل منوی همبرگری
+
+**افزوده:**
+- `src/features/marketing/components/mobile-menu.tsx` — دکمه همبرگر
+  (`sm:hidden`) + دراور کشویی از سمت start؛ داخلش `HeaderSearch`، لینک
+  «دسته‌بندی‌ها»، آیتم‌های `PRIMARY_NAV`، «پیگیری سفارش» و «حساب کاربری».
+  بسته‌شدن با Escape و با تغییر مسیر (`usePathname`).
+- آیکون `home` در `icon-paths.tools.tsx` (برای تب‌بار پایین).
+
+**تغییریافته:**
+- `src/features/marketing/components/store-header.tsx` — ردیف جست‌وجوی
+  مستقل زیر هدر و `PrimaryNav` (ردیف چیپ دسته‌بندی) روی موبایل حذف شدند؛
+  `PrimaryNav` فقط از `sm` به بالا نمایش داده می‌شود، محتوای معادلش داخل
+  `MobileMenu` است.
+
+## 2026-10-15 — ریسپانسیو هیرو + هدر/ناوبری موبایل شبیه اپ
+
+**افزوده:**
+- `src/features/marketing/components/mobile-tab-bar.tsx` — تب‌بار پایین ثابت،
+  فقط موبایل (`sm:hidden`)، ۵ آیتم (خانه/دسته‌بندی/دکمه سبد برجسته با
+  badge تعداد/جست‌وجو/حساب من)، `usePathname` برای active state،
+  `env(safe-area-inset-bottom)`. در بارل `features/marketing/index.ts` export شد.
+- آیکون‌های `home` و `grid` در `src/components/atoms/icons/icon-paths.tools.tsx`.
+
+**تغییریافته:**
+- `src/app/(public)/layout.tsx` — `<MobileTabBar />` اضافه شد؛ `<main>`
+  روی موبایل `pb-20` گرفت تا تب‌بار محتوا را نپوشاند.
+- `src/features/marketing/components/store-header.tsx` — `AnnouncementBar` و
+  `HeaderActions` فقط از `sm` به بالا نمایش داده می‌شوند (حذف شلوغی نوار بالا
+  در موبایل)، پدینگ هدر روی موبایل جمع‌تر شد.
+- `src/features/marketing/components/hero/hero-floating-card.tsx` — کارت‌های
+  شناور دکوراتیو هیرو زیر `sm` با هم تداخل/هم‌پوشانی داشتند (فاصله لبه فقط
+  ۰.۵rem)؛ با `hidden sm:flex` فقط از تبلت به بالا نمایش داده می‌شوند.
+
+## 2026-10-15 — مگامنوی سه‌سطحی دسته‌بندی در هدر
+
+**افزوده:**
+- `src/features/marketing/hooks/use-category-menu.ts` — هوک کلاینت state
+  باز/بسته + دو سطح hover (`l1`/`l2`) + بستن با Escape/کلیک بیرون.
+- `src/features/marketing/components/category-mega-menu-column.tsx` — یک
+  ستون flyout (هدر + دکمه بازگشت اختیاری، لیست آیتم با آیکون/تصویر، لینک
+  «مشاهده همه»).
+- `src/features/marketing/components/category-mega-menu.tsx` — دکمه trigger
+  (`bg-accent-500`) + پنل کشویی ۳ ستونه (سطح۱ → فرزندان → نوه‌ها)، کلاینت لیف.
+- `src/components/atoms/icons/icon-paths.tools.tsx` — آیکون `chevron` جدید
+  (برای فلش بازگشت و نشانگر زیرمنو، با `rotate-180` در دو جهت استفاده می‌شود).
+
+**تغییر:**
+- `primary-nav.tsx` از Server Component معمولی به `async` تبدیل شد؛ درخت
+  دسته‌بندی را با `getCategoryTree()` (مسیر مستقیم، نه بارل) می‌خواند و
+  `CategoryMegaMenu` را به‌عنوان اولین آیتم ردیف ناوبری رندر می‌کند.
+- `data/navigation.ts` — آیتم ایستای «دسته‌بندی‌ها» (لینک anchor مرده به
+  `#categories`، چون هیچ عنصری آن id را نداشت) از `PRIMARY_NAV` حذف شد؛
+  جایگزین آن مگامنوی تعاملی بالاست.
+
+**State flow:** `PrimaryNav` (RSC) درخت را فچ می‌کند → `CategoryMegaMenu`
+(کلاینت) مالک state باز/بسته و دو سطح فعال است → `CategoryMegaMenuColumn`ها
+state را فقط از طریق props/callback می‌خوانند و تغییر می‌دهند، بدون state
+داخلی خودشان.
+
+**اصلاح (همان روز):**
+- باز شدن با hover هم اضافه شد (قبلاً فقط کلیک)، با تاخیر ۱۵۰ms روی بسته
+  شدن تا جابه‌جایی موس از دکمه به پنل آن را نبندد — در
+  `use-category-menu.ts` (`openOnHover`/`closeOnHoverOut`).
+- پنل با `createPortal` به `document.body` منتقل شد و با `position: fixed`
+  + مختصات واقعی viewport (`use-panel-position.ts`) پوزیشن می‌گیرد؛ قبلاً
+  به‌خاطر `overflow-x-auto` ردیف ناوبری و containing-block ناشی از
+  `backdrop-filter` هدر، داخل خود هدر کلیپ/خراب می‌شد.
+- سایز ستون‌ها بزرگ‌تر شد (`w-80`، تامبنیل ۴۸px، ردیف‌های پرپدینگ‌تر) تا با
+  مرجع بصری کاربر مطابقت کند.
+- `CategoryMegaMenuColumn` پراپ `headerNode` گرفت: در ستون سطح۲ یک چیپ
+  تصویر/آیکون کوچک کنار عنوان هدر نشان می‌دهد (مطابق رفرنس کاربر). خطوط
+  جداکننده نازک بین ردیف‌ها (`divide-y`) اضافه شد و شورون هر ردیف دیگر
+  مشروط به `hasChildren` نیست — همیشه نمایش داده می‌شود چون هر ردیف خودش
+  هم لینک به صفحه‌ی همان دسته است.
+
+**باگ‌فیکس:** `onMouseEnter`/`onFocus` روی هر ردیف قبلاً فقط وقتی
+`onHoverItem` را صدا می‌زد که `item.children.length > 0` بود؛ هاور روی
+دسته‌ای بدون زیرشاخه هیچ کاری نمی‌کرد و ستون بعدی را روی انتخاب قبلی
+«یخ‌زده» نگه می‌داشت. حالا هاور همیشه `onHoverItem` را صدا می‌زند؛ ستون
+بعدی خودش بر اساس خالی/پر بودن `children` نمایش داده می‌شود یا نه (منطق
+موجود در `category-mega-menu.tsx`). سایز تصویر/آیکون ردیف‌ها و چیپ هدر هم
+کوچک‌تر شد (`size-9`/`size-8`).
+
+**ریزاصلاح برای تطبیق دقیق با رفرنس:**
+- `sizes="3۰0px"` (عدد فارسی تایپی، مقدار نامعتبر CSS) به `"36px"` درست شد.
+- خطوط جداکننده بین ردیف‌ها (`divide-y`) حذف شد، به‌جایش `space-y-1` برای
+  فاصله‌ی ظریف بدون خط — مطابق رفرنس که هیچ خط جداکننده‌ای ندارد.
+- `rounded-xl` که از هایلایت هاور روی هر ردیف افتاده بود برگشت.
+
+---
+
 ## 2026-10-09 — نماد اعتماد الکترونیکی در فوتر
 
 **افزوده:**
