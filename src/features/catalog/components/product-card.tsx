@@ -18,7 +18,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const outOfStock = stockQty !== undefined && stockQty <= 0;
 
   return (
-    <article className="bg-surface group rounded-card ring-hairline relative flex h-full flex-col gap-3 p-3 transition-shadow duration-300 ease-out hover:shadow-(--shadow-lift) ring-1 motion-reduce:transition-none">
+    <article className="bg-surface group rounded-card ring-hairline relative flex h-full flex-col gap-3 p-3 ring-1 transition-shadow duration-300 ease-out hover:shadow-(--shadow-lift) motion-reduce:transition-none">
       <div className="bg-surface-muted relative overflow-hidden rounded-[calc(var(--radius-card)-0.5rem)]">
         <Link href={href} aria-label={product.title} tabIndex={-1} className="block">
           <MediaPlaceholder

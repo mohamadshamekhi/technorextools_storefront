@@ -37,6 +37,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       return NextResponse.json({ message: error.message }, { status: 409 });
     }
     console.error('[repairs] decision failed', error);
-    return NextResponse.json({ message: 'ثبت پاسخ ناموفق بود. دوباره تلاش کنید.' }, { status: 502 });
+    return NextResponse.json(
+      { message: 'ثبت پاسخ ناموفق بود. دوباره تلاش کنید.' },
+      { status: 502 },
+    );
   }
 }

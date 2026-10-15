@@ -14,8 +14,8 @@ export function CheckoutResultMissing({ orderNumber }: { orderNumber: string }) 
 
       <h1 className="text-[1.45rem] font-black">وضعیت سفارش قابل تأیید نبود</h1>
       <p className="text-foreground-muted mx-auto mt-2.5 mb-7 max-w-sm text-sm leading-7">
-        نتوانستیم این سفارش را بخوانیم. اگر مبلغی از حساب شما کسر شده، در سفارش‌های شما ثبت است؛
-        در غیر این صورت تا چند دقیقه دیگر به حساب شما برمی‌گردد.
+        نتوانستیم این سفارش را بخوانیم. اگر مبلغی از حساب شما کسر شده، در سفارش‌های شما ثبت است؛ در
+        غیر این صورت تا چند دقیقه دیگر به حساب شما برمی‌گردد.
       </p>
 
       <div className="bg-surface-sunken mx-auto mb-8 flex max-w-xs items-center justify-center gap-2.5 rounded-2xl px-5 py-3.5">

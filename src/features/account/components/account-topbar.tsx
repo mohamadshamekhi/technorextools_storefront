@@ -57,7 +57,7 @@ export function AccountTopbar({ user }: { user: SessionUser }) {
             ) : null}
           </Link>
 
-          <div className="border-hairline bg-surface-muted/70 flex h-10 items-center gap-2 rounded-xl border pe-1 ps-3">
+          <div className="border-hairline bg-surface-muted/70 flex h-10 items-center gap-2 rounded-xl border ps-3 pe-1">
             <span className="hidden max-w-32 truncate text-[12.5px] font-bold sm:inline">
               {user.name ?? 'کاربر'}
             </span>

@@ -47,7 +47,7 @@ export function CategoryMegaMenuColumn({
       )}
     >
       <div className="border-hairline flex items-center gap-2 border-b px-5 py-4 text-base font-bold">
-        {/* {onBack ? (
+        {onBack ? (
           <button
             type="button"
             onClick={onBack}
@@ -56,7 +56,7 @@ export function CategoryMegaMenuColumn({
           >
             <Icon name="chevron" className="size-4.5 rotate-180" />
           </button>
-        ) : null} */}
+        ) : null}
         <span className="truncate">{title}</span>
         {headerStyle ? (
           headerNode?.imageUrl ? (

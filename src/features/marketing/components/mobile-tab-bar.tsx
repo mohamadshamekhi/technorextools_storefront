@@ -68,7 +68,7 @@ export function MobileTabBar({ categories }: MobileTabBarProps) {
               type="button"
               onClick={() => setMiniCartOpen(true)}
               aria-label="باز کردن سبد خرید"
-              className="bg-brand-500 shadow-brand-500/30 relative -mt-6 grid size-14 place-items-center rounded-full text-white shadow-lg ring-4 ring-surface"
+              className="bg-brand-500 shadow-brand-500/30 ring-surface relative -mt-6 grid size-14 place-items-center rounded-full text-white shadow-lg ring-4"
             >
               <Icon name="cart" className="size-6" />
               {quantity > 0 ? (

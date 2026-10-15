@@ -8,7 +8,7 @@ import { QuestionForm } from './question-form';
 /** Approved Q&A for this product, plus the ask form. Empty until someone asks. */
 export function QaSection({ questions, slug }: { questions: ProductQuestion[]; slug: string }) {
   return (
-    <div className="flex  flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {questions.length === 0 ? (
         <p className="border-hairline bg-surface-muted rounded-2xl border border-dashed p-5 text-center text-sm leading-7">
           هنوز پرسشی برای این محصول ثبت نشده است. اولین پرسش را شما بپرسید.
