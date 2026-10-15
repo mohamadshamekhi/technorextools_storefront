@@ -15,6 +15,12 @@ const nextConfig = {
   experimental: {
     cpus: 1,
     workerThreads: false,
+    // `cpus`/`workerThreads` only limit worker *processes* — within a single worker, Next
+    // still renders pages concurrently (default 8), which races on first-time resolution of
+    // a chunk shared by many statically-generated pages (the (public) layout's MobileTabBar),
+    // producing "Could not find the module ... in the React Client Manifest". Serialize it.
+    staticGenerationMaxConcurrency: 1,
+    staticGenerationMinPagesPerWorker: 1000,
   },
   // Disable persistent webpack filesystem cache in production builds — under memory
   // pressure (Docker, low-RAM hosts) its pack-file serialization can corrupt mid-build,
