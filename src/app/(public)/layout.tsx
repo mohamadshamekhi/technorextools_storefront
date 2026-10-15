@@ -1,7 +1,14 @@
+import dynamic from 'next/dynamic';
+
 import { MiniCartDrawer } from '@/components/organisms';
 import { getCategoryTree } from '@/features/catalog/services/catalog.api';
-import { MobileTabBar, StoreFooter, StoreHeader } from '@/features/marketing';
+import { StoreFooter, StoreHeader } from '@/features/marketing';
 import type { WithChildren } from '@/types';
+
+// Explicit next/dynamic boundary (instead of the barrel's static export) — works around a
+// Next.js 15 RSC bundler bug where this shared layout-level client component intermittently
+// goes missing from a given static page's client reference manifest at build time.
+const MobileTabBar = dynamic(() => import('@/features/marketing').then((m) => m.MobileTabBar));
 
 /** Public storefront shell. Rendered as RSC for maximum SEO + minimal JS. */
 export default async function PublicLayout({ children }: WithChildren) {
