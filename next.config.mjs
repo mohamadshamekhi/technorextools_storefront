@@ -6,6 +6,8 @@ const nextConfig = {
   compress: true,
   experimental: {
     optimizePackageImports: ['@tanstack/react-query', 'zustand', '@react-three/drei'],
+    cpus: 1,
+    workerThreads: false,
   },
   images: {
     formats: ['image/avif', 'image/webp'],
