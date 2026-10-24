@@ -102,7 +102,9 @@ export function MobileTabBar({ categories }: MobileTabBarProps) {
       {sheetOpen ? (
         <CategoryBottomSheet categories={categories} onClose={() => setSheetOpen(false)} />
       ) : null}
-      {menuOpen ? <MobileMenuDrawer onClose={() => setMenuOpen(false)} /> : null}
+      {menuOpen ? (
+        <MobileMenuDrawer categories={categories} onClose={() => setMenuOpen(false)} />
+      ) : null}
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { listBrands, getCategoryTree, listProducts } from '../services/catalog.api';
 import type { CatalogParams } from '../services/catalog.query';
-import { flattenCategories } from '../utils/category-tree';
+import { flattenCategories, toCategoryOptions } from '../utils/category-tree';
 import { CatalogEmptyState } from './catalog-empty-state';
 import { CatalogFilters } from './catalog-filters';
 import { CatalogPagination } from './catalog-pagination';
@@ -38,7 +38,7 @@ export async function CatalogView({ params, lockedCategory }: CatalogViewProps) 
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[260px_1fr]">
       <CatalogFilters
-        categories={categories}
+        categoryTree={toCategoryOptions(tree)}
         brands={brandOptions}
         lockedCategory={lockedCategory}
       />

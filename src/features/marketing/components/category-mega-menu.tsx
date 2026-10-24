@@ -50,8 +50,12 @@ export function CategoryMegaMenu({ categories }: { categories: CategoryNode[] })
             role="menu"
             onMouseEnter={openOnHover}
             onMouseLeave={closeOnHoverOut}
-            style={{ top: position.top, right: position.right }}
-            className="bg-surface border-hairline fixed z-50 flex max-h-176 overflow-hidden rounded-2xl border shadow-(--shadow-lift)"
+            style={{
+              top: position.top,
+              right: position.right,
+              maxHeight: `min(44rem, calc(100dvh - ${position.top + 16}px))`,
+            }}
+            className="bg-surface border-hairline fixed z-50 flex overflow-hidden rounded-2xl border shadow-(--shadow-lift)"
           >
             <CategoryMegaMenuColumn
               title="دسته‌بندی‌ها"

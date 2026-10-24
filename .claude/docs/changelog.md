@@ -5,6 +5,81 @@
 
 ---
 
+## 2026-10-24 — ریل دسته‌بندی صفحه‌ی اصلی: کارت‌های موبایل
+
+**افزوده:**
+- `src/features/catalog/components/category-rail-card.tsx` — کارت موبایل: تامبنیل + عنوان +
+  تعداد زیردسته؛ `featured` = کارت عریض col-span-2 با گرادیان brand و دکمه‌ی فلش.
+
+**تغییریافته:**
+- `category-rail.tsx` — زیر `sm`: هدر «دسته‌بندی ابزارها» + لینک «همه محصولات» و گرید
+  ۲ستونه‌ی `CategoryRailCard` (اولی featured)؛ از `sm` ردیف قبلی (`hidden sm:flex`) بدون اسکرول افقی.
+
+---
+
+## 2026-10-24 — منوی کشویی موبایل: «دسته‌بندی‌ها» آکاردئونی
+
+**افزوده:**
+- `src/features/marketing/components/drawer-categories.tsx` — ردیف تاگل «دسته‌بندی‌ها» با
+  state `open` محلی؛ باز = `CategoryAccordion` روی کل درخت.
+
+**تغییریافته:**
+- `mobile-menu.tsx` — لینک `routes.categories` (صفحه نداشت → 404) حذف و `DrawerCategories`
+  جایگزین؛ prop `categories` اضافه.
+- `mobile-tab-bar.tsx` — `categories` به `MobileMenuDrawer` پاس می‌شود.
+- `next.config.mjs` — redirect دائمی `/categories` → `/products` (لینک empty-state و لینک‌های قدیمی).
+
+---
+
+## 2026-10-24 — رفع باز نشدن آکاردئون دسته‌بندی موبایل
+
+**تغییریافته:**
+- `category-bottom-sheet.tsx` — ناحیه‌ی اسکرول `flex-1` → `flex-auto` (basis 0 در ستون با
+  ارتفاع auto زیرشاخه‌های باز را ارتفاع صفر می‌داد).
+- `catalog/components/category-tree-item.tsx` — کلیک روی عنوان والد علاوه بر انتخاب، زیرشاخه را باز می‌کند.
+
+---
+
+## 2026-10-24 — دسته‌بندی موبایل: آکاردئون
+
+**افزوده:**
+- `src/features/marketing/components/category-accordion.tsx` — درخت بازگشتی؛ state
+  `openId` محلی هر سطح (یک باز در هر سطح)؛ والد = تاگل + لینک «همه‌ی X»، برگ = لینک.
+- `src/features/marketing/components/category-chip.tsx` — تامبنیل ۳۶px (تصویر API یا آیکون preset).
+
+**تغییریافته:**
+- `category-bottom-sheet.tsx` — به‌جای `CategoryMegaMenuColumn` (فقط سطح اول)،
+  `CategoryAccordion` روی کل درخت + لینک ثابت «مشاهده همه محصولات» پایین شیت.
+
+---
+
+## 2026-10-24 — فیلتر دسته‌بندی کاتالوگ: درخت جمع‌شونده
+
+**افزوده:**
+- `src/features/catalog/components/category-tree-filter.tsx` — fieldset «دسته‌بندی» + «همه»؛
+  state `expanded: Set<slug>` محلی، مقدار اولیه = اجداد دسته‌ی انتخاب‌شده.
+- `src/features/catalog/components/category-tree-item.tsx` — ردیف بازگشتی؛ دکمه‌ی انتخاب +
+  تاگل chevron برای نودهای دارای فرزند، زیرشاخه با `border-s` تورفته.
+- `utils/category-tree.ts` — `CategoryOption`، `toCategoryOptions()`، `categoryAncestors()`.
+
+**تغییریافته:**
+- `catalog-filters.tsx` — prop `categories` → `categoryTree`؛ `FilterRadioList` دسته‌بندی
+  با `CategoryTreeFilter` جایگزین (برند همچنان `FilterRadioList`).
+- `catalog-view.tsx` — `toCategoryOptions(tree)` به فیلتر؛ لیست flat برای toolbar/chips باقی است.
+
+---
+
+## 2026-10-24 — مگامنوی دسته‌بندی: نمایش کامل درخت + اسکرول
+
+**تغییریافته:**
+- `src/features/marketing/components/category-mega-menu-column.tsx` — لیست ستون از
+  `flex-1` (basis 0، باعث جمع‌شدن به ۲ آیتم) به `min-h-0 flex-auto overflow-y-auto`؛
+  همه‌ی دسته‌ها نمایش داده می‌شوند و ستون اسکرول می‌خورد.
+- `src/features/marketing/components/category-mega-menu.tsx` — `max-h-176` حذف؛
+  `maxHeight` زمان‌اجرا `min(44rem, 100dvh - top - 16px)` تا پنل از viewport بیرون نزند.
+
+---
+
 ## 2026-10-15 — کارت‌های آمار هیرو: آیکون روی موبایل بالای متن
 
 **تغییریافته:**

@@ -7,18 +7,20 @@ import { toPersianDigits } from '@/lib/persian';
 import { cn } from '@/lib/utils';
 
 import { useCatalogParams } from '../hooks/use-catalog-params';
+import type { CategoryOption } from '../utils/category-tree';
+import { CategoryTreeFilter } from './category-tree-filter';
 import { FilterRadioList } from './filter-radio-list';
 import { PriceRangeFilter } from './price-range-filter';
 
 type Option = { slug: string; title: string };
 
 type CatalogFiltersProps = {
-  categories: Option[];
+  categoryTree: CategoryOption[];
   brands: Option[];
   lockedCategory?: string;
 };
 
-export function CatalogFilters({ categories, brands, lockedCategory }: CatalogFiltersProps) {
+export function CatalogFilters({ categoryTree, brands, lockedCategory }: CatalogFiltersProps) {
   const { params, update } = useCatalogParams(lockedCategory);
   const [open, setOpen] = useState(false);
 
@@ -88,11 +90,10 @@ export function CatalogFilters({ categories, brands, lockedCategory }: CatalogFi
           <span className="truncate">فقط شگفت‌انگیزها</span>
         </label>
 
-        {!lockedCategory && categories.length > 0 ? (
+        {!lockedCategory && categoryTree.length > 0 ? (
           <div className="border-hairline border-t pt-5">
-            <FilterRadioList
-              legend="دسته‌بندی"
-              options={categories}
+            <CategoryTreeFilter
+              tree={categoryTree}
               value={params.category}
               onChange={(slug) => update({ category: slug })}
             />

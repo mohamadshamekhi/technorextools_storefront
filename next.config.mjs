@@ -41,6 +41,10 @@ const nextConfig = {
       { protocol: 'https', hostname: 'trustseal.enamad.ir' },
     ],
   },
+  // `/categories` has no index page — every category lives under `/categories/[slug]`.
+  async redirects() {
+    return [{ source: '/categories', destination: '/products', permanent: true }];
+  },
   async headers() {
     return [
       {

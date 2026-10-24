@@ -8,19 +8,26 @@ import { createPortal } from 'react-dom';
 import { Icon } from '@/components/atoms';
 import { BrandLogo } from '@/components/molecules';
 import { routes } from '@/config/routes';
+import type { CategoryNode } from '@/features/catalog';
 
 import { PRIMARY_NAV } from '../data/navigation';
+import { DrawerCategories } from './drawer-categories';
 import styles from './mobile-menu.module.css';
 
 const DRAWER_LINKS = [
-  { label: 'دسته‌بندی‌ها', href: routes.categories, icon: 'grid' } as const,
   ...PRIMARY_NAV.map((item) => ({ label: item.label, href: item.href, icon: null }) as const),
   { label: 'پیگیری سفارش', href: routes.orderTracking, icon: 'truck' } as const,
   { label: 'حساب کاربری', href: routes.account, icon: 'user' } as const,
 ];
 
 /** Slide-in drawer carrying the secondary nav links — mounted by the bottom tab bar's «منو» tab, same conditional-mount pattern as `CategoryBottomSheet`. */
-export function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
+export function MobileMenuDrawer({
+  categories,
+  onClose,
+}: {
+  categories: CategoryNode[];
+  onClose: () => void;
+}) {
   const pathname = usePathname();
   const initialPathname = useRef(pathname);
 
@@ -36,10 +43,10 @@ export function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
-  return createPortal(<Drawer onClose={onClose} />, document.body);
+  return createPortal(<Drawer categories={categories} onClose={onClose} />, document.body);
 }
 
-function Drawer({ onClose }: { onClose: () => void }) {
+function Drawer({ categories, onClose }: { categories: CategoryNode[]; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-70 sm:hidden" role="dialog" aria-modal="true">
       <div
@@ -62,6 +69,7 @@ function Drawer({ onClose }: { onClose: () => void }) {
           </button>
         </div>
         <nav aria-label="منوی موبایل" className="flex flex-col gap-1">
+          <DrawerCategories categories={categories} onNavigate={onClose} />
           {DRAWER_LINKS.map((link) => (
             <DrawerLink key={link.href} href={link.href} icon={link.icon}>
               {link.label}
@@ -79,7 +87,7 @@ function DrawerLink({
   children,
 }: {
   href: string;
-  icon: 'grid' | 'truck' | 'user' | null;
+  icon: 'truck' | 'user' | null;
   children: ReactNode;
 }) {
   return (
