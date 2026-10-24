@@ -55,7 +55,7 @@ export async function CategoryRail() {
                       alt={category.title}
                       fill
                       sizes="78px"
-                      className="object-contain p-3"
+                      className="object-contain p-1"
                     />
                   </span>
                 ) : (

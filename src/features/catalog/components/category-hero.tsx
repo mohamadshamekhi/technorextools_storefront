@@ -37,7 +37,7 @@ export function CategoryHero({ title, slug, count, imageUrl }: CategoryHeroProps
       <div className="border-hairline bg-surface rounded-card relative flex flex-col gap-5 overflow-hidden border p-6 shadow-(--shadow-soft) sm:flex-row sm:items-center sm:gap-7 sm:p-8">
         {imageUrl ? (
           <span className="bg-surface border-hairline relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-2xl border shadow-(--shadow-soft) sm:size-17.5">
-            <Image src={imageUrl} alt={title} fill sizes="70px" className="object-contain p-3" />
+            <Image src={imageUrl} alt={title} fill sizes="70px" className="object-contain p-1" />
           </span>
         ) : (
           <span
