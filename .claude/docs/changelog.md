@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-10-30 — فیلترهای کاتالوگ: بخش‌های جمع‌شونده، جستجوی برند، قیمت، شیت موبایل
+
+**افزوده:**
+- `src/features/catalog/components/filter-section.tsx` — گروه فیلتر جمع‌شونده (`aria-expanded`)
+  با پیل خلاصه‌ی انتخاب فعلی کنار عنوان.
+- `src/features/catalog/components/catalog-filter-body.tsx` — پشته‌ی فیلترها (سوییچ
+  شگفت‌انگیز + دسته‌بندی + برند + قیمت)؛ مشترک بین سایدبار دسکتاپ و شیت موبایل.
+- `src/features/catalog/components/price-input.tsx` — فیلد قیمت با رقم گروه‌بندی‌شده‌ی فارسی.
+- `src/features/catalog/data/price-presets.ts` — بازه‌های آماده‌ی قیمت.
+- `src/features/catalog/utils/price-input.ts` — `toDigits` (ارقام فارسی/عربی → لاتین)،
+  `formatDigits`، `priceRangeSummary` (خلاصه‌ی «۱۰ تا ۵۰ میلیون»).
+
+**تغییریافته:**
+- `catalog-filters.tsx` — پوسته: دسکتاپ = سایدبار sticky زیر هدر ۱۶۴px (`lg:top-[11.5rem]`،
+  قبلاً زیر هدر می‌رفت) با اسکرول داخلی؛ موبایل = دکمه‌ی «فیلتر محصولات» + bottom sheet
+  (`z-[61]`، بالای `MobileTabBar`)، Escape/بک‌دراپ می‌بندد، فوتر «نمایش N محصول» با تعداد زنده.
+  state `open` محلی؛ فیلترها مثل قبل فوراً روی URL اعمال می‌شوند.
+- `filter-radio-list.tsx` — بیش از ۸ گزینه: کادر جستجو؛ بیش از ۸ نتیجه: ۶ تا + «نمایش همه»؛
+  گزینه‌ی فعال همیشه قابل‌مشاهده؛ نشانگر رادیویی.
+- `price-range-filter.tsx` — بازه‌های آماده (تاگل) + فرم با دکمه‌ی «اعمال» / Enter به‌جای
+  اعمال روی blur؛ بازه‌ی برعکس جابه‌جا می‌شود.
+- `use-catalog-params.ts` — ناوبری در `useTransition`، خروجی `isPending` (اسپینر هدر/فوتر)؛
+  `goToPage` در صفحه‌ی دسته‌بندی قفل‌شده دیگر `?category=` اضافه نمی‌کند.
+- `catalog.query.ts` — `CLEAR_FILTERS_PATCH` و `countActiveFilters` (بازه‌ی قیمت = یک فیلتر)؛
+  `active-filter-chips.tsx` از همان patch استفاده می‌کند.
+- `catalog-view.tsx` — `categories` و `total` به `CatalogFilters` پاس می‌شوند.
+
+---
+
 ## 2026-10-24 — ریل دسته‌بندی صفحه‌ی اصلی: کارت‌های موبایل
 
 **افزوده:**

@@ -37,6 +37,25 @@ export function parseCatalogParams(raw: RawSearchParams): CatalogParams {
   return result.success ? result.data : {};
 }
 
+/** Patch that resets every sidebar facet (search query and sort are kept). */
+export const CLEAR_FILTERS_PATCH: Partial<CatalogParams> = {
+  category: undefined,
+  brand: undefined,
+  deal: undefined,
+  minPrice: undefined,
+  maxPrice: undefined,
+};
+
+/** Number of active sidebar facets — a locked category page doesn't count its own category. */
+export function countActiveFilters(params: CatalogParams, lockedCategory?: string): number {
+  return (
+    (params.brand ? 1 : 0) +
+    (params.deal ? 1 : 0) +
+    (params.minPrice !== undefined || params.maxPrice !== undefined ? 1 : 0) +
+    (!lockedCategory && params.category ? 1 : 0)
+  );
+}
+
 /** True when the visitor has narrowed the catalog — drives `noindex`. */
 export function hasActiveFilters(params: CatalogParams): boolean {
   return Boolean(

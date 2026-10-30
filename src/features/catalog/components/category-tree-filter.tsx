@@ -31,7 +31,7 @@ export function CategoryTreeFilter({ tree, value, onChange }: CategoryTreeFilter
 
   return (
     <fieldset className="flex flex-col gap-1">
-      <legend className="mb-2 text-sm font-bold">دسته‌بندی</legend>
+      <legend className="sr-only">دسته‌بندی</legend>
       <button
         type="button"
         onClick={() => onChange(undefined)}

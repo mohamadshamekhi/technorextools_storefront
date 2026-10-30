@@ -39,7 +39,9 @@ export async function CatalogView({ params, lockedCategory }: CatalogViewProps) 
     <div className="grid items-start gap-8 lg:grid-cols-[260px_1fr]">
       <CatalogFilters
         categoryTree={toCategoryOptions(tree)}
+        categories={categories}
         brands={brandOptions}
+        total={result.total}
         lockedCategory={lockedCategory}
       />
       <div>
