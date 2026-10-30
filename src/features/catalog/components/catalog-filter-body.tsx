@@ -1,12 +1,11 @@
 'use client';
 
-import { Icon } from '@/components/atoms';
-
 import type { CatalogParams } from '../services/catalog.query';
 import type { CategoryOption } from '../utils/category-tree';
 import { priceRangeSummary } from '../utils/price-input';
+import { BrandFilter, type BrandOption } from './brand-filter';
 import { CategoryTreeFilter } from './category-tree-filter';
-import { FilterRadioList } from './filter-radio-list';
+import { DealToggle } from './deal-toggle';
 import { FilterSection } from './filter-section';
 import { PriceRangeFilter } from './price-range-filter';
 
@@ -17,7 +16,7 @@ type CatalogFilterBodyProps = {
   update: (patch: Partial<CatalogParams>) => void;
   categoryTree: CategoryOption[];
   categories: Option[];
-  brands: Option[];
+  brands: BrandOption[];
   lockedCategory?: string;
 };
 
@@ -34,57 +33,49 @@ export function CatalogFilterBody({
   lockedCategory,
 }: CatalogFilterBodyProps) {
   return (
-    <div className="flex flex-col gap-3">
-      <label className="border-hairline bg-surface-muted hover:border-sale/40 has-checked:border-sale/40 has-checked:bg-sale/5 flex min-h-12 cursor-pointer items-center gap-2.5 rounded-xl border px-3 text-[13px] font-bold transition-colors">
-        <span className="bg-sale/10 text-sale grid size-7 shrink-0 place-items-center rounded-lg">
-          <Icon name="fire" className="size-4" />
-        </span>
-        <span className="flex-1 truncate">فقط شگفت‌انگیزها</span>
-        <input
-          type="checkbox"
-          role="switch"
-          checked={Boolean(params.deal)}
-          onChange={(event) => update({ deal: event.target.checked ? '1' : undefined })}
-          className="peer sr-only"
-        />
-        <span
-          aria-hidden="true"
-          className="bg-hairline peer-checked:bg-sale peer-focus-visible:ring-sale/40 relative h-5 w-9 shrink-0 rounded-full transition-colors peer-focus-visible:ring-2 after:absolute after:start-0.5 after:top-0.5 after:size-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:-translate-x-4"
-        />
-      </label>
+    <div className="flex flex-col gap-2">
+      <DealToggle
+        checked={Boolean(params.deal)}
+        onChange={(checked) => update({ deal: checked ? '1' : undefined })}
+      />
 
-      {!lockedCategory && categoryTree.length > 0 ? (
-        <FilterSection title="دسته‌بندی" summary={titleOf(categories, params.category)}>
-          <CategoryTreeFilter
-            tree={categoryTree}
-            value={params.category}
-            onChange={(slug) => update({ category: slug })}
+      <div className="mt-2 flex flex-col">
+        {!lockedCategory && categoryTree.length > 0 ? (
+          <FilterSection
+            title="دسته‌بندی"
+            icon="grid"
+            summary={titleOf(categories, params.category)}
+          >
+            <CategoryTreeFilter
+              tree={categoryTree}
+              value={params.category}
+              onChange={(slug) => update({ category: slug })}
+            />
+          </FilterSection>
+        ) : null}
+
+        {brands.length > 0 ? (
+          <FilterSection title="برند" icon="shield" summary={titleOf(brands, params.brand)}>
+            <BrandFilter
+              brands={brands}
+              value={params.brand}
+              onChange={(slug) => update({ brand: slug })}
+            />
+          </FilterSection>
+        ) : null}
+
+        <FilterSection
+          title="قیمت"
+          icon="wallet"
+          summary={priceRangeSummary(params.minPrice, params.maxPrice)}
+        >
+          <PriceRangeFilter
+            min={params.minPrice}
+            max={params.maxPrice}
+            onChange={(next) => update(next)}
           />
         </FilterSection>
-      ) : null}
-
-      {brands.length > 0 ? (
-        <FilterSection title="برند" summary={titleOf(brands, params.brand)}>
-          <FilterRadioList
-            legend="برند"
-            options={brands}
-            itemClassName="uppercase"
-            value={params.brand}
-            onChange={(slug) => update({ brand: slug })}
-          />
-        </FilterSection>
-      ) : null}
-
-      <FilterSection
-        title="قیمت (تومان)"
-        summary={priceRangeSummary(params.minPrice, params.maxPrice)}
-      >
-        <PriceRangeFilter
-          min={params.minPrice}
-          max={params.maxPrice}
-          onChange={(next) => update(next)}
-        />
-      </FilterSection>
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { PRICE_PRESETS } from '../data/price-presets';
 import { digitsToNumber, formatDigits, toDigits } from '../utils/price-input';
 import { PriceInput } from './price-input';
+import { PriceSlider } from './price-slider';
 
 type PriceRange = { minPrice?: number; maxPrice?: number };
 
@@ -18,7 +19,7 @@ type PriceRangeFilterProps = {
 
 const digitsOf = (value: number | undefined) => (value ? String(value) : '');
 
-/** Price facet: one-tap brackets + a free range applied explicitly (Enter or the button). */
+/** Price facet: brackets apply at once; slider + typed range apply explicitly. */
 export function PriceRangeFilter({ min, max, onChange }: PriceRangeFilterProps) {
   const [lo, setLo] = useState(digitsOf(min));
   const [hi, setHi] = useState(digitsOf(max));
@@ -39,9 +40,45 @@ export function PriceRangeFilter({ min, max, onChange }: PriceRangeFilterProps) 
   };
 
   return (
-    <fieldset className="flex flex-col gap-3">
+    <fieldset className="flex flex-col gap-4">
       <legend className="sr-only">بازهٔ قیمت (تومان)</legend>
-      <div className="flex flex-wrap gap-1.5">
+      <form onSubmit={submit} className="flex flex-col gap-4">
+        <div className="px-1 pt-1">
+          <PriceSlider
+            lo={next.minPrice}
+            hi={next.maxPrice}
+            onChange={(low, high) => {
+              setLo(digitsOf(low));
+              setHi(digitsOf(high));
+            }}
+          />
+        </div>
+        <div className="flex items-stretch gap-2">
+          <PriceInput
+            label="حداقل (تومان)"
+            value={formatDigits(lo)}
+            onChange={(raw) => setLo(toDigits(raw))}
+          />
+          <PriceInput
+            label="حداکثر (تومان)"
+            value={formatDigits(hi)}
+            onChange={(raw) => setHi(toDigits(raw))}
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={!dirty}
+          className={cn(
+            'min-h-10 rounded-xl text-[13px] font-bold transition-all',
+            dirty
+              ? 'bg-brand-500 hover:bg-brand-600 cursor-pointer text-white shadow-(--shadow-brand)'
+              : 'bg-surface-muted text-foreground-muted cursor-not-allowed',
+          )}
+        >
+          اعمال بازهٔ قیمت
+        </button>
+      </form>
+      <div className="grid grid-cols-2 gap-1.5">
         {PRICE_PRESETS.map((preset) => {
           const active = preset.minPrice === min && preset.maxPrice === max;
           return (
@@ -53,10 +90,10 @@ export function PriceRangeFilter({ min, max, onChange }: PriceRangeFilterProps) 
                 onChange(active ? {} : { minPrice: preset.minPrice, maxPrice: preset.maxPrice })
               }
               className={cn(
-                'min-h-8 cursor-pointer rounded-full border px-3 text-[12px] font-bold transition-colors',
+                'min-h-9 cursor-pointer rounded-lg border text-[11.5px] font-bold transition-colors',
                 active
-                  ? 'border-brand-500 bg-brand-50 text-brand-700'
-                  : 'border-hairline text-foreground-muted hover:border-brand-300 hover:text-foreground',
+                  ? 'border-brand-500 bg-brand-500 text-white'
+                  : 'border-hairline bg-surface text-foreground-muted hover:border-brand-300 hover:text-brand-700',
               )}
             >
               {preset.label}
@@ -64,29 +101,6 @@ export function PriceRangeFilter({ min, max, onChange }: PriceRangeFilterProps) 
           );
         })}
       </div>
-      <form onSubmit={submit} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2">
-          <PriceInput
-            label="از"
-            ariaLabel="حداقل قیمت"
-            value={formatDigits(lo)}
-            onChange={(raw) => setLo(toDigits(raw))}
-          />
-          <PriceInput
-            label="تا"
-            ariaLabel="حداکثر قیمت"
-            value={formatDigits(hi)}
-            onChange={(raw) => setHi(toDigits(raw))}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={!dirty}
-          className="bg-brand-500 hover:bg-brand-600 disabled:bg-surface-sunken disabled:text-foreground-muted min-h-10 cursor-pointer rounded-xl text-[13px] font-bold text-white transition-colors disabled:cursor-not-allowed"
-        >
-          اعمال بازهٔ قیمت
-        </button>
-      </form>
     </fieldset>
   );
 }

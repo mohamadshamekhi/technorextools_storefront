@@ -9,3 +9,6 @@ export const PRICE_PRESETS: readonly PricePreset[] = [
   { label: '۵۰ تا ۱۰۰ میلیون', minPrice: 50 * MILLION, maxPrice: 100 * MILLION },
   { label: 'بالای ۱۰۰ میلیون', minPrice: 100 * MILLION },
 ];
+
+/** Slider scale: anything above `max` is reachable only through the typed fields. */
+export const PRICE_SLIDER = { max: 200 * MILLION, step: 500_000 } as const;

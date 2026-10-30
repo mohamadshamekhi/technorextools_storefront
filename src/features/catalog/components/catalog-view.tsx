@@ -32,7 +32,7 @@ export async function CatalogView({ params, lockedCategory }: CatalogViewProps) 
     slug: node.slug,
     title: node.title,
   }));
-  const brandOptions = brands.map((brand) => ({ slug: brand.slug, title: brand.title }));
+  const brandOptions = brands.map(({ slug, title, logoUrl }) => ({ slug, title, logoUrl }));
   const page = params.page ?? 1;
 
   return (
