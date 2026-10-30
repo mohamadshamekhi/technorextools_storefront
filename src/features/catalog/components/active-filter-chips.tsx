@@ -4,7 +4,7 @@ import { Icon } from '@/components/atoms';
 import { formatToman } from '@/lib/persian';
 
 import { useCatalogParams } from '../hooks/use-catalog-params';
-import type { CatalogParams } from '../services/catalog.query';
+import { CLEAR_FILTERS_PATCH, type CatalogParams } from '../services/catalog.query';
 
 type Option = { slug: string; title: string };
 type Chip = { key: string; label: string; patch: Partial<CatalogParams> };
@@ -64,15 +64,7 @@ export function ActiveFilterChips({ categories, brands, lockedCategory }: Active
       <li>
         <button
           type="button"
-          onClick={() =>
-            update({
-              category: undefined,
-              brand: undefined,
-              deal: undefined,
-              minPrice: undefined,
-              maxPrice: undefined,
-            })
-          }
+          onClick={() => update(CLEAR_FILTERS_PATCH)}
           className="text-foreground-muted hover:text-sale min-h-8 cursor-pointer px-2 text-[12.5px] font-bold transition-colors"
         >
           پاک‌کردن همه
