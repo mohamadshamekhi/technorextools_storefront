@@ -1,0 +1,50 @@
+/* Two overlaid native range inputs: only the thumbs take pointer events, the track is drawn
+   by the parent so both thumbs share one filled segment. */
+.range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+  margin: 0;
+}
+
+.range::-webkit-slider-thumb {
+  appearance: none;
+  pointer-events: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--color-surface);
+  border: 5px solid var(--color-brand-500);
+  box-shadow: 0 2px 8px oklch(0.4 0.1 260 / 0.3);
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.range::-moz-range-thumb {
+  pointer-events: auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: var(--color-surface);
+  border: 5px solid var(--color-brand-500);
+  box-shadow: 0 2px 8px oklch(0.4 0.1 260 / 0.3);
+  cursor: grab;
+}
+
+.range:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  transform: scale(1.15);
+}
+
+.range:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--color-brand-200);
+  outline-offset: 2px;
+}
+
+.range::-webkit-slider-runnable-track,
+.range::-moz-range-track {
+  background: transparent;
+}

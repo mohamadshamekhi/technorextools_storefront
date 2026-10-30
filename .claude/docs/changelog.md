@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-10-30 — کارت محصول: بازطراحی
+
+**افزوده:**
+- `src/features/catalog/components/product-card-media.tsx` — صحنه‌ی تصویر: گرادیان + هاله، zoom/tilt
+  روی hover، بج درصد تخفیف (`bg-sale`)، بج «شگفت‌انگیز» گرادیانی، علاقه‌مندی، پرده‌ی «ناموجود»،
+  نوار «مشاهده‌ی جزئیات» که روی hover بالا می‌آید (فقط `lg`).
+- `product-card-price.tsx` — قیمت فروش + قیمت خط‌خورده وقتی `effectivePrice < basePrice`.
+- `product-card-stock.tsx` — «موجود در انبار، ارسال فوری» با نقطه‌ی پالس؛ موجودی کم (≤۳) = متن
+  قرمز + نوار فوریت.
+- `utils/card-variant.ts` — `cardDiscount` و `cardStock` / `LOW_STOCK`.
+
+**تغییریافته:**
+- `product-card.tsx` — کارت بالا می‌آید و رینگ brand می‌گیرد روی hover؛ کل کارت کلیک‌پذیر
+  (stretched link روی عنوان، ردیف قیمت/سبد `z-10`)؛ برند به‌صورت پیل؛ جداکننده‌ی خط‌چین بالای قیمت؛
+  دکمه‌ی سبد `rounded-xl`. در گرید کاتالوگ و کاروسل‌های PDP یکسان.
+
+---
+
+## 2026-10-30 — فیلترهای کاتالوگ: بازطراحی بصری
+
+**افزوده:**
+- `src/features/catalog/components/brand-filter.tsx` — گرید ۲ستونه‌ی کاشی برند (لوگو یا wordmark)،
+  جستجو، ۸ تا + «همه‌ی N برند»؛ کلیک روی کاشی فعال = حذف فیلتر. جای `filter-radio-list.tsx` (حذف شد).
+- `price-slider.tsx` + `price-slider.module.css` — اسلایدر دوسر RTL (دو `input[type=range]` روی هم،
+  thumb با CSS Module)؛ دو سر بازه = بدون حد. مقیاس در `PRICE_SLIDER` (`data/price-presets.ts`).
+- `deal-toggle.tsx` — کارت گرادیانی «شگفت‌انگیزها» با سوییچ.
+
+**تغییریافته:**
+- `catalog-filters.tsx` — هدر تیره (`bg-ink`، هم‌سبک هیروی کاتالوگ) با آیکون accent، تعداد نتایج
+  زنده و دکمه‌ی «پاک‌کردن همه‌ی فیلترها»؛ دکمه‌ی موبایل تیره.
+- `filter-section.tsx` — prop `icon` (چیپ آیکون کنار عنوان).
+- `category-tree-item.tsx` — ردیف سطح اول با آیکون/رنگ `categoryPresentation`، نوار فعال در
+  لبه‌ی start؛ زیردسته‌ها با نقطه. `category-tree-filter.tsx` — «همه‌ی دسته‌ها» هم‌سبک.
+- `price-range-filter.tsx` / `price-input.tsx` — اسلایدر + دو فیلد کادری (عنوان بالای مقدار)، دکمه‌ی
+  اعمال فقط وقتی تغییر هست فعال، بازه‌های آماده در گرید ۲ستونه.
+- `catalog-view.tsx` — `logoUrl` برند به فیلترها پاس می‌شود.
+
+---
+
 ## 2026-10-30 — فیلترهای کاتالوگ: بخش‌های جمع‌شونده، جستجوی برند، قیمت، شیت موبایل
 
 **افزوده:**

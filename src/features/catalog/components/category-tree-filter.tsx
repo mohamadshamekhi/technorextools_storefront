@@ -30,23 +30,28 @@ export function CategoryTreeFilter({ tree, value, onChange }: CategoryTreeFilter
   const allActive = value === undefined;
 
   return (
-    <fieldset className="flex flex-col gap-1">
+    <fieldset className="flex flex-col gap-0.5">
       <legend className="sr-only">دسته‌بندی</legend>
       <button
         type="button"
         onClick={() => onChange(undefined)}
         aria-pressed={allActive}
         className={cn(
-          'flex min-h-10 items-center justify-between gap-2 rounded-lg px-2.5 text-[13px] transition-colors',
+          'relative flex min-h-10 cursor-pointer items-center gap-2.5 rounded-xl ps-2.5 text-[13px] transition-colors',
           allActive
-            ? 'text-brand-600 bg-brand-50 font-bold'
-            : 'text-foreground-muted hover:bg-surface-muted hover:text-foreground',
+            ? 'bg-brand-50 text-brand-700 font-bold'
+            : 'text-foreground hover:bg-surface-muted font-semibold',
         )}
       >
-        <span>همه</span>
-        {allActive ? <Icon name="check" className="size-3.5 shrink-0" /> : null}
+        {allActive ? (
+          <span className="bg-brand-500 absolute inset-y-2 start-0 w-1 rounded-full" />
+        ) : null}
+        <span className="bg-ink grid size-7 shrink-0 place-items-center rounded-lg text-white">
+          <Icon name="grid" className="size-3.5" />
+        </span>
+        همه‌ی دسته‌ها
       </button>
-      <ul className="flex flex-col gap-1">
+      <ul className="flex flex-col gap-0.5">
         {tree.map((node) => (
           <CategoryTreeItem
             key={node.slug}
