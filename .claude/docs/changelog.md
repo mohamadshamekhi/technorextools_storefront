@@ -5,6 +5,10 @@
 
 ---
 
+## 2026-11-01 — Google Search Console verification
+
+- `src/app/layout.tsx` — `metadata.verification.google` → `<meta name="google-site-verification">`.
+
 ## 2026-10-30 — کارت محصول: بازطراحی
 
 **افزوده:**

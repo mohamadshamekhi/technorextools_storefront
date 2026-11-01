@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   ...buildMetadata(),
   // Site-wide ownership tokens rendered as <meta name="…"> by Next.
   other: { enamad: '33398049' },
+  verification: { google: 'YvErtKnLIc2i8l4cWUuCZvuDhLVV--3Ehfvo-0UUWeQ' },
 };
 
 export const viewport: Viewport = {
