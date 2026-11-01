@@ -8,7 +8,7 @@ export function FooterContact() {
         <a href={`tel:${siteConfig.phoneHref}`} className="hover:text-accent-500">
           تلفن: {siteConfig.phone}
         </a>
-        <span>موبایل: ۰۹۱۲-۱۷۷۱۵۸۷</span>
+        <span>موبایل: ۰۹۱۲۰۲۰۷۴۹۴</span>
         <a href={`mailto:${siteConfig.email}`} className="hover:text-accent-500" dir="ltr">
           {siteConfig.email}
         </a>

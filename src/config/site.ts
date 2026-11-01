@@ -19,14 +19,14 @@ export const siteConfig = {
     'تکنورکس',
     'فروش ابزار صنعتی',
   ],
-  phone: '۰۲۱-۶۶۹۹۰۰۰۰',
-  phoneHref: '+982166990000',
+  phone: '۰۲۱۶۶۷۵۲۶۵۳',
+  phoneHref: '۰۹۱۲۰۲۰۷۴۹۴',
   email: 'info@technorextools.ir',
-  address: 'تهران، خیابان ولی‌عصر، مجتمع صنعتی ابزار',
+  address: 'تهران، خیابان امام خمینی نرسیده به میدان حسن آباد جنب بیمارستان سینا کوچه نعمتی ساختمان دیاکو طبقه دوم واحد ۵',
   links: {
     instagram: 'https://instagram.com/technorextools',
     telegram: 'https://t.me/technorextools',
-    whatsapp: 'https://wa.me/989121771587',
+    whatsapp: 'https://wa.me/989120207494',
   },
   enamad: {
     id: '8041899',

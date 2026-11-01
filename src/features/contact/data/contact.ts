@@ -20,7 +20,7 @@ export const CONTACT_CHANNELS: Array<{
   {
     icon: 'whatsapp',
     title: 'واتساپ',
-    value: '۰۹۱۲-۱۷۷۱۵۸۷',
+    value: '۰۹۱۲۰۲۰۷۴۹۴',
     note: 'ارسال عکس ابزار و شماره فنی',
     href: siteConfig.links.whatsapp,
   },
