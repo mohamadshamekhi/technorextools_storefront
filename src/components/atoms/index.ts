@@ -9,3 +9,4 @@ export { Icon, type IconProps } from './icons/icon';
 export { type IconName } from './icons/icon-paths';
 export { MediaPlaceholder, type MediaPlaceholderProps } from './media-placeholder';
 export { CountUp, type CountUpProps } from './count-up';
+export { GoogleAnalytics } from './google-analytics';

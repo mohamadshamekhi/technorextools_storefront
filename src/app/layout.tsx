@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Space_Grotesk, Vazirmatn } from 'next/font/google';
 
+import { GoogleAnalytics } from '@/components/atoms';
 import { RouteProgress } from '@/components/molecules';
 import { siteConfig } from '@/config/site';
 import { organizationSchema } from '@/lib/json-ld';
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: WithChildren) {
         />
         <RouteProgress />
         <AppProviders>{children}</AppProviders>
+        <GoogleAnalytics />
       </body>
     </html>
   );

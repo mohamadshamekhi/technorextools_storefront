@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-11-01 — Google Analytics (GA4)
+
+- `src/components/atoms/google-analytics.tsx` — `next/script` gtag `G-KSK2PQDNTV`, `afterInteractive`;
+  mounted in `src/app/layout.tsx` after `AppProviders`. Exported from `components/atoms`.
+
 ## 2026-11-01 — Google Search Console verification
 
 - `src/app/layout.tsx` — `metadata.verification.google` → `<meta name="google-site-verification">`.
