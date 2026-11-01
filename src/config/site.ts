@@ -22,7 +22,8 @@ export const siteConfig = {
   phone: '۰۲۱۶۶۷۵۲۶۵۳',
   phoneHref: '۰۹۱۲۰۲۰۷۴۹۴',
   email: 'info@technorextools.ir',
-  address: 'تهران، خیابان امام خمینی نرسیده به میدان حسن آباد جنب بیمارستان سینا کوچه نعمتی ساختمان دیاکو طبقه دوم واحد ۵',
+  address:
+    'تهران، خیابان امام خمینی نرسیده به میدان حسن آباد جنب بیمارستان سینا کوچه نعمتی ساختمان دیاکو طبقه دوم واحد ۵',
   links: {
     instagram: 'https://instagram.com/technorextools',
     telegram: 'https://t.me/technorextools',
