@@ -1,6 +1,6 @@
 import type { PromoCard, Testimonial, ValueProp } from '../types';
 
-export const HERO_WORDS = ['کارهای سنگین', 'خط تولید صنعتی', 'تعمیرگاه خودرو', 'کارگاه نجاری'];
+export const HERO_WORDS = ['خط مونتاژ', 'خط تولید صنعتی', 'تعمیرگاه خودرو', 'کارگاه نجاری'];
 
 /** Used when no `isFeatured` product exists yet in `abzar/api`. */
 export const HERO_SHOWCASE_FALLBACK = {

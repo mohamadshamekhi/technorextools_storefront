@@ -9,6 +9,7 @@ import { FooterEnamadBadge } from './footer-enamad-badge';
 import { FooterNavColumn } from './footer-nav-column';
 import { FooterSocialLinks } from './footer-social-links';
 import { FooterTrustBar } from './footer-trust-bar';
+import { FooterZarinpalBadge } from './footer-zarinpal-badge';
 
 export function StoreFooter() {
   return (
@@ -30,8 +31,9 @@ export function StoreFooter() {
               پشتیبانی فنی.
             </p>
             <FooterSocialLinks />
-            <div className="mt-5">
+            <div className="mt-5 flex items-center gap-3">
               <FooterEnamadBadge />
+              <FooterZarinpalBadge />
             </div>
           </div>
           {FOOTER_COLUMNS.map((column) => (
