@@ -33,6 +33,7 @@ export function BundleAddButton({ bundle }: { bundle: Bundle }) {
           kind: 'bundle',
           imageUrl: bundleCoverImage(bundle),
           variant: 'پکیج',
+          slug: bundle.slug,
         });
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1800);

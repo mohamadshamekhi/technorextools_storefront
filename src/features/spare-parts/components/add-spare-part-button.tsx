@@ -9,6 +9,7 @@ import { useCartStore } from '@/store/cart-store';
 type AddSparePartButtonProps = {
   id: string;
   title: string;
+  slug: string;
   price: number;
   imageUrl: string | null;
   partNumber: string | null;
@@ -19,6 +20,7 @@ type AddSparePartButtonProps = {
 export function AddSparePartButton({
   id,
   title,
+  slug,
   price,
   imageUrl,
   partNumber,
@@ -39,6 +41,7 @@ export function AddSparePartButton({
         variant: partNumber ? `قطعه ${partNumber}` : 'قطعه یدکی',
         imageUrl,
         kind: 'spare_part',
+        slug,
       },
       1,
     );

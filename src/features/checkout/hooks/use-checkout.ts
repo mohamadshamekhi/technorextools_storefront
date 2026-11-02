@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { toSyncLines } from '@/features/cart/utils/sync-lines';
+import { trackPurchaseOnce } from '@/lib/analytics';
 import { UnauthorizedError } from '@/lib/api-error';
-import { useCartStore, type CartLine } from '@/store/cart-store';
+import { toAnalyticsItem, useCartStore, type CartLine } from '@/store/cart-store';
 
 import { CheckoutConflictError, toCheckoutConflict } from '../services/checkout-errors';
 import type { CheckoutConflict } from '../services/checkout.schemas';
@@ -71,7 +72,7 @@ export function useCheckout() {
     onError: (error) => {
       if (error instanceof CheckoutConflictError) setConflict(error.conflict);
     },
-    onSuccess: ({ result, itemCount }) => {
+    onSuccess: ({ result, itemCount }, { lines }) => {
       // The order is placed either way (stock reserved, row created) — safe to clear now.
       useCartStore.getState().clear();
 
@@ -80,6 +81,8 @@ export function useCheckout() {
         window.location.assign(result.paymentUrl);
         return;
       }
+      // Settled without a gateway round trip, so `/checkout/result` never runs for this order.
+      if (result.paid) trackPurchaseOnce(result.orderNumber, lines.map(toAnalyticsItem));
       setPlacedOrder({ orderNumber: result.orderNumber, total: result.total, itemCount });
       setStep(result.paid ? 'success' : 'cash-pending');
     },

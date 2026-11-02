@@ -3,6 +3,7 @@ import type { OrderDetail } from '@/features/account';
 import { CashPendingStep } from './cash-pending-step';
 import { FailedStep } from './failed-step';
 import { PendingConfirmationStep } from './pending-confirmation-step';
+import { PurchaseTracker } from './purchase-tracker';
 import { SuccessStep } from './success-step';
 
 const SETTLED_STATUSES: OrderDetail['status'][] = ['paid', 'processing', 'shipped', 'delivered'];
@@ -12,7 +13,20 @@ const FAILED_STATUSES: OrderDetail['status'][] = ['payment_failed', 'abandoned',
  * `abzar/api`, owner-scoped) rather than the `status` query param the gateway appended, which
  * is only a redirect hint and never verified. */
 export function CheckoutResultView({ order }: { order: OrderDetail }) {
-  if (SETTLED_STATUSES.includes(order.status)) return <SuccessStep order={order} />;
+  if (SETTLED_STATUSES.includes(order.status)) {
+    return (
+      <>
+        <PurchaseTracker
+          transactionId={order.orderNumber}
+          items={order.items.map((item) => ({
+            item_id: item.productSlug ?? item.sku ?? item.productTitle,
+            item_name: item.productTitle,
+          }))}
+        />
+        <SuccessStep order={order} />
+      </>
+    );
+  }
   if (order.status === 'pending_payment' && order.paymentMethod === 'cash') {
     return <CashPendingStep order={order} />;
   }

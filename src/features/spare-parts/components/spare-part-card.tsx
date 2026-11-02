@@ -69,6 +69,7 @@ export function SparePartCard({ part }: { part: SparePart }) {
       <AddSparePartButton
         id={part.id}
         title={part.title}
+        slug={part.slug}
         price={part.price}
         imageUrl={part.mainImageUrl}
         partNumber={part.partNumber}

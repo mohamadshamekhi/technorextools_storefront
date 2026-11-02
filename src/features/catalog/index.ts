@@ -10,6 +10,7 @@ export { CatalogHero } from './components/catalog-hero';
 export { CategoryHero } from './components/category-hero';
 export { CatalogEmptyState } from './components/catalog-empty-state';
 export { ProductDetailView } from './components/product-detail/product-detail-view';
+export { ProductViewTracker } from './components/product-detail/product-view-tracker';
 
 export {
   catalogParamsSchema,

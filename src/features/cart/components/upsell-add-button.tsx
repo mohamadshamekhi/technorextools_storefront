@@ -19,6 +19,7 @@ export function UpsellAddButton({ product }: { product: UpsellProduct }) {
       compareAt: null,
       categorySlug: product.categorySlug,
       imageUrl: product.imageUrl,
+      slug: product.slug,
     });
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1400);

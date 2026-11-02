@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { trackEcommerce, type AnalyticsItem } from '@/lib/analytics';
+
 export type CartLine = {
   id: string;
   title: string;
@@ -17,6 +19,9 @@ export type CartLine = {
   /** Absent = product variant (`id` is the variant id); `spare_part` / `bundle` = `id` is the
    * spare part / bundle id. */
   kind?: 'spare_part' | 'bundle';
+  /** Product / spare part / bundle slug — the only id `OrderDetail` items share with the catalog,
+   * so GA4's `item_id` stays the same from `view_item` to `purchase`. */
+  slug?: string;
 };
 
 type CartState = {
@@ -57,7 +62,7 @@ export const useCartStore = create<CartState>()(
       shippingCost: 0,
       discountCode: null,
       discountAmount: 0,
-      addItem: (item, quantity = 1) =>
+      addItem: (item, quantity = 1) => {
         set((state) => {
           const existing = state.lines.find((line) => line.id === item.id);
           const lines = existing
@@ -66,7 +71,9 @@ export const useCartStore = create<CartState>()(
               )
             : [...state.lines, { ...item, quantity }];
           return { lines, discountCode: null, discountAmount: 0 };
-        }),
+        });
+        trackEcommerce('add_to_cart', [toAnalyticsItem(item)]);
+      },
       setQuantity: (id, quantity) =>
         set((state) => ({
           lines:
@@ -100,6 +107,11 @@ export const useCartStore = create<CartState>()(
     },
   ),
 );
+
+/** GA4 item for a cart line. `id` only covers lines persisted before `slug` existed. */
+export function toAnalyticsItem(line: Pick<CartLine, 'id' | 'slug' | 'title'>): AnalyticsItem {
+  return { item_id: line.slug ?? line.id, item_name: line.title };
+}
 
 /** Total unit count — selector kept next to the store it reads. */
 export const selectCartQuantity = (state: CartState) =>

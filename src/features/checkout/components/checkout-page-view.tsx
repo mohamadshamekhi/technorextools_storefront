@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useCartTotals, type ShippingMethod } from '@/features/cart';
-import { useCartStore } from '@/store/cart-store';
+import { trackEcommerce } from '@/lib/analytics';
+import { toAnalyticsItem, useCartStore } from '@/store/cart-store';
 
 import { useAddresses } from '../hooks/use-addresses';
 import { useCheckout } from '../hooks/use-checkout';
@@ -27,6 +28,7 @@ export function CheckoutPageView({ shippingMethods, paymentMethods }: CheckoutPa
   const shippingMethodId = useCartStore((state) => state.shippingMethodId);
   const discountCode = useCartStore((state) => state.discountCode) ?? '';
   const [hydrated, setHydrated] = useState(false);
+  const beginCheckoutSent = useRef(false);
   const checkout = useCheckout();
   const addressesQuery = useAddresses();
   const addresses = addressesQuery.data ?? [];
@@ -37,6 +39,14 @@ export function CheckoutPageView({ shippingMethods, paymentMethods }: CheckoutPa
   const totals = useCartTotals(shippingMethods, selectedShippingId);
 
   useEffect(() => setHydrated(true), []);
+
+  // GA4 funnel step. Here rather than on the cart button so it also covers the post-login redirect
+  // and direct visits; waits for the persisted cart so an empty checkout never counts.
+  useEffect(() => {
+    if (!hydrated || beginCheckoutSent.current || lines.length === 0) return;
+    beginCheckoutSent.current = true;
+    trackEcommerce('begin_checkout', lines.map(toAnalyticsItem));
+  }, [hydrated, lines]);
 
   // Default to the customer's default address (or the first one) once the list loads.
   useEffect(() => {

@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-11-02 — GA4 ecommerce events
+
+- New `lib/analytics.ts`: `trackEcommerce`, `trackPurchaseOnce` (localStorage key
+  `ga4-purchase:<orderNumber>` + in-memory fallback).
+- `components/atoms/google-analytics.tsx`: inline init → `beforeInteractive`, so `window.gtag` exists
+  before mount effects; library stays `afterInteractive`.
+- `view_item`: new `product-detail/product-view-tracker.tsx`, mounted in `products/[slug]/page.tsx`.
+- `add_to_cart`: inside `useCartStore.addItem` (covers all add paths). `begin_checkout`: mount effect in
+  `CheckoutPageView`. `purchase`: new `checkout/components/purchase-tracker.tsx` in settled branch of
+  `CheckoutResultView`, plus `useCheckout.onSuccess` when `result.paid` without a gateway. Cash pending = none.
+- `item_id` = slug everywhere (only id shared by catalog and `OrderDetail` items): new `CartLine.slug`,
+  set at all add sites; `AddSparePartButton` gets a `slug` prop. Lines persisted earlier fall back to `id`.
+
 ## 2026-11-01 — Google Analytics (GA4)
 
 - `src/components/atoms/google-analytics.tsx` — `next/script` gtag `G-KSK2PQDNTV`, `afterInteractive`;

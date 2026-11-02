@@ -42,7 +42,10 @@ export function AddToCartButton({
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
-    addItem({ id, title, price, variant, compareAt: null, categorySlug: slug, imageUrl }, quantity);
+    addItem(
+      { id, title, price, variant, compareAt: null, categorySlug: slug, imageUrl, slug },
+      quantity,
+    );
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };

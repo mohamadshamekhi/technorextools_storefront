@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { routes } from '@/config/routes';
-import { ProductDetailView } from '@/features/catalog';
+import { ProductDetailView, ProductViewTracker } from '@/features/catalog';
 import {
   getProduct,
   getProductComments,
@@ -94,6 +94,7 @@ export default async function ProductDetailPage({ params }: PageProps<ProductPar
         // Static, server-generated structured data — XSS-safe.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <ProductViewTracker slug={product.slug} title={product.title} />
       <ProductDetailView
         product={product}
         comments={comments}

@@ -43,6 +43,7 @@ export function useAddToCart({ product, lineId, price, label, qty }: Input) {
             compareAt: null,
             categorySlug: product.category.slug,
             imageUrl: image?.url,
+            slug: product.slug,
           },
           qty,
         );
