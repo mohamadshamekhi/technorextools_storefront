@@ -49,3 +49,15 @@ export type TeamMember = {
   name: string;
   role: string;
 };
+
+/** One hero carousel slide — mapped server-side from an `isFeatured` product. */
+export type HeroSlide = {
+  key: string;
+  title: string;
+  /** Brand, else category — the small line above the title. */
+  eyebrow: string | null;
+  price: number | null;
+  href: string | null;
+  image: string | undefined;
+  specs: Array<{ value: string; label: string }>;
+};

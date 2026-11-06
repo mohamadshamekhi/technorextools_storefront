@@ -40,5 +40,5 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 export const SOCIAL_LINKS: SocialLink[] = [
   { label: 'اینستاگرام', href: 'https://instagram.com/technorextools', icon: 'instagram' },
   { label: 'تلگرام', href: 'https://t.me/technorextools', icon: 'telegram' },
-  { label: 'واتساپ', href: 'https://wa.me/989121771587', icon: 'whatsapp' },
+  { label: 'واتساپ', href: 'https://wa.me/989357861773', icon: 'whatsapp' },
 ];

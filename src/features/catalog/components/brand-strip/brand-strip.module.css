@@ -1,14 +1,3 @@
-/* Edge fade so marquee tiles dissolve instead of clipping at the container. */
-.fade {
-  mask-image: linear-gradient(
-    to left,
-    transparent 0,
-    #000 6rem,
-    #000 calc(100% - 6rem),
-    transparent 100%
-  );
-}
-
 /* Faint blueprint grid + brand glow behind the band. */
 .canvas::before {
   content: '';
@@ -21,4 +10,80 @@
     linear-gradient(90deg, var(--color-hairline) 1px, transparent 1px) 0 0 / 3.5rem 100%;
   mask-image: radial-gradient(80% 100% at 50% 40%, #000 0%, transparent 78%);
   opacity: 0.55;
+}
+
+/* ── Coverflow ─────────────────────────────────────────────── */
+
+/* --w ≈ tile width + gap; --x is the distance from center in tile widths. Positive offsets
+   sit toward the inline end (left in RTL). Tiles past ±3 fade out at the outer slot. */
+.stage {
+  --w: 10.5rem;
+  --dir: 1;
+  height: 8.5rem;
+}
+:global([dir='rtl']) .stage {
+  --dir: -1;
+}
+@media (min-width: 40rem) {
+  .stage {
+    --w: 12.5rem;
+    height: 9.5rem;
+  }
+}
+
+.slot {
+  --x: 0;
+  --s: 1;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  transform: translateX(calc(var(--x) * var(--w) * var(--dir))) scale(var(--s));
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+}
+:global([dir='rtl']) .slot {
+  translate: 50% -50%;
+}
+.slot[data-offset='0'] {
+  z-index: 40;
+}
+.slot[data-offset='1'],
+.slot[data-offset='-1'] {
+  --x: 1.04;
+  --s: 0.84;
+  z-index: 30;
+  opacity: 0.85;
+}
+.slot[data-offset='2'],
+.slot[data-offset='-2'] {
+  --x: 1.92;
+  --s: 0.68;
+  z-index: 20;
+  opacity: 0.6;
+}
+.slot[data-offset='3'],
+.slot[data-offset='-3'] {
+  --x: 2.62;
+  --s: 0.54;
+  z-index: 10;
+  opacity: 0.35;
+}
+.slot[data-offset='-1'] {
+  --x: -1.04;
+}
+.slot[data-offset='-2'] {
+  --x: -1.92;
+}
+.slot[data-offset='-3'] {
+  --x: -2.62;
+}
+.slot[data-offset='hidden'] {
+  --s: 0.4;
+  opacity: 0;
+  pointer-events: none;
+}
+.slot:not([data-offset='0']) {
+  cursor: pointer;
 }

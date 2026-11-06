@@ -7,7 +7,7 @@ import { CategoryRail } from '@/features/catalog/components/category-rail';
 import { FlashDeals } from '@/features/catalog/components/flash-deals';
 import { ProductShowcase } from '@/features/catalog/components/product-showcase';
 import { ProductShowcaseSkeleton } from '@/features/catalog/components/product-showcase-skeleton';
-import { getFeaturedProduct, listProducts } from '@/features/catalog/services/catalog.api';
+import { getFeaturedProducts, listProducts } from '@/features/catalog/services/catalog.api';
 import { cardPurchase } from '@/features/catalog/utils/card-variant';
 import { JournalRail } from '@/features/content/components/journal-rail';
 import {
@@ -30,9 +30,9 @@ export const metadata: Metadata = buildMetadata({
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [featured, featuredProduct] = await Promise.all([
+  const [featured, featuredProducts] = await Promise.all([
     listProducts({ sort: 'newest' }, { take: 8 }).catch(() => null),
-    getFeaturedProduct().catch(() => null),
+    getFeaturedProducts().catch(() => []),
   ]);
 
   const structuredData = [
@@ -58,7 +58,7 @@ export default async function HomePage() {
         // Static, server-generated structured data — XSS-safe.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Hero featuredProduct={featuredProduct} />
+      <Hero featuredProducts={featuredProducts} />
       <CategoryRail />
       <FlashDeals />
       <PromoCards />

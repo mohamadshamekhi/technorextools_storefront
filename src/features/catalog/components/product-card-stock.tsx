@@ -1,7 +1,7 @@
 import { toPersianDigits } from '@/lib/persian';
-import { cn } from '@/lib/utils';
 
 import { LOW_STOCK, type CardStock } from '../utils/card-variant';
+import { CALL_TO_ORDER_MESSAGE } from './call-to-order';
 
 /** Stock line under the title; low stock gets an urgency bar. */
 export function ProductCardStock({ stock }: { stock: CardStock }) {
@@ -21,26 +21,19 @@ export function ProductCardStock({ stock }: { stock: CardStock }) {
     );
   }
 
-  const inStock = stock.state === 'in';
+  if (stock.state === 'call') {
+    return (
+      <p className="text-brand-700 text-[12px] leading-5 font-bold">{CALL_TO_ORDER_MESSAGE}</p>
+    );
+  }
+
   return (
-    <p
-      className={cn(
-        'flex items-center gap-1.5 text-[11.5px] font-semibold',
-        inStock ? 'text-success' : 'text-foreground-muted',
-      )}
-    >
+    <p className="text-success flex items-center gap-1.5 text-[11.5px] font-semibold">
       <span className="relative flex size-2">
-        {inStock ? (
-          <span className="bg-success absolute inset-0 animate-ping rounded-full opacity-50 motion-reduce:hidden" />
-        ) : null}
-        <span
-          className={cn(
-            'relative size-2 rounded-full',
-            inStock ? 'bg-success' : 'bg-foreground-muted',
-          )}
-        />
+        <span className="bg-success absolute inset-0 animate-ping rounded-full opacity-50 motion-reduce:hidden" />
+        <span className="bg-success relative size-2 rounded-full" />
       </span>
-      {inStock ? 'موجود در انبار، ارسال فوری' : 'فعلاً موجود نیست'}
+      موجود در انبار، ارسال فوری
     </p>
   );
 }

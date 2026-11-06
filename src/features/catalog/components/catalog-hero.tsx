@@ -13,7 +13,7 @@ const HIGHLIGHTS: { icon: IconName; label: string }[] = [
 const STATS: { value: string; label: string }[] = [
   { value: '+۳۵۰', label: 'مدل ابزار' },
   { value: '+۲۰', label: 'دسته‌بندی تخصصی' },
-  { value: '۱۸ ماه', label: 'گارانتی و خدمات' },
+  { value: '۶ ماه', label: 'گارانتی و خدمات' },
 ];
 
 /** Breadcrumb + heading band above the catalog grid (server-rendered for SEO). */

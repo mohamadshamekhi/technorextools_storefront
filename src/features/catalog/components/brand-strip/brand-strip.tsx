@@ -1,23 +1,24 @@
 import Link from 'next/link';
 
 import { Container } from '@/components/atoms';
-import { Marquee, Reveal, SectionHeading } from '@/components/molecules';
+import { Reveal, SectionHeading } from '@/components/molecules';
 import { routes } from '@/config/routes';
 import { cn } from '@/lib/utils';
 
 import { listBrands } from '../../services/catalog.api';
+import { BrandCoverflow } from './brand-coverflow';
 import { BrandTile } from './brand-tile';
 import styles from './brand-strip.module.css';
 
-/** Below this count a marquee leaves dead space — render a centered row instead. */
-const MARQUEE_THRESHOLD = 7;
+/** Below this count the coverflow has no side tiles to step through — render a centered row instead. */
+const COVERFLOW_MIN = 5;
 
 export async function BrandStrip() {
   const brands = await listBrands().catch(() => []);
   if (brands.length === 0) return null;
 
   const exclusiveCount = brands.filter((brand) => brand.isExclusiveDistributor).length;
-  const scrolls = brands.length >= MARQUEE_THRESHOLD;
+  const scrolls = brands.length >= COVERFLOW_MIN;
 
   return (
     <section
@@ -38,15 +39,9 @@ export async function BrandStrip() {
             : `تأمین مستقیم از ${brands.length} برند صنعتی، با گارانتی اصالت کالا و خدمات پس از فروش.`}
         </p>
 
-        <div className={cn('mt-10', scrolls && styles.fade)}>
+        <div className="mt-10">
           {scrolls ? (
-            <Marquee label="برندهای همکار" speed="slow" reverse>
-              {brands.map((brand) => (
-                <div key={brand.id} className="px-2.5">
-                  <BrandTile brand={brand} />
-                </div>
-              ))}
-            </Marquee>
+            <BrandCoverflow brands={brands} />
           ) : (
             <ul className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
               {brands.map((brand) => (

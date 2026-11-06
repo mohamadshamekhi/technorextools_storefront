@@ -1,11 +1,37 @@
+/* Keyframes live here, not in animations.css: CSS Modules rename animation names, so a
+   global @keyframes would never match. The track renders its content twice, so a ±50%
+   shift lands seamlessly. In RTL the track overflows to the left, hence the positive shift. */
+@keyframes marquee-forward {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--marquee-shift));
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(var(--marquee-shift));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 .viewport {
   overflow: hidden;
 }
 
 .track {
+  --marquee-shift: -50%;
   display: flex;
   width: max-content;
   flex-wrap: nowrap;
+}
+
+:global([dir='rtl']) .track {
+  --marquee-shift: 50%;
 }
 
 .track.slow {

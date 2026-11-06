@@ -7,6 +7,8 @@ import { WishlistButton } from '@/features/account';
 import { useInView } from '../../../hooks/use-in-view';
 import type { ProductComments, ProductDetail } from '../../../types';
 import type { ProductExtras, DownloadableDocument } from '../../../types/pdp';
+import { CALL_TO_ORDER_MAX_QTY } from '../../../utils/card-variant';
+import { CallToOrderButton, CALL_TO_ORDER_MESSAGE } from '../../call-to-order';
 import { BottomSheet } from '../mobile/bottom-sheet';
 import { StickyBuyBar } from '../mobile/sticky-buy-bar';
 import { AddToCartButton } from './add-to-cart-button';
@@ -33,13 +35,14 @@ export function ProductBuyBox({ product, comments, extras, catalog }: ProductBuy
   const [qty, setQty] = useState(1);
   const [cityId, setCityId] = useState('tehran');
   const [sheetOpen, setSheetOpen] = useState(false);
-  const ctaRef = useRef<HTMLButtonElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   const ctaVisible = useInView(ctaRef);
 
   const variant = product.variants[variantIndex] ?? null;
   const price = variant?.effectivePrice ?? product.basePrice;
-  const inStock = variant ? variant.stockQty > 0 : product.variants.length === 0;
+  const callToOrder = variant ? variant.stockQty <= CALL_TO_ORDER_MAX_QTY : false;
   const maxQty = Math.max(1, variant?.stockQty ?? 10);
+  const shownQty = callToOrder ? 1 : qty;
 
   const cart = useAddToCart({
     product,
@@ -61,18 +64,27 @@ export function ProductBuyBox({ product, comments, extras, catalog }: ProductBuy
           </span>
         }
       />
-      <PriceBlock unitPrice={price} quantity={qty} />
+      <PriceBlock unitPrice={price} quantity={shownQty} />
       <KeySpecs items={extras.highlights} />
-      <StockLine inStock={inStock} />
+      {callToOrder ? null : <StockLine />}
       <VariantPicker
         variants={product.variants}
         selected={variantIndex}
         onSelect={setVariantIndex}
       />
 
-      <div className="flex items-center gap-3">
-        <QuantityStepper value={qty} onChange={setQty} max={maxQty} />
-        <AddToCartButton ref={ctaRef} status={cart.status} disabled={!inStock} onClick={cart.add} />
+      <div ref={ctaRef}>
+        {callToOrder ? (
+          <div className="bg-brand-50 flex flex-col gap-3 rounded-xl p-4">
+            <p className="text-brand-700 text-sm leading-6 font-bold">{CALL_TO_ORDER_MESSAGE}</p>
+            <CallToOrderButton />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <QuantityStepper value={qty} onChange={setQty} max={maxQty} />
+            <AddToCartButton status={cart.status} onClick={cart.add} />
+          </div>
+        )}
       </div>
 
       <SupportLinks catalog={catalog} />
@@ -83,8 +95,8 @@ export function ProductBuyBox({ product, comments, extras, catalog }: ProductBuy
 
       <StickyBuyBar
         visible={!ctaVisible && !sheetOpen}
-        price={price * qty}
-        inStock={inStock}
+        price={price * shownQty}
+        callToOrder={callToOrder}
         status={cart.status}
         onAdd={cart.add}
         onOpenOptions={() => setSheetOpen(true)}

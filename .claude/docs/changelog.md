@@ -5,6 +5,37 @@
 
 ---
 
+## 2026-11-06 — Hero grid card motion
+
+- `hero.module.css` `.gridCard`: blur/scale entrance, idle float (`translate`), staggered diagonal sheen
+  (`::after`), hover lift + glow + image zoom/tilt. Entrance, float and hover use separate properties
+  (`scale`/`filter`, `translate`, `transform`) so fill-mode never pins the hover transform. Arrow nudges on hover.
+
+## 2026-11-06 — Brand strip coverflow
+
+- New `features/catalog/components/brand-strip/brand-coverflow.tsx` (client): center brand full size + color,
+  ±1..3 neighbours scale/fade per step (`data-offset` → `brand-strip.module.css` `.slot`), hidden beyond.
+  Steps every 2.8s; paused on hover/focus, hidden tab, reduced motion. Side tile click → centers it
+  (`onClickCapture` prevents navigation); center tile links to brand products. Prev/next buttons.
+- `BrandStrip`: marquee + edge `.fade` replaced by `BrandCoverflow` at ≥5 brands (`COVERFLOW_MIN`).
+- `BrandTile`: `active` (color logo, ring) + `tabIndex` props.
+
+## 2026-11-05 — Marquee actually animates
+
+- `components/molecules/marquee/marquee.module.css` — keyframes moved here from `styles/animations.css`:
+  CSS Modules renamed the animation name, so the global `@keyframes` never matched and every marquee was
+  static. Shift via `--marquee-shift` (`+50%` under `[dir='rtl']`, track overflows left).
+- `Marquee` gets `copies` (repeats per half, avoids a gap on wide screens). `PromoTicker`: `slow`, `copies={4}`.
+- Side effect: `BrandStrip`'s marquee (when it scrolls) now moves too.
+
+## 2026-11-03 — Call-to-order at stock ≤ 1
+
+- `CALL_TO_ORDER_MAX_QTY = 1` in `features/catalog/utils/card-variant.ts`; `CardStock.state` `out` → `call`.
+- New `features/catalog/components/call-to-order.tsx` (`CallToOrderButton`, `CallToOrderIconLink`, message).
+- PDP (`product-buy-box.tsx`, per selected variant), `sticky-buy-bar.tsx`, `product-card*.tsx`: add-to-cart
+  replaced by `tel:` CTA + message. `ctaRef` moved to an always-mounted wrapper div so `useInView` keeps
+  observing across variant switches. Removed sold-out badge/grayscale from card media.
+
 ## 2026-11-02 — GA4 ecommerce events
 
 - New `lib/analytics.ts`: `trackEcommerce`, `trackPurchaseOnce` (localStorage key
@@ -17,6 +48,19 @@
   `CheckoutResultView`, plus `useCheckout.onSuccess` when `result.paid` without a gateway. Cash pending = none.
 - `item_id` = slug everywhere (only id shared by catalog and `OrderDetail` items): new `CartLine.slug`,
   set at all add sites; `AddSparePartButton` gets a `slug` prop. Lines persisted earlier fall back to `id`.
+
+## 2026-11-02 — Hero featured-product grid (≤4 cards)
+
+- `features/catalog/services/catalog.api.ts` — `getFeaturedProduct()` → `getFeaturedProducts(take = 4)`;
+  fetches `isFeatured` list then each detail, drops failed ones.
+- `app/(public)/page.tsx` → `<Hero featuredProducts>` → `HeroShowcase` (maps `ProductDetail` →
+  `HeroSlide`, static fallback when empty) → `HeroProductGrid`. All RSC, no client state.
+- New: `hero/hero-product-grid.tsx` (square 2-col grid: 1 → single card + floating specs, 2/4 →
+  second column offset down, 3 → first card spans two rows), `hero/hero-grid-card.tsx` (art,
+  brand/category, title, price; whole card links to PDP), `hero/hero-slide-specs.tsx` (floating spec
+  chips, was inline in showcase), `HeroSlide` in `types/index.ts`. `hero.module.css` `.gridCard`
+  (staggered entrance via `--card-delay`, hover lift).
+- Cap of 4 enforced in `abzar/api` (`ProductsService.ensureFeaturedSlot`).
 
 ## 2026-11-01 — Google Analytics (GA4)
 

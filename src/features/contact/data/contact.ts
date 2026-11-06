@@ -34,14 +34,14 @@ export const CONTACT_CHANNELS: Array<{
   {
     icon: 'pin',
     title: 'نشانی فروشگاه',
-    value: 'تهران، خیابان ولی‌عصر',
+    value: 'تهران، خیابان امام خمینی',
     note: 'مشاهده روی نقشه و مسیریابی',
     href: '#location',
   },
 ];
 
 export const WORK_HOURS = [
-  { days: 'شنبه تا چهارشنبه', hours: '۹ صبح تا ۸ شب' },
+  { days: 'شنبه تا چهارشنبه', hours: '۹ صبح تا ۶ بعدظهر' },
   { days: 'پنجشنبه', hours: '۹ صبح تا ۲ بعدازظهر' },
   { days: 'جمعه و تعطیلات رسمی', hours: 'تعطیل' },
 ];

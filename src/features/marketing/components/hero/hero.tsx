@@ -10,11 +10,11 @@ import { HeroStats } from './hero-stats';
 import styles from './hero.module.css';
 
 type HeroProps = {
-  /** `isFeatured` product to spotlight; `null` shows the static fallback art. */
-  featuredProduct: ProductDetail | null;
+  /** Up to 4 `isFeatured` products for the carousel; empty shows the static fallback art. */
+  featuredProducts: ProductDetail[];
 };
 
-export function Hero({ featuredProduct }: HeroProps) {
+export function Hero({ featuredProducts }: HeroProps) {
   return (
     <section
       className="relative overflow-hidden py-16 [background:radial-gradient(120%_120%_at_85%_-10%,var(--color-brand-50)_0%,transparent_55%)] sm:py-24 lg:py-28"
@@ -65,7 +65,7 @@ export function Hero({ featuredProduct }: HeroProps) {
           </Reveal>
         </div>
         <Reveal delayMs={150}>
-          <HeroShowcase product={featuredProduct} />
+          <HeroShowcase products={featuredProducts} />
         </Reveal>
       </Container>
     </section>

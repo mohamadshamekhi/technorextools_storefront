@@ -5,6 +5,7 @@ import { routes } from '@/config/routes';
 import type { ProductCard as ProductCardData } from '../types';
 import { cardDiscount, cardPurchase, cardStock } from '../utils/card-variant';
 import { AddToCartButton } from './add-to-cart-button';
+import { CallToOrderIconLink } from './call-to-order';
 import { ProductCardMedia } from './product-card-media';
 import { ProductCardPrice } from './product-card-price';
 import { ProductCardStock } from './product-card-stock';
@@ -14,16 +15,10 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const purchase = cardPurchase(product);
   const discount = cardDiscount(product, purchase.price);
   const stock = cardStock(product);
-  const outOfStock = stock.state === 'out';
 
   return (
     <article className="bg-surface group rounded-card ring-hairline hover:ring-brand-200 relative flex h-full flex-col gap-3.5 p-2.5 ring-1 transition-[box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:shadow-(--shadow-lift) motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-      <ProductCardMedia
-        product={product}
-        href={href}
-        percentOff={discount?.percent ?? null}
-        outOfStock={outOfStock}
-      />
+      <ProductCardMedia product={product} href={href} percentOff={discount?.percent ?? null} />
 
       <div className="flex flex-1 flex-col gap-2 px-1.5">
         {product.brand ? (
@@ -45,17 +40,20 @@ export function ProductCard({ product }: { product: ProductCardData }) {
 
         <div className="border-hairline relative z-10 mt-auto flex items-end justify-between gap-3 border-t border-dashed pt-3">
           <ProductCardPrice price={purchase.price} compareAt={discount?.compareAt ?? null} />
-          <AddToCartButton
-            compact
-            disabled={outOfStock}
-            id={purchase.id}
-            title={product.title}
-            price={purchase.price}
-            slug={product.slug}
-            imageUrl={product.mainImageUrl}
-            variant="1"
-            className="rounded-xl"
-          />
+          {stock.state === 'call' ? (
+            <CallToOrderIconLink className="rounded-xl" />
+          ) : (
+            <AddToCartButton
+              compact
+              id={purchase.id}
+              title={product.title}
+              price={purchase.price}
+              slug={product.slug}
+              imageUrl={product.mainImageUrl}
+              variant="1"
+              className="rounded-xl"
+            />
+          )}
         </div>
       </div>
     </article>

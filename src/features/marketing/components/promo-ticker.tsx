@@ -5,7 +5,7 @@ import { TICKER_PHRASES } from '../data/content';
 export function PromoTicker() {
   return (
     <div className="bg-brand-600 bg-(image:--gradient-brand) py-4 text-white">
-      <Marquee label="مزیت‌های خرید از تکنورکس" speed="normal">
+      <Marquee label="مزیت‌های خرید از تکنورکس" speed="slow" copies={4}>
         {TICKER_PHRASES.map((phrase) => (
           <span
             key={phrase}

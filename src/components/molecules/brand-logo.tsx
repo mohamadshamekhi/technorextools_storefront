@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { routes } from '@/config/routes';
@@ -14,15 +15,11 @@ export function BrandLogo({ tone = 'default', className }: BrandLogoProps) {
   return (
     <Link
       href={routes.home}
-      className={cn('flex items-center gap-2.5', className)}
+      className={cn('flex items-center gap-1', className)}
       aria-label={`${siteConfig.name} — صفحه اصلی`}
     >
-      <span
-        aria-hidden
-        className="bg-brand-500 font-display text-surface relative grid size-10 place-items-center rounded-xl bg-(image:--gradient-brand) text-xl font-black shadow-(--shadow-brand)"
-      >
-        T
-        <span className="bg-accent-500 ring-surface absolute -end-1 -top-1 size-2.5 rounded-full ring-2" />
+      <span aria-hidden>
+        <Image src="/logo.svg" alt="" width={950} height={382} priority className="h-7 w-auto" />
       </span>
       <span
         className={cn(

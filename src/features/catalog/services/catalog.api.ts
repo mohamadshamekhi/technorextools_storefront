@@ -52,15 +52,15 @@ export function getProduct(slug: string) {
   });
 }
 
-/** First `isFeatured` product's full detail, for hero/spotlight placements. `null` if none set. */
-export async function getFeaturedProduct() {
+/** Up to `take` `isFeatured` products' full detail, for the hero carousel. Unloadable ones are skipped. */
+export async function getFeaturedProducts(take = 4) {
   const { items } = await apiClient.get(
-    `${BASE}/products?take=1&isFeatured=true`,
+    `${BASE}/products?take=${take}&isFeatured=true`,
     productListSchema,
     { auth: false, next: { revalidate, tags: ['catalog:products', 'catalog:featured'] } },
   );
-  const card = items[0];
-  return card ? getProduct(card.slug) : null;
+  const details = await Promise.all(items.map((card) => getProduct(card.slug).catch(() => null)));
+  return details.filter((product) => product !== null);
 }
 
 export function getProductComments(slug: string, opts: { skip?: number; take?: number } = {}) {

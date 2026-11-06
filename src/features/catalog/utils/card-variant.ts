@@ -18,14 +18,17 @@ export function cardDiscount(
   return percent >= 1 ? { compareAt: product.basePrice, percent } : null;
 }
 
-export type CardStock = { state: 'in' | 'low' | 'out'; qty: number | undefined };
+export type CardStock = { state: 'in' | 'low' | 'call'; qty: number | undefined };
 
-/** Low = 1–3 left. Unknown stock (no variant) reads as available. */
+/** Low = 2–3 left. Unknown stock (no variant) reads as available. */
 export const LOW_STOCK = 3;
+
+/** At or below this, the item isn't sold online — the customer phones to check stock and order. */
+export const CALL_TO_ORDER_MAX_QTY = 1;
 
 export function cardStock(product: ProductCard): CardStock {
   const qty = product.firstVariant?.stockQty;
   if (qty === undefined) return { state: 'in', qty };
-  if (qty <= 0) return { state: 'out', qty };
+  if (qty <= CALL_TO_ORDER_MAX_QTY) return { state: 'call', qty };
   return { state: qty <= LOW_STOCK ? 'low' : 'in', qty };
 }

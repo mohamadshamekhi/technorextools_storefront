@@ -5,12 +5,13 @@ import { formatToman } from '@/lib/persian';
 import { cn } from '@/lib/utils';
 
 import { useScrollDirection } from '../../../hooks/use-scroll-direction';
+import { CallToOrderButton } from '../../call-to-order';
 import { AddToCartButton, type AddStatus } from '../buy-box/add-to-cart-button';
 
 type StickyBuyBarProps = {
   visible: boolean;
   price: number;
-  inStock: boolean;
+  callToOrder: boolean;
   status: AddStatus;
   onAdd: (source: HTMLElement) => void;
   onOpenOptions: () => void;
@@ -20,7 +21,7 @@ type StickyBuyBarProps = {
 export function StickyBuyBar({
   visible,
   price,
-  inStock,
+  callToOrder,
   status,
   onAdd,
   onOpenOptions,
@@ -38,19 +39,25 @@ export function StickyBuyBar({
         shown ? 'translate-y-0' : 'translate-y-full duration-150',
       )}
     >
-      <button
-        type="button"
-        onClick={onOpenOptions}
-        aria-label="تعداد و زمان ارسال"
-        className="border-hairline focus-visible:ring-brand-500 grid size-12 shrink-0 place-items-center rounded-xl border focus-visible:ring-2 focus-visible:outline-none"
-      >
-        <Icon name="sliders" className="size-5" />
-      </button>
+      {callToOrder ? null : (
+        <button
+          type="button"
+          onClick={onOpenOptions}
+          aria-label="تعداد و زمان ارسال"
+          className="border-hairline focus-visible:ring-brand-500 grid size-12 shrink-0 place-items-center rounded-xl border focus-visible:ring-2 focus-visible:outline-none"
+        >
+          <Icon name="sliders" className="size-5" />
+        </button>
+      )}
       <p className="flex min-w-0 flex-col leading-tight">
         <span className="font-display text-lg font-bold tabular-nums">{formatToman(price)}</span>
         <span className="text-foreground-muted text-xs">تومان</span>
       </p>
-      <AddToCartButton status={status} disabled={!inStock} onClick={onAdd} className="flex-1" />
+      {callToOrder ? (
+        <CallToOrderButton className="flex-1" />
+      ) : (
+        <AddToCartButton status={status} onClick={onAdd} className="flex-1" />
+      )}
     </div>
   );
 }

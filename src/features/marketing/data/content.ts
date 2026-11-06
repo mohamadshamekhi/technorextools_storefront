@@ -6,7 +6,7 @@ export const HERO_WORDS = ['خط مونتاژ', 'خط تولید صنعتی', '�
 export const HERO_SHOWCASE_FALLBACK = {
   label: 'پیچ‌گوشتی بادی تکنورکس',
   torque: '۱۲۰۰ Nm',
-  warranty: '۱۸ ماه',
+  warranty: '۶ ماه',
 };
 
 export const HERO_STATS = [
@@ -62,7 +62,7 @@ export const PILLARS: ValueProp[] = [
   {
     icon: 'gear',
     title: 'خدمات پس از فروش',
-    description: 'تعمیر و سرویس دوره‌ای توسط تیم فنی خودمان.',
+    description: 'تعمیرء سرویس و پشتیبانی تمامی محصولات توسط تیم فنی مجموعه.',
   },
 ];
 
