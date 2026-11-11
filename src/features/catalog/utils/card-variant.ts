@@ -26,9 +26,13 @@ export const LOW_STOCK = 3;
 /** At or below this, the item isn't sold online — the customer phones to check stock and order. */
 export const CALL_TO_ORDER_MAX_QTY = 1;
 
-export function cardStock(product: ProductCard): CardStock {
-  const qty = product.firstVariant?.stockQty;
+/** Shared by product cards and the PDP buy box, so both read the same stock state from a qty. */
+export function stockState(qty: number | undefined): CardStock {
   if (qty === undefined) return { state: 'in', qty };
   if (qty <= CALL_TO_ORDER_MAX_QTY) return { state: 'call', qty };
   return { state: qty <= LOW_STOCK ? 'low' : 'in', qty };
+}
+
+export function cardStock(product: ProductCard): CardStock {
+  return stockState(product.firstVariant?.stockQty);
 }

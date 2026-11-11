@@ -7,8 +7,9 @@ import { WishlistButton } from '@/features/account';
 import { useInView } from '../../../hooks/use-in-view';
 import type { ProductComments, ProductDetail } from '../../../types';
 import type { ProductExtras, DownloadableDocument } from '../../../types/pdp';
-import { CALL_TO_ORDER_MAX_QTY } from '../../../utils/card-variant';
+import { stockState } from '../../../utils/card-variant';
 import { CallToOrderButton, CALL_TO_ORDER_MESSAGE } from '../../call-to-order';
+import { ProductCardStock } from '../../product-card-stock';
 import { BottomSheet } from '../mobile/bottom-sheet';
 import { StickyBuyBar } from '../mobile/sticky-buy-bar';
 import { AddToCartButton } from './add-to-cart-button';
@@ -17,7 +18,6 @@ import { DeliveryEstimate } from './delivery-estimate';
 import { KeySpecs } from './key-specs';
 import { PriceBlock } from './price-block';
 import { QuantityStepper } from './quantity-stepper';
-import { StockLine } from './stock-line';
 import { SupportLinks } from './support-links';
 import { TrustRow } from './trust-row';
 import { useAddToCart } from './use-add-to-cart';
@@ -40,7 +40,8 @@ export function ProductBuyBox({ product, comments, extras, catalog }: ProductBuy
 
   const variant = product.variants[variantIndex] ?? null;
   const price = variant?.effectivePrice ?? product.basePrice;
-  const callToOrder = variant ? variant.stockQty <= CALL_TO_ORDER_MAX_QTY : false;
+  const stock = stockState(variant ? variant.stockQty : undefined);
+  const callToOrder = stock.state === 'call';
   const maxQty = Math.max(1, variant?.stockQty ?? 10);
   const shownQty = callToOrder ? 1 : qty;
 
@@ -66,7 +67,7 @@ export function ProductBuyBox({ product, comments, extras, catalog }: ProductBuy
       />
       <PriceBlock unitPrice={price} quantity={shownQty} />
       <KeySpecs items={extras.highlights} />
-      {callToOrder ? null : <StockLine />}
+      {callToOrder ? null : <ProductCardStock stock={stock} />}
       <VariantPicker
         variants={product.variants}
         selected={variantIndex}

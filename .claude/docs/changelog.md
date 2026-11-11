@@ -5,6 +5,15 @@
 
 ---
 
+## 2026-11-11 — PDP stock line matches card low-stock state
+
+- `card-variant.ts`: extracted `stockState(qty)` from `cardStock()` so the PDP can read the same
+  in/low/call state from a raw qty instead of a `ProductCard`.
+- `product-buy-box.tsx`: dropped the static `StockLine` (always "موجود · ارسال امروز از تهران",
+  ignored actual qty) for `ProductCardStock` — the same component product cards use. A low-stock
+  variant (2-3 left) now shows the same "فقط N عدد باقی مانده" bar on the PDP as on the card; call-to-order
+  state still replaces it entirely. Deleted `buy-box/stock-line.tsx`.
+
 ## 2026-11-06 — Hero grid card motion
 
 - `hero.module.css` `.gridCard`: blur/scale entrance, idle float (`translate`), staggered diagonal sheen
