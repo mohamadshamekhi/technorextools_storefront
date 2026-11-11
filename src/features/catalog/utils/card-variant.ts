@@ -18,19 +18,16 @@ export function cardDiscount(
   return percent >= 1 ? { compareAt: product.basePrice, percent } : null;
 }
 
-export type CardStock = { state: 'in' | 'low' | 'call'; qty: number | undefined };
-
-/** Low = 2–3 left. Unknown stock (no variant) reads as available. */
-export const LOW_STOCK = 3;
+/** Never shows the exact count — only whether it can be ordered online or needs a call. */
+export type CardStock = { state: 'in' | 'call' };
 
 /** At or below this, the item isn't sold online — the customer phones to check stock and order. */
 export const CALL_TO_ORDER_MAX_QTY = 1;
 
 /** Shared by product cards and the PDP buy box, so both read the same stock state from a qty. */
 export function stockState(qty: number | undefined): CardStock {
-  if (qty === undefined) return { state: 'in', qty };
-  if (qty <= CALL_TO_ORDER_MAX_QTY) return { state: 'call', qty };
-  return { state: qty <= LOW_STOCK ? 'low' : 'in', qty };
+  if (qty !== undefined && qty <= CALL_TO_ORDER_MAX_QTY) return { state: 'call' };
+  return { state: 'in' };
 }
 
 export function cardStock(product: ProductCard): CardStock {
