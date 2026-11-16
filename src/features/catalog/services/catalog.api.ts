@@ -52,8 +52,11 @@ export function getProduct(slug: string) {
   });
 }
 
-/** Up to `take` `isFeatured` products' full detail, for the hero carousel. Unloadable ones are skipped. */
-export async function getFeaturedProducts(take = 4) {
+/**
+ * Up to `take` `isFeatured` products' full detail (admin may feature ~20); the hero
+ * shows a random 4 of them per visit. Unloadable ones are skipped.
+ */
+export async function getFeaturedProducts(take = 20) {
   const { items } = await apiClient.get(
     `${BASE}/products?take=${take}&isFeatured=true`,
     productListSchema,
