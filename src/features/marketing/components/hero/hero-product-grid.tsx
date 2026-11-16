@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 import { cn } from '@/lib/utils';
 
 import type { HeroSlide } from '../../types';
@@ -5,11 +9,30 @@ import { HeroGridCard } from './hero-grid-card';
 import { HeroSlideSpecs } from './hero-slide-specs';
 import styles from './hero.module.css';
 
+/** Max cards shown at once; the rest of the featured pool rotates in randomly. */
+const MAX_VISIBLE = 4;
+
+/** Fisher–Yates: `count` random items of `items`, without repeats. */
+function pickRandom<T>(items: T[], count: number): T[] {
+  const pool = [...items];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j] as T, pool[i] as T];
+  }
+  return pool.slice(0, count);
+}
+
 /**
- * All featured products side by side (≤4). 1 → single card with floating specs;
+ * Featured products side by side (≤4, picked at random from the pool on every visit).
+ * SSR renders the first 4 (deterministic, no hydration mismatch); the random pick is
+ * swapped in on mount while the cards are still hidden by their entrance animation. 1 → single card with floating specs;
  * 2/4 → two columns, second column offset down; 3 → first card spans both rows.
  */
-export function HeroProductGrid({ slides }: { slides: HeroSlide[] }) {
+export function HeroProductGrid({ slides: pool }: { slides: HeroSlide[] }) {
+  const [slides, setSlides] = useState(() => pool.slice(0, MAX_VISIBLE));
+  useEffect(() => {
+    if (pool.length > MAX_VISIBLE) setSlides(pickRandom(pool, MAX_VISIBLE));
+  }, [pool]);
   const count = slides.length;
   const single = slides[0];
 
@@ -30,8 +53,9 @@ export function HeroProductGrid({ slides }: { slides: HeroSlide[] }) {
         <ul
           aria-label="محصولات ویژه"
           className={cn(
-            'relative mb-8 grid aspect-square grid-cols-2 gap-3 sm:gap-5',
-            count === 2 ? 'grid-rows-1' : 'grid-rows-2',
+            // موبایل: ارتفاع طبیعی کارت‌ها تا تصویر محصول در خانه‌ی مربعی کوچک نشود
+            'relative mb-6 grid grid-cols-2 gap-3 sm:mb-8 sm:aspect-square sm:gap-5',
+            count === 2 ? 'sm:grid-rows-1' : 'sm:grid-rows-2',
           )}
         >
           {slides.map((slide, i) => {
@@ -42,7 +66,7 @@ export function HeroProductGrid({ slides }: { slides: HeroSlide[] }) {
                 className={cn(
                   'flex min-h-0',
                   tall && 'row-span-2',
-                  count !== 3 && i % 2 === 1 && 'translate-y-8',
+                  count !== 3 && i % 2 === 1 && 'translate-y-5 sm:translate-y-8',
                 )}
               >
                 <HeroGridCard

@@ -27,21 +27,24 @@ export function HeroGridCard({ slide, fill, priority, className, delayMs }: Hero
         src={slide.image}
         priority={priority}
         sizes="(max-width: 1024px) 45vw, 22vw"
-        className={cn('rounded-3xl', fill ? 'min-h-0 flex-1' : 'aspect-square')}
+        className={cn(
+          'rounded-3xl p-0',
+          fill ? 'aspect-square sm:aspect-auto sm:min-h-0 sm:flex-1' : 'aspect-square',
+        )}
       />
-      <div className="flex items-end gap-2 px-1.5 pt-3 pb-1">
+      <div className="flex items-end gap-2 px-1 pt-2.5 pb-0.5 sm:px-1.5 sm:pt-3 sm:pb-1">
         <div className="min-w-0 flex-1">
           {slide.eyebrow && (
-            <p className="text-brand-600 truncate text-[11px] leading-5 font-bold">
+            <p className="text-brand-600 hidden truncate text-[11px] leading-5 font-bold sm:block">
               {slide.eyebrow}
             </p>
           )}
-          <p className="text-foreground line-clamp-2 text-[13px] leading-5 font-extrabold sm:text-sm">
+          <p className="text-foreground line-clamp-2 min-h-10 text-[13px] leading-5 font-extrabold sm:min-h-0 sm:text-sm">
             {slide.title}
           </p>
           {slide.price !== null && (
-            <p className="text-foreground-muted mt-1 text-[11px] leading-5">
-              <span className="font-display text-foreground text-[13px] font-black sm:text-sm">
+            <p className="text-foreground-muted mt-0.5 text-[10px] leading-5 sm:mt-1 sm:text-[11px]">
+              <span className="font-display text-foreground-muted sm:text-foreground text-[11px] font-bold sm:text-sm sm:font-black">
                 {formatToman(slide.price)}
               </span>{' '}
               تومان
@@ -51,7 +54,7 @@ export function HeroGridCard({ slide, fill, priority, className, delayMs }: Hero
         {slide.href && (
           <span
             aria-hidden
-            className="bg-brand-500 text-surface group-hover:bg-brand-600 hidden size-9 shrink-0 place-items-center rounded-full transition-[background-color,translate] duration-300 group-hover:-translate-x-1 sm:grid"
+            className="bg-brand-500 text-surface group-hover:bg-brand-600 group-active:bg-brand-600 grid size-8 shrink-0 place-items-center rounded-full shadow-sm transition-[background-color,translate,scale] duration-300 group-hover:-translate-x-1 group-active:scale-90 sm:size-9"
           >
             <Icon name="chevronEnd" className="size-4" />
           </span>
